@@ -17,3 +17,8 @@ jobs:
       run: |
         mvn -B install --file pom.xml
         bash <(curl -s https://codecov.io/bash)
+    steps:
+    - uses: actions/checkout@master
+    - uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
