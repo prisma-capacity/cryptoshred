@@ -1,6 +1,6 @@
 name: Java CI
 
-on: [push] 
+on: [push]
 
 jobs:
   build:
@@ -17,4 +17,3 @@ jobs:
       run: |
         mvn -B package --file pom.xml
         bash <(curl -s https://codecov.io/bash)
-        
