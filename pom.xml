@@ -44,9 +44,6 @@
 		<developerConnection>scm:git:ssh://github.com/prisma-capacity/cryptoshred.git</developerConnection>
 		<url>https://github.com/prisma-capacity/cryptoshred</url>
 	</scm>
-	<prerequisites>
-		<maven>${maven.version}</maven>
-	</prerequisites>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.7</maven.compiler.source>
