@@ -9,4 +9,9 @@ public class FooTest {
 		new Foo().covered();
 	}
 
+	@Test
+	public void testUncovered() throws Exception {
+		new Foo().uncovered();
+	}
+
 }
