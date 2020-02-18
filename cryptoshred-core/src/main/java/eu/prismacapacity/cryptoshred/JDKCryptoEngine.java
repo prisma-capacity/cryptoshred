@@ -24,19 +24,20 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JDKCryptoEngine implements CryptoEngine {
 
-	private Map<CryptoAlgorithm, String> exactCipherNames;
+	private Map<CryptoAlgorithm, String> exactCipherNames = createExactCipherMapping();
 
-	{
+	private static Map<CryptoAlgorithm, String> createExactCipherMapping() {
+		// initialize with known algorithms
 		HashMap<CryptoAlgorithm, String> map = new HashMap<CryptoAlgorithm, String>();
 		map.put(CryptoAlgorithm.AES_CBC, "AES/CBC/PKCS5PADDING");
-		exactCipherNames = Collections.unmodifiableMap(map);
+		return Collections.unmodifiableMap(map);
 	}
 
 	@NonNull
 	private final CryptoInitializationVector initVector;
 
 	@Override
-	public byte[] decrypt(@NonNull CryptoAlgorithm algo, @NonNull CryptoKey cryptoKey, byte[] bytes) {
+	public byte[] decrypt(@NonNull CryptoAlgorithm algo, @NonNull CryptoKey cryptoKey, @NonNull byte[] bytes) {
 		IvParameterSpec iv = new IvParameterSpec(initVector.getBytes());
 		try {
 			Cipher cipher = getCipher(algo);

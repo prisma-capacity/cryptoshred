@@ -1,8 +1,10 @@
 package eu.prismacapacity.cryptoshred;
 
+import lombok.NonNull;
+
 public class CryptoEngineException extends RuntimeException {
 
-	public CryptoEngineException(Exception cause) {
+	public CryptoEngineException(@NonNull Exception cause) {
 		super(cause);
 	}
 

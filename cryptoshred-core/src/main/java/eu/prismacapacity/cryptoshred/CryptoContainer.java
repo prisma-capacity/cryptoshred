@@ -29,10 +29,10 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 
-@Builder(access = AccessLevel.PACKAGE)
+//@Builder(access = AccessLevel.PACKAGE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonDeserialize(using = CryptoContainer.Deserializer.class)
 @JsonSerialize(using = CryptoContainer.Serializer.class)
@@ -44,13 +44,13 @@ public class CryptoContainer<T> {
 
 	public static class Deserializer extends JsonDeserializer<CryptoContainer<?>> implements ContextualDeserializer {
 
-		private JavaType javaType;
+		private JavaType contextualType;
 
 		@Override
 		public CryptoContainer<?> deserialize(JsonParser jp, DeserializationContext ctxt)
 				throws IOException, JsonProcessingException {
 
-			Class<?> targetType = javaType.getBindings().getBoundType(0).getRawClass();
+			Class<?> targetType = contextualType.getBindings().getBoundType(0).getRawClass();
 
 			JsonNode tree = jp.getCodec().readTree(jp);
 			int keySize = (Integer) ((IntNode) tree.get(JSON_KEY_KEY_SIZE)).numberValue();
@@ -70,8 +70,7 @@ public class CryptoContainer<T> {
 		@Override
 		public JsonDeserializer<CryptoContainer<?>> createContextual(DeserializationContext ctx, BeanProperty prop)
 				throws JsonMappingException {
-			javaType = ctx.getContextualType();
-
+			contextualType = ctx.getContextualType();
 			return this;
 		}
 
@@ -85,21 +84,38 @@ public class CryptoContainer<T> {
 			jgen.writeStartObject();
 			jgen.writeStringField(JSON_KEY_ALGO, value.getAlgo().getId());
 			jgen.writeNumberField(JSON_KEY_KEY_SIZE, value.getSize().getKeySize());
-			jgen.writeStringField(JSON_KEY_SUBJECT_ID, value.getSubjectId().getSubjectId().toString());
+			jgen.writeStringField(JSON_KEY_SUBJECT_ID, value.getSubjectId().getId().toString());
 			jgen.writeBinaryField(JSON_KEY_ENCRYPTED_BYTES, value.getEncryptedBytes());
 			jgen.writeEndObject();
 		}
 
 	}
 
-	public CryptoContainer(Class<T> type, CryptoAlgorithm algo, CryptoKeySize size, CryptoSubjectId subjectId,
-			byte[] encryptedBytes) {
+	private CryptoContainer(@NonNull Class<T> type, @NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size,
+			@NonNull CryptoSubjectId subjectId, @NonNull byte[] encryptedBytes) {
 		this.type = type;
 		this.algo = algo;
 		this.size = size;
 		this.subjectId = subjectId;
 		this.encryptedBytes = encryptedBytes;
+	}
 
+	private CryptoContainer(@NonNull Class<T> class1, @NonNull CryptoAlgorithm algorithm,
+			@NonNull CryptoKeySize keySize, @NonNull CryptoSubjectId id, @NonNull byte[] encryptedBytes,
+			@NonNull T value, @NonNull CryptoObjectMapper cryptoObjectMapper) {
+		this.cachedValue = Optional.ofNullable(value);
+		this.mapper = cryptoObjectMapper;
+		this.type = class1;
+		this.algo = algorithm;
+		this.size = keySize;
+		this.encryptedBytes = encryptedBytes;
+		this.subjectId = id;
+	}
+
+	static <T> CryptoContainer<T> fromValue(@NonNull Class<T> type, @NonNull CryptoAlgorithm algorithm,
+			@NonNull CryptoKeySize keySize, @NonNull CryptoSubjectId id, @NonNull byte[] encryptedBytes,
+			@NonNull T value, CryptoObjectMapper cryptoObjectMapper) {
+		return new CryptoContainer<T>(type, algorithm, keySize, id, encryptedBytes, value, cryptoObjectMapper);
 	}
 
 	@Getter
@@ -115,15 +131,24 @@ public class CryptoContainer<T> {
 	private CryptoSubjectId subjectId;
 
 	// the encrypted value
-	@Getter(value = AccessLevel.PROTECTED)
+	@Getter(value = AccessLevel.PACKAGE)
 	private byte[] encryptedBytes;
 
 	// set after decryption or before encryption for short circuit retrieval
-	private transient T cachedValue;
+	private transient Optional<T> cachedValue;
 
 	private transient CryptoObjectMapper mapper;
 
+	private T value() {
+		if (cachedValue == null) {
+			cachedValue = Optional.ofNullable(mapper.unwrap(this));
+		}
+		return cachedValue.orElse(null);
+	}
+
+	////////////////////////////////////////
 	// stolen from optional
+	////////////////////////////////////////
 	public T get() {
 		if (value() == null) {
 			throw new NoSuchElementException("No value present");
@@ -145,7 +170,7 @@ public class CryptoContainer<T> {
 		if (!isPresent())
 			return Optional.empty();
 		else
-			return predicate.test(value()) ? Optional.of(cachedValue) : Optional.empty();
+			return predicate.test(value()) ? cachedValue : Optional.empty();
 	}
 
 	public <U> Optional<U> map(Function<? super T, ? extends U> mapper) {
@@ -180,13 +205,6 @@ public class CryptoContainer<T> {
 		} else {
 			throw exceptionSupplier.get();
 		}
-	}
-
-	private T value() {
-		if (cachedValue == null) {
-			cachedValue = mapper.unwrap(this);
-		}
-		return cachedValue;
 	}
 
 }

@@ -12,11 +12,14 @@ import lombok.NonNull;
  */
 public interface CryptoEngine {
 
+	@NonNull
 	byte[] decrypt(@NonNull CryptoAlgorithm algo, @NonNull CryptoKey cryptoKey, @NonNull byte[] bytes);
 
+	@NonNull
 	byte[] encrypt(@NonNull byte[] unencypted, @NonNull CryptoAlgorithm algorithm, @NonNull CryptoKey key,
 			@NonNull CryptoObjectMapper mapper);
 
+	@NonNull
 	CryptoKey generateKey(@NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size);
 
 }

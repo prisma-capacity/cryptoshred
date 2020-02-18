@@ -43,7 +43,7 @@ class CryptoObjectMapper implements CryptoContainerFactory {
 	final ObjectMapper mapper;
 
 	@Override
-	public @NonNull <T> CryptoContainer<T> wrap(@NonNull T value, @NonNull CryptoSubjectId id)
+	public final @NonNull <T> CryptoContainer<T> wrap(@NonNull T value, @NonNull CryptoSubjectId id)
 			throws JsonProcessingException {
 		return wrap(value, id, defaultAlgorithm, defaultKeySize);
 	}
@@ -57,12 +57,13 @@ class CryptoObjectMapper implements CryptoContainerFactory {
 		byte[] bytes;
 		bytes = writeValueAsBytes(value);
 		byte[] encryptToBytes = engine.encrypt(bytes, algorithm, key, this);
-		return (@NonNull CryptoContainer<T>) CryptoContainer.builder().type(value.getClass()).algo(algorithm)
-				.size(keySize).mapper(this).encryptedBytes(encryptToBytes).cachedValue(value).subjectId(id).build();
+
+		return CryptoContainer.fromValue((Class<T>) value.getClass(), algorithm, keySize, id, encryptToBytes, value,
+				this);
 
 	}
 
-	<T> T unwrap(CryptoContainer<T> cryptoContainer) {
+	<T> T unwrap(@NonNull CryptoContainer<T> cryptoContainer) {
 		byte[] bytes = cryptoContainer.getEncryptedBytes();
 		if (bytes != null) {
 			Optional<CryptoKey> key = keyRepository.findKeyFor(cryptoContainer.getSubjectId(),
