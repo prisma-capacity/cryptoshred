@@ -25,6 +25,7 @@ class CryptoObjectMapper implements CryptoContainerFactory {
 
 	@NonNull
 	final CryptoKeyRepository keyRepository;
+
 	@NonNull
 	final CryptoMetrics metrics;
 
@@ -57,12 +58,11 @@ class CryptoObjectMapper implements CryptoContainerFactory {
 		bytes = writeValueAsBytes(value);
 		byte[] encryptToBytes = engine.encrypt(bytes, algorithm, key, this);
 		return (@NonNull CryptoContainer<T>) CryptoContainer.builder().type(value.getClass()).algo(algorithm)
-				.size(keySize).mapper(this).encryptedBytes(encryptToBytes).cachedValue(Optional.of(value)).subjectId(id)
-				.build();
+				.size(keySize).mapper(this).encryptedBytes(encryptToBytes).cachedValue(value).subjectId(id).build();
 
 	}
 
-	<T> Optional<T> unwrap(CryptoContainer<T> cryptoContainer) {
+	<T> T unwrap(CryptoContainer<T> cryptoContainer) {
 		byte[] bytes = cryptoContainer.getEncryptedBytes();
 		if (bytes != null) {
 			Optional<CryptoKey> key = keyRepository.findKeyFor(cryptoContainer.getSubjectId(),
@@ -74,7 +74,7 @@ class CryptoObjectMapper implements CryptoContainerFactory {
 				try {
 					T t = readerFor(cryptoContainer.getType()).readValue(decrypted);
 					metrics.notifyDecryptionSuccess();
-					return Optional.ofNullable(t);
+					return t;
 				} catch (IOException e) {
 					metrics.notifyDecryptionFailure(e);
 				}
@@ -86,7 +86,7 @@ class CryptoObjectMapper implements CryptoContainerFactory {
 			// no value, nothing to do here...
 		}
 
-		return Optional.empty();
+		return null;
 	}
 
 	@Accessors(chain = true, fluent = true)
