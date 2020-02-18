@@ -14,6 +14,10 @@ public class CryptoKeyTest {
 			CryptoKey.fromBytes(null);
 		});
 
+	}
+
+	@Test
+	void testSymetry() throws Exception {
 		CryptoKey key1 = CryptoKey.fromBytes("Foo".getBytes());
 		CryptoKey key2 = CryptoKey.fromBase64(key1.getBase64());
 
@@ -21,4 +25,13 @@ public class CryptoKeyTest {
 		assertEquals(key1.getBase64(), key2.getBase64());
 		assertEquals(key1, key2);
 	}
+
+	@Test
+	void testToString() throws Exception {
+		CryptoKey key1 = CryptoKey.fromBytes("Foo".getBytes());
+
+		assertEquals(key1.getBase64(), key1.toString());
+
+	}
+
 }

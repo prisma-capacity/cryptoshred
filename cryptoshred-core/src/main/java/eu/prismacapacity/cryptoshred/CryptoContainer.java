@@ -88,7 +88,7 @@ public class CryptoContainer<T> {
 				throws IOException {
 			jgen.writeStartObject();
 			jgen.writeStringField(JSON_KEY_ALGO, value.getAlgo().getId());
-			jgen.writeNumberField(JSON_KEY_KEY_SIZE, value.getSize().getKeySize());
+			jgen.writeNumberField(JSON_KEY_KEY_SIZE, value.getSize().asInt());
 			jgen.writeStringField(JSON_KEY_SUBJECT_ID, value.getSubjectId().getId().toString());
 			jgen.writeBinaryField(JSON_KEY_ENCRYPTED_BYTES, value.getEncryptedBytes());
 			jgen.writeEndObject();
