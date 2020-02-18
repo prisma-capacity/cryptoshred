@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -51,6 +53,15 @@ public class CryptoObjectMapperTest {
 		Bar b2 = om.readValue(json, Bar.class);
 
 		assertEquals(b.pair.get(), b2.pair.get());
+
+		CryptoContainer<String> c = factory.wrap("hubbi", id);
+		json = om.writeValueAsString(c);
+		System.out.println(json);
+		// if we need to deserialize a container without a surrounding bean (so without
+		// type info), we need to pass a type-reference
+		CryptoContainer<String> c2 = om.readValue(json, new TypeReference<CryptoContainer<String>>() {
+		});
+		System.out.println(c2.get());
 
 	}
 
