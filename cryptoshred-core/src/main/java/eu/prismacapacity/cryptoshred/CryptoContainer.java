@@ -50,7 +50,12 @@ public class CryptoContainer<T> {
 		public CryptoContainer<?> deserialize(JsonParser jp, DeserializationContext ctxt)
 				throws IOException, JsonProcessingException {
 
-			Class<?> targetType = contextualType.getBindings().getBoundType(0).getRawClass();
+			JavaType boundType = contextualType.getBindings().getBoundType(0);
+			if (boundType == null)
+				throw new IllegalArgumentException(
+						"Cannot infer the container's parameter type. Avoid using RAW-types or use 'new TypeReference<CryptoContainer<String>>() {}' depending on your context.");
+
+			Class<?> targetType = boundType.getRawClass();
 
 			JsonNode tree = jp.getCodec().readTree(jp);
 			int keySize = (Integer) ((IntNode) tree.get(JSON_KEY_KEY_SIZE)).numberValue();
