@@ -78,7 +78,7 @@ public class JDKCryptoEngine implements CryptoEngine {
 	public CryptoKey generateKey(@NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size) {
 		try {
 			KeyGenerator kgen = KeyGenerator.getInstance(algo.getId());
-			kgen.init(size.getKeySize());
+			kgen.init(size.asInt());
 			SecretKey secret = kgen.generateKey();
 			return CryptoKey.fromBytes(secret.getEncoded());
 		} catch (NoSuchAlgorithmException e) {
