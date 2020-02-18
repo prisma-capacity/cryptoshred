@@ -10,7 +10,7 @@ public interface CryptoMetrics {
 	default void notifyDecryptionSuccess() {
 	}
 
-	default void notifyDecryptionFailure(IOException e) {
+	default void notifyDecryptionFailure(Exception e) {
 	}
 
 	static class NOP implements CryptoMetrics {

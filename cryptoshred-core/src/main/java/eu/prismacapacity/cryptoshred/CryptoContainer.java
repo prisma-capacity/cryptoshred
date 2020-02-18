@@ -10,6 +10,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import lombok.Generated;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,188 +30,208 @@ import com.fasterxml.jackson.databind.node.IntNode;
 
 import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
 //@Builder(access = AccessLevel.PACKAGE)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonDeserialize(using = CryptoContainer.Deserializer.class)
 @JsonSerialize(using = CryptoContainer.Serializer.class)
 public class CryptoContainer<T> {
-	private static final String JSON_KEY_ENCRYPTED_BYTES = "enc";
-	private static final String JSON_KEY_SUBJECT_ID = "id";
-	private static final String JSON_KEY_KEY_SIZE = "ksize";
-	private static final String JSON_KEY_ALGO = "algo";
+    private static final String JSON_KEY_ENCRYPTED_BYTES = "enc";
 
-	public static class Deserializer extends JsonDeserializer<CryptoContainer<?>> implements ContextualDeserializer {
+    private static final String JSON_KEY_SUBJECT_ID = "id";
 
-		private JavaType contextualType;
+    private static final String JSON_KEY_KEY_SIZE = "ksize";
 
-		@Override
-		public CryptoContainer<?> deserialize(JsonParser jp, DeserializationContext ctxt)
-				throws IOException, JsonProcessingException {
+    private static final String JSON_KEY_ALGO = "algo";
 
-			JavaType boundType = contextualType.getBindings().getBoundType(0);
-			if (boundType == null)
-				throw new IllegalArgumentException(
-						"Cannot infer the container's parameter type. Avoid using RAW-types or use 'new TypeReference<CryptoContainer<String>>() {}' depending on your context.");
+    public static class Deserializer extends JsonDeserializer<CryptoContainer<?>>
+            implements ContextualDeserializer {
 
-			Class<?> targetType = boundType.getRawClass();
+        private JavaType contextualType;
 
-			JsonNode tree = jp.getCodec().readTree(jp);
-			int keySize = (Integer) ((IntNode) tree.get(JSON_KEY_KEY_SIZE)).numberValue();
-			String subjectId = tree.get(JSON_KEY_SUBJECT_ID).asText();
-			String algo = tree.get(JSON_KEY_ALGO).asText();
-			byte[] encrypted = tree.get(JSON_KEY_ENCRYPTED_BYTES).binaryValue();
+        @Override
+        public CryptoContainer<?> deserialize(JsonParser jp, DeserializationContext ctxt)
+                throws IOException, JsonProcessingException {
 
-			CryptoContainer<?> cc = new CryptoContainer<>(targetType, CryptoAlgorithm.of(algo),
-					CryptoKeySize.of(keySize), CryptoSubjectId.of(UUID.fromString(subjectId)), encrypted);
+            JavaType boundType = contextualType.getBindings().getBoundType(0);
+            if (boundType == null)
+                throw new IllegalArgumentException(
+                        "Cannot infer the container's parameter type. Avoid using RAW-types or use 'new TypeReference<CryptoContainer<String>>() {}' depending on your context.");
 
-			cc.mapper = (CryptoObjectMapper) ctxt.findInjectableValue(CryptoObjectMapper.JACKSON_INJECT_NAME,
-					new BeanProperty.Bogus(), cc);
+            Class<?> targetType = boundType.getRawClass();
 
-			return cc;
-		}
+            JsonNode tree = jp.getCodec().readTree(jp);
+            int keySize = (Integer) ((IntNode) tree.get(JSON_KEY_KEY_SIZE)).numberValue();
+            String subjectId = tree.get(JSON_KEY_SUBJECT_ID).asText();
+            String algo = tree.get(JSON_KEY_ALGO).asText();
+            byte[] encrypted = tree.get(JSON_KEY_ENCRYPTED_BYTES).binaryValue();
 
-		@Override
-		public JsonDeserializer<CryptoContainer<?>> createContextual(DeserializationContext ctx, BeanProperty prop)
-				throws JsonMappingException {
-			contextualType = ctx.getContextualType();
-			return this;
-		}
+            CryptoContainer<?> cc = new CryptoContainer<>(targetType, CryptoAlgorithm.of(algo),
+                    CryptoKeySize.of(keySize), CryptoSubjectId.of(UUID.fromString(subjectId)),
+                    encrypted);
 
-	}
+            cc.mapper = (CryptoObjectMapper) ctxt.findInjectableValue(
+                    CryptoObjectMapper.JACKSON_INJECT_NAME,
+                    new BeanProperty.Bogus(), cc);
 
-	public static class Serializer extends JsonSerializer<CryptoContainer<?>> {
+            return cc;
+        }
 
-		@Override
-		public void serialize(CryptoContainer<?> value, JsonGenerator jgen, SerializerProvider serializers)
-				throws IOException {
-			jgen.writeStartObject();
-			jgen.writeStringField(JSON_KEY_ALGO, value.getAlgo().getId());
-			jgen.writeNumberField(JSON_KEY_KEY_SIZE, value.getSize().asInt());
-			jgen.writeStringField(JSON_KEY_SUBJECT_ID, value.getSubjectId().getId().toString());
-			jgen.writeBinaryField(JSON_KEY_ENCRYPTED_BYTES, value.getEncryptedBytes());
-			jgen.writeEndObject();
-		}
+        @Override
+        public JsonDeserializer<CryptoContainer<?>> createContextual(DeserializationContext ctx,
+                BeanProperty prop)
+                throws JsonMappingException {
+            contextualType = ctx.getContextualType();
+            return this;
+        }
 
-	}
+    }
 
-	private CryptoContainer(@NonNull Class<T> type, @NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size,
-			@NonNull CryptoSubjectId subjectId, @NonNull byte[] encryptedBytes) {
-		this.type = type;
-		this.algo = algo;
-		this.size = size;
-		this.subjectId = subjectId;
-		this.encryptedBytes = encryptedBytes;
-	}
+    public static class Serializer extends JsonSerializer<CryptoContainer<?>> {
 
-	private CryptoContainer(@NonNull Class<T> class1, @NonNull CryptoAlgorithm algorithm,
-			@NonNull CryptoKeySize keySize, @NonNull CryptoSubjectId id, @NonNull byte[] encryptedBytes,
-			@NonNull T value, @NonNull CryptoObjectMapper cryptoObjectMapper) {
-		this.cachedValue = Optional.ofNullable(value);
-		this.mapper = cryptoObjectMapper;
-		this.type = class1;
-		this.algo = algorithm;
-		this.size = keySize;
-		this.encryptedBytes = encryptedBytes;
-		this.subjectId = id;
-	}
+        @Override
+        public void serialize(CryptoContainer<?> value, JsonGenerator jgen,
+                SerializerProvider serializers)
+                throws IOException {
+            jgen.writeStartObject();
+            jgen.writeStringField(JSON_KEY_ALGO, value.getAlgo().getId());
+            jgen.writeNumberField(JSON_KEY_KEY_SIZE, value.getSize().asInt());
+            jgen.writeStringField(JSON_KEY_SUBJECT_ID, value.getSubjectId().getId().toString());
+            jgen.writeBinaryField(JSON_KEY_ENCRYPTED_BYTES, value.getEncryptedBytes());
+            jgen.writeEndObject();
+        }
 
-	static <T> CryptoContainer<T> fromValue(@NonNull Class<T> type, @NonNull CryptoAlgorithm algorithm,
-			@NonNull CryptoKeySize keySize, @NonNull CryptoSubjectId id, @NonNull byte[] encryptedBytes,
-			@NonNull T value, CryptoObjectMapper cryptoObjectMapper) {
-		return new CryptoContainer<T>(type, algorithm, keySize, id, encryptedBytes, value, cryptoObjectMapper);
-	}
+    }
 
-	@Getter
-	private Class<?> type;
+    private CryptoContainer(@NonNull Class<T> type, @NonNull CryptoAlgorithm algo,
+            @NonNull CryptoKeySize size,
+            @NonNull CryptoSubjectId subjectId, @NonNull byte[] encryptedBytes) {
+        this.type = type;
+        this.algo = algo;
+        this.size = size;
+        this.subjectId = subjectId;
+        this.encryptedBytes = encryptedBytes;
+    }
 
-	@Getter
-	private CryptoAlgorithm algo;
+    private CryptoContainer(@NonNull Class<T> class1, @NonNull CryptoAlgorithm algorithm,
+            @NonNull CryptoKeySize keySize, @NonNull CryptoSubjectId id,
+            @NonNull byte[] encryptedBytes,
+            @NonNull T value, @NonNull CryptoObjectMapper cryptoObjectMapper) {
+        this.cachedValue = Optional.ofNullable(value);
+        this.mapper = cryptoObjectMapper;
+        this.type = class1;
+        this.algo = algorithm;
+        this.size = keySize;
+        this.encryptedBytes = encryptedBytes;
+        this.subjectId = id;
+    }
 
-	@Getter
-	private CryptoKeySize size;
+    static <T> CryptoContainer<T> fromValue(@NonNull Class<T> type,
+            @NonNull CryptoAlgorithm algorithm,
+            @NonNull CryptoKeySize keySize, @NonNull CryptoSubjectId id,
+            @NonNull byte[] encryptedBytes,
+            @NonNull T value, CryptoObjectMapper cryptoObjectMapper) {
+        return new CryptoContainer<T>(type, algorithm, keySize, id, encryptedBytes, value,
+                cryptoObjectMapper);
+    }
 
-	@Getter
-	private CryptoSubjectId subjectId;
+    @Getter
+    private Class<?> type;
 
-	// the encrypted value
-	@Getter(value = AccessLevel.PACKAGE)
-	private byte[] encryptedBytes;
+    @Getter
+    private CryptoAlgorithm algo;
 
-	// set after decryption or before encryption for short circuit retrieval
-	private transient Optional<T> cachedValue;
+    @Getter
+    private CryptoKeySize size;
 
-	private transient CryptoObjectMapper mapper;
+    @Getter
+    private CryptoSubjectId subjectId;
 
-	private T value() {
-		if (cachedValue == null) {
-			cachedValue = Optional.ofNullable(mapper.unwrap(this));
-		}
-		return cachedValue.orElse(null);
-	}
+    // the encrypted value
+    @Getter(value = AccessLevel.PACKAGE)
+    private byte[] encryptedBytes;
 
-	////////////////////////////////////////
-	// stolen from optional
-	////////////////////////////////////////
-	public T get() {
-		if (value() == null) {
-			throw new NoSuchElementException("No value present");
-		}
-		return value();
-	}
+    // set after decryption or before encryption for short circuit retrieval
+    private transient Optional<T> cachedValue;
 
-	public boolean isPresent() {
-		return value() != null;
-	}
+    private transient CryptoObjectMapper mapper;
 
-	public void ifPresent(Consumer<? super T> consumer) {
-		if (value() != null)
-			consumer.accept(value());
-	}
+    private T value() {
+        if (cachedValue == null) {
+            cachedValue = Optional.ofNullable(mapper.unwrap(this));
+        }
+        return cachedValue.orElse(null);
+    }
 
-	public Optional<T> filter(Predicate<? super T> predicate) {
-		Objects.requireNonNull(predicate);
-		if (!isPresent())
-			return Optional.empty();
-		else
-			return predicate.test(value()) ? cachedValue : Optional.empty();
-	}
+    ////////////////////////////////////////
+    // stolen from optional
+    ////////////////////////////////////////
+    @Generated
+    public T get() {
+        if (value() == null) {
+            throw new NoSuchElementException("No value present");
+        }
+        return value();
+    }
 
-	public <U> Optional<U> map(Function<? super T, ? extends U> mapper) {
-		Objects.requireNonNull(mapper);
-		if (!isPresent())
-			return Optional.empty();
-		else {
-			return Optional.ofNullable(mapper.apply(value()));
-		}
-	}
+    @Generated
+    public boolean isPresent() {
+        return value() != null;
+    }
 
-	public <U> Optional<U> flatMap(Function<? super T, Optional<U>> mapper) {
-		Objects.requireNonNull(mapper);
-		if (!isPresent())
-			return Optional.empty();
-		else {
-			return Objects.requireNonNull(mapper.apply(value()));
-		}
-	}
+    @Generated
+    public void ifPresent(Consumer<? super T> consumer) {
+        if (value() != null)
+            consumer.accept(value());
+    }
 
-	public T orElse(T other) {
-		return value() != null ? value() : other;
-	}
+    @Generated
+    public Optional<T> filter(Predicate<? super T> predicate) {
+        Objects.requireNonNull(predicate);
+        if (!isPresent())
+            return Optional.empty();
+        else
+            return predicate.test(value()) ? cachedValue : Optional.empty();
+    }
 
-	public T orElseGet(Supplier<? extends T> other) {
-		return value() != null ? value() : other.get();
-	}
+    @Generated
+    public <U> Optional<U> map(Function<? super T, ? extends U> mapper) {
+        Objects.requireNonNull(mapper);
+        if (!isPresent())
+            return Optional.empty();
+        else {
+            return Optional.ofNullable(mapper.apply(value()));
+        }
+    }
 
-	public <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
-		if (value() != null) {
-			return value();
-		} else {
-			throw exceptionSupplier.get();
-		}
-	}
+    @Generated
+    public <U> Optional<U> flatMap(Function<? super T, Optional<U>> mapper) {
+        Objects.requireNonNull(mapper);
+        if (!isPresent())
+            return Optional.empty();
+        else {
+            return Objects.requireNonNull(mapper.apply(value()));
+        }
+    }
+
+    @Generated
+    public T orElse(T other) {
+        return value() != null ? value() : other;
+    }
+
+    @Generated
+    public T orElseGet(Supplier<? extends T> other) {
+        return value() != null ? value() : other.get();
+    }
+
+    @Generated
+    public <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
+        if (value() != null) {
+            return value();
+        } else {
+            throw exceptionSupplier.get();
+        }
+    }
 
 }
