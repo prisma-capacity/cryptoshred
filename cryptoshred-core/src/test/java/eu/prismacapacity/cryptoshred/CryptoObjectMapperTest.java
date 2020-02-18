@@ -45,7 +45,7 @@ public class CryptoObjectMapperTest {
 		assertEquals(fooName, foo2Name);
 
 		Bar b = new Bar();
-		b.pair = factory.wrap(new Pair("hubba", 77), id);
+		b.pair = factory.wrap(new Pair<>("hubba", 77), id);
 		json = om.writeValueAsString(b);
 		System.out.println(json);
 		Bar b2 = om.readValue(json, Bar.class);
