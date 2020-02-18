@@ -3,11 +3,13 @@ package eu.prismacapacity.cryptoshred.keys;
 import java.util.Base64;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode
 public class CryptoKey {
 	@Getter
 	@NonNull

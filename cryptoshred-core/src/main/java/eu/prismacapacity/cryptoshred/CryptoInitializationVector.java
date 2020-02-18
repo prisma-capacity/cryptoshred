@@ -2,7 +2,6 @@ package eu.prismacapacity.cryptoshred;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
-import java.util.Objects;
 
 import lombok.NonNull;
 import lombok.Value;
@@ -17,7 +16,7 @@ public class CryptoInitializationVector {
 			// make sure, we have 16 bytes there
 			StringBuffer sb = new StringBuffer(initVector);
 			while (sb.length() < 16)
-				sb.append(Objects.hash(initVector));
+				sb.append(initVector);
 
 			byte[] bytes = sb.toString().getBytes("UTF-8");
 			// take the first 16 bytes
