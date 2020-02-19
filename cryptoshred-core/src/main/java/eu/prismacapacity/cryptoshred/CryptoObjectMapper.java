@@ -12,13 +12,14 @@ import eu.prismacapacity.cryptoshred.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.metrics.CryptoMetrics;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 class CryptoObjectMapper implements CryptoContainerFactory {
 
     static final String JACKSON_INJECT_NAME = "cryptoshredding.CryptoObjectMapper";
