@@ -56,7 +56,7 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
 
     }
 
-    private CryptoKey createCryptoKey(CryptoSubjectId subjectId, CryptoAlgorithm algorithm, CryptoKeySize size) {
+    protected CryptoKey createCryptoKey(CryptoSubjectId subjectId, CryptoAlgorithm algorithm, CryptoKeySize size) {
         val key = engine.generateKey(algorithm, size);
         val createRequest = CreateCryptoKeyRequest.of(subjectId, algorithm, size, key, tableName);
 
@@ -77,7 +77,7 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
             val item = findKeyFor(subjectId, algorithm, size);
 
             if (!item.isPresent()) {
-                throw new RuntimeException("Should never ever happen");
+                throw new IllegalStateException("DynamoDB consistent read failed.");
             }
 
             return item.get();

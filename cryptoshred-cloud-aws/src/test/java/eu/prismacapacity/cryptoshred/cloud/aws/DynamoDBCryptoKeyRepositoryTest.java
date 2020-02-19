@@ -16,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -139,17 +138,8 @@ class DynamoDBCryptoKeyRepositoryTest {
                     new AttributeValue().withB(ByteBuffer.wrap(key.getBytes())));
         }};
 
-        AtomicInteger invocationCount = new AtomicInteger();
-        when(getResponseMock.getItem()).thenAnswer(invocationOnMock -> {
-            invocationCount.getAndIncrement();
-
-            if(invocationCount.get() == 2) {
-                return item;
-            }
-
-            return null;
-        });
-
+        //noinspection unchecked
+        when(getResponseMock.getItem()).thenReturn(null, item);
 
         when(dynamoDB.updateItem(any(UpdateItemRequest.class))).thenThrow(new ConditionalCheckFailedException("foo"));
 

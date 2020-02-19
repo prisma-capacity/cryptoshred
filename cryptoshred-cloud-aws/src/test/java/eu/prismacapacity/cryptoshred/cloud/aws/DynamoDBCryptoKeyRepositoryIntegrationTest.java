@@ -8,6 +8,7 @@ import eu.prismacapacity.cryptoshred.*;
 import eu.prismacapacity.cryptoshred.cloud.aws.utils.TestIntegration;
 import eu.prismacapacity.cryptoshred.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
+import lombok.NonNull;
 import lombok.val;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,6 +19,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.UUID;
+
+import static org.junit.Assert.*;
 
 
 @Testcontainers
@@ -78,7 +81,7 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
         val result = uut.findKeyFor(subjectId, algorithm, size);
 
         Assert.assertTrue(result.isPresent());
-        Assert.assertEquals(result.get().getBase64(), key.getBase64());
+        assertEquals(result.get().getBase64(), key.getBase64());
     }
 
     @TestIntegration
@@ -94,7 +97,7 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
         val foundKey = uut.findKeyFor(subjectId, algorithm, size);
 
         Assert.assertTrue(foundKey.isPresent());
-        Assert.assertEquals(createdKey, foundKey.get());
+        assertEquals(createdKey, foundKey.get());
     }
 
     @TestIntegration
@@ -115,13 +118,47 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
         val getOrCreateKey192 = uut.getOrCreateKeyFor(subjectId, algorithm, size192);
         val findKey192 = uut.findKeyFor(subjectId, algorithm, size192);
 
-        Assert.assertEquals(createdKey128, getOrCreateKey128);
-        Assert.assertTrue(findKey128.isPresent());
-        Assert.assertEquals(getOrCreateKey128, findKey128.get());
-        Assert.assertNotEquals(createdKey128, createdKey192);
-        Assert.assertTrue(findKey192.isPresent());
-        Assert.assertEquals(findKey192.get(), createdKey192);
-        Assert.assertEquals(createdKey192, getOrCreateKey192);
+        assertEquals(createdKey128, getOrCreateKey128);
+        assertTrue(findKey128.isPresent());
+        assertEquals(getOrCreateKey128, findKey128.get());
+        assertNotEquals(createdKey128, createdKey192);
+        assertTrue(findKey192.isPresent());
+        assertEquals(findKey192.get(), createdKey192);
+        assertEquals(createdKey192, getOrCreateKey192);
+    }
+
+
+    @TestIntegration
+    void testGetOrCreateKeyForRaceConditionBetweenMultipleClients() {
+        val client = getClient();
+
+        val subjectId = CryptoSubjectId.of(UUID.randomUUID());
+        val size128 = CryptoKeySize.of(128);
+        val algorithm = CryptoAlgorithm.AES_CBC;
+        val key = engine.generateKey(algorithm, size128);
+
+        val uut = new RaceConditionCryptoKeyRepository(engine, client, TABLE_NAME, key);
+
+        val createdKey = uut.getOrCreateKeyFor(subjectId, algorithm, size128);
+
+        assertEquals(createdKey, key);
+    }
+
+    class RaceConditionCryptoKeyRepository extends DynamoDBCryptoKeyRepository {
+        private final CryptoKey key;
+
+        public RaceConditionCryptoKeyRepository(@NonNull CryptoEngine engine, @NonNull AmazonDynamoDB dynamoDB, @NonNull String tableName, CryptoKey key) {
+            super(engine, dynamoDB, tableName);
+
+            this.key = key;
+        }
+
+        @Override
+        protected CryptoKey createCryptoKey(CryptoSubjectId subjectId, CryptoAlgorithm algorithm, CryptoKeySize size) {
+            addExampleKey(subjectId, algorithm, size, key);
+
+            return super.createCryptoKey(subjectId, algorithm, size);
+        }
     }
 
 
