@@ -131,6 +131,8 @@
                         <!-- proto-generated classes -->
                         <exclude>**/gen/*</exclude>
                         <exclude>**/generated/*</exclude>
+                        <!-- JDK provided -->
+                        <exclude>**/OptionalBehavior*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
