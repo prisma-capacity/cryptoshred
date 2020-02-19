@@ -1,10 +1,12 @@
-package eu.prismacapacity.cryptoshred;
+package eu.prismacapacity.cryptoshred.core;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
+
+import eu.prismacapacity.cryptoshred.core.CryptoEngineException;
 
 public class CryptoEngineExceptionTest {
 

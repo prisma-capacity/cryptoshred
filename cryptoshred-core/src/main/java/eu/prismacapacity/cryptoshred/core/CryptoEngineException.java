@@ -1,4 +1,4 @@
-package eu.prismacapacity.cryptoshred;
+package eu.prismacapacity.cryptoshred.core;
 
 import lombok.NonNull;
 

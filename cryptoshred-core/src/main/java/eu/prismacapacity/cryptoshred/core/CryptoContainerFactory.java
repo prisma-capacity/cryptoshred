@@ -1,8 +1,8 @@
-package eu.prismacapacity.cryptoshred;
+package eu.prismacapacity.cryptoshred.core;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import lombok.NonNull;
 
 public interface CryptoContainerFactory {

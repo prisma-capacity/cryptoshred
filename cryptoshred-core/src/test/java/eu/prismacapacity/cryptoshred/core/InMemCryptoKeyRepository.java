@@ -1,13 +1,16 @@
-package eu.prismacapacity.cryptoshred;
+package eu.prismacapacity.cryptoshred.core;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import eu.prismacapacity.cryptoshred.keys.CryptoKey;
-import eu.prismacapacity.cryptoshred.keys.CryptoKeyNotFoundAfterCreatingException;
-import eu.prismacapacity.cryptoshred.keys.CryptoKeyRepository;
-import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
+import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
+import eu.prismacapacity.cryptoshred.core.CryptoEngine;
+import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyNotFoundAfterCreatingException;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 
 public class InMemCryptoKeyRepository implements CryptoKeyRepository {
 

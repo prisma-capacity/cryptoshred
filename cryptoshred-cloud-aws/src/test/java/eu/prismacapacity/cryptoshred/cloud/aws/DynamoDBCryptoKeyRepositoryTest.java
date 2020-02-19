@@ -2,11 +2,12 @@ package eu.prismacapacity.cryptoshred.cloud.aws;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.*;
-import eu.prismacapacity.cryptoshred.CryptoAlgorithm;
-import eu.prismacapacity.cryptoshred.CryptoEngine;
-import eu.prismacapacity.cryptoshred.CryptoSubjectId;
-import eu.prismacapacity.cryptoshred.keys.CryptoKey;
-import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
+
+import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
+import eu.prismacapacity.cryptoshred.core.CryptoEngine;
+import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

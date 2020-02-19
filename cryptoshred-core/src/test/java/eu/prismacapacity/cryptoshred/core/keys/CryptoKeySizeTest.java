@@ -1,8 +1,10 @@
-package eu.prismacapacity.cryptoshred.keys;
+package eu.prismacapacity.cryptoshred.core.keys;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 
 public class CryptoKeySizeTest {
 

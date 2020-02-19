@@ -1,4 +1,4 @@
-package eu.prismacapacity.cryptoshred;
+package eu.prismacapacity.cryptoshred.core;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -8,10 +8,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.prismacapacity.cryptoshred.keys.CryptoKey;
-import eu.prismacapacity.cryptoshred.keys.CryptoKeyRepository;
-import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
-import eu.prismacapacity.cryptoshred.metrics.CryptoMetrics;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
+import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

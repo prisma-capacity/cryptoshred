@@ -55,6 +55,7 @@
     <modules>
         <module>cryptoshred-core</module>
         <module>cryptoshred-cloud-aws</module>
+        <module>cryptoshred-spring</module>
         <!-- <module>cryptoshred-spring-boot-autoconfigure</module> -->
     </modules>
     <dependencies>

@@ -1,9 +1,9 @@
-package eu.prismacapacity.cryptoshred.keys;
+package eu.prismacapacity.cryptoshred.core.keys;
 
 import java.util.Optional;
 
-import eu.prismacapacity.cryptoshred.CryptoAlgorithm;
-import eu.prismacapacity.cryptoshred.CryptoSubjectId;
+import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
+import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
 import lombok.NonNull;
 
 public interface CryptoKeyRepository {

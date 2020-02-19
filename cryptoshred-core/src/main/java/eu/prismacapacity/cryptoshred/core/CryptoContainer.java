@@ -1,4 +1,4 @@
-package eu.prismacapacity.cryptoshred;
+package eu.prismacapacity.cryptoshred.core;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.node.IntNode;
 
-import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;

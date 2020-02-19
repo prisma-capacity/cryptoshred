@@ -1,4 +1,4 @@
-package eu.prismacapacity.cryptoshred.keys;
+package eu.prismacapacity.cryptoshred.core.keys;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

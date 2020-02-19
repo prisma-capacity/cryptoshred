@@ -1,7 +1,7 @@
-package eu.prismacapacity.cryptoshred;
+package eu.prismacapacity.cryptoshred.core;
 
-import eu.prismacapacity.cryptoshred.keys.CryptoKey;
-import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import lombok.NonNull;
 
 /**

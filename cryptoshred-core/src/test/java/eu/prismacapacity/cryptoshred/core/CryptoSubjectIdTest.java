@@ -1,10 +1,12 @@
-package eu.prismacapacity.cryptoshred;
+package eu.prismacapacity.cryptoshred.core;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+
+import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
 
 public class CryptoSubjectIdTest {
 	@Test

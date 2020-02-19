@@ -1,4 +1,4 @@
-package eu.prismacapacity.cryptoshred.keys;
+package eu.prismacapacity.cryptoshred.core.keys;
 
 import java.util.Base64;
 

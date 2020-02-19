@@ -5,10 +5,10 @@ import java.util.Optional;
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
-import eu.prismacapacity.cryptoshred.CryptoAlgorithm;
-import eu.prismacapacity.cryptoshred.CryptoSubjectId;
-import eu.prismacapacity.cryptoshred.keys.CryptoKey;
-import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
+import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
+import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import lombok.val;
 
 class Utils {

@@ -1,4 +1,4 @@
-package eu.prismacapacity.cryptoshred.metrics;
+package eu.prismacapacity.cryptoshred.core.metrics;
 
 public interface CryptoMetrics {
 
