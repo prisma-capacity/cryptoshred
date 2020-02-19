@@ -33,10 +33,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 
-//@Builder(access = AccessLevel.PACKAGE)
 @JsonDeserialize(using = CryptoContainer.Deserializer.class)
 @JsonSerialize(using = CryptoContainer.Serializer.class)
-public class CryptoContainer<T> {
+public class CryptoContainer<T> extends OptionalBehavior<T> {
     private static final String JSON_KEY_ENCRYPTED_BYTES = "enc";
 
     private static final String JSON_KEY_SUBJECT_ID = "id";
@@ -157,81 +156,13 @@ public class CryptoContainer<T> {
 
     private transient CryptoObjectMapper mapper;
 
-    private T value() {
+    protected T value() {
         if (cachedValue == null) {
             cachedValue = Optional.ofNullable(mapper.unwrap(this));
         }
         return cachedValue.orElse(null);
     }
 
-    ////////////////////////////////////////
-    // stolen from optional
-    ////////////////////////////////////////
-    @Generated
-    public T get() {
-        if (value() == null) {
-            throw new NoSuchElementException("No value present");
-        }
-        return value();
-    }
 
-    @Generated
-    public boolean isPresent() {
-        return value() != null;
-    }
-
-    @Generated
-    public void ifPresent(Consumer<? super T> consumer) {
-        if (value() != null)
-            consumer.accept(value());
-    }
-
-    @Generated
-    public Optional<T> filter(Predicate<? super T> predicate) {
-        Objects.requireNonNull(predicate);
-        if (!isPresent())
-            return Optional.empty();
-        else
-            return predicate.test(value()) ? cachedValue : Optional.empty();
-    }
-
-    @Generated
-    public <U> Optional<U> map(Function<? super T, ? extends U> mapper) {
-        Objects.requireNonNull(mapper);
-        if (!isPresent())
-            return Optional.empty();
-        else {
-            return Optional.ofNullable(mapper.apply(value()));
-        }
-    }
-
-    @Generated
-    public <U> Optional<U> flatMap(Function<? super T, Optional<U>> mapper) {
-        Objects.requireNonNull(mapper);
-        if (!isPresent())
-            return Optional.empty();
-        else {
-            return Objects.requireNonNull(mapper.apply(value()));
-        }
-    }
-
-    @Generated
-    public T orElse(T other) {
-        return value() != null ? value() : other;
-    }
-
-    @Generated
-    public T orElseGet(Supplier<? extends T> other) {
-        return value() != null ? value() : other.get();
-    }
-
-    @Generated
-    public <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
-        if (value() != null) {
-            return value();
-        } else {
-            throw exceptionSupplier.get();
-        }
-    }
 
 }
