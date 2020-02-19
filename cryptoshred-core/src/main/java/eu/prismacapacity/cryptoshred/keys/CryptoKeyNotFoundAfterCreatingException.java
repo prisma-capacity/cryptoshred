@@ -10,4 +10,7 @@ public class CryptoKeyNotFoundAfterCreatingException extends IllegalStateExcepti
 		super(e);
 	}
 
+	public CryptoKeyNotFoundAfterCreatingException(@NonNull String msg) {
+		super(msg);
+	}
 }

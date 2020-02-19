@@ -54,7 +54,8 @@
     </properties>
     <modules>
         <module>cryptoshred-core</module>
-        <!-- <module>cryptoshred-cloud-aws</module> <module>cryptoshred-spring-boot-autoconfigure</module> -->
+        <module>cryptoshred-cloud-aws</module>
+        <!-- <module>cryptoshred-spring-boot-autoconfigure</module> -->
     </modules>
     <dependencies>
         <dependency>
@@ -81,6 +82,20 @@
             <version>1.5.2</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.21.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>2.23.0</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -102,10 +117,16 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M4</version>
+                <configuration>
+                   <excludedGroups>it</excludedGroups>
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>3.0.0-M4</version>
+                <configuration>
+                    <groups>it</groups>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -118,7 +139,7 @@
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
-                    <!-- <execution> <id>report</id> <phase>test</phase> 
+                    <!-- <execution> <id>report</id> <phase>test</phase>
                         <goals> <goal>report</goal> </goals> </execution> -->
                 </executions>
                 <configuration>
@@ -147,7 +168,7 @@
         </plugins>
         <pluginManagement>
             <plugins>
-                <!--This plugin's configuration is used to store Eclipse 
+                <!--This plugin's configuration is used to store Eclipse
                     m2e settings only. It has no influence on the Maven build itself. -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
@@ -158,12 +179,12 @@
                             <pluginExecutions>
                                 <pluginExecution>
                                     <pluginExecutionFilter>
-                                        <groupId> eu.prismacapacity 
+                                        <groupId> eu.prismacapacity
                                         </groupId>
                                         <artifactId>
-                                            unixuid-maven-plugin 
+                                            unixuid-maven-plugin
                                         </artifactId>
-                                        <versionRange> [1.0.8,) 
+                                        <versionRange> [1.0.8,)
                                         </versionRange>
                                         <goals>
                                             <goal>unixuid</goal>
