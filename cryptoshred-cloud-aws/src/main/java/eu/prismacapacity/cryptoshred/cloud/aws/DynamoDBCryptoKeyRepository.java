@@ -60,10 +60,10 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
     }
 
     protected CryptoKey createCryptoKey(CryptoSubjectId subjectId, CryptoAlgorithm algorithm, CryptoKeySize size) {
+        metrics.notifyKeyCreation();
+
         val key = engine.generateKey(algorithm, size);
         val createRequest = CreateCryptoKeyRequest.of(subjectId, algorithm, size, key, tableName);
-
-        metrics.notifyKeyCreation();
 
         try {
             val result = metrics.timed("createKeyInDynamoDbTable",
