@@ -20,7 +20,7 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
@@ -42,6 +42,29 @@ class DynamoDBCryptoKeyRepositoryTest {
     CryptoKeySize size = CryptoKeySize.BIT_256;
     CryptoKey key = CryptoKey.fromBytes("foo".getBytes());
 
+    @Test
+
+    void testNullContracts() {
+        val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, metrics, TABLE_NAME);
+
+        assertThrows(NullPointerException.class, () ->
+                uut.findKeyFor(null, algorithm, size));
+
+        assertThrows(NullPointerException.class, () ->
+                uut.findKeyFor(subjectId, null, size));
+
+        assertThrows(NullPointerException.class, () ->
+                uut.findKeyFor(subjectId, algorithm, null));
+
+        assertThrows(NullPointerException.class, () ->
+                uut.getOrCreateKeyFor(null, algorithm, size));
+
+        assertThrows(NullPointerException.class, () ->
+                uut.getOrCreateKeyFor(subjectId, null, size));
+
+        assertThrows(NullPointerException.class, () ->
+                uut.getOrCreateKeyFor(subjectId, algorithm, null));
+    }
 
     @Test
     void testFindKeyForValidItem() {
