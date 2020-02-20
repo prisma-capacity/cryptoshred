@@ -8,6 +8,7 @@ import eu.prismacapacity.cryptoshred.*;
 import eu.prismacapacity.cryptoshred.cloud.aws.utils.TestIntegration;
 import eu.prismacapacity.cryptoshred.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
+import eu.prismacapacity.cryptoshred.metrics.CryptoMetrics;
 import lombok.NonNull;
 import lombok.val;
 import org.junit.Assert;
@@ -28,6 +29,7 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
     private static String TABLE_NAME = "foo";
 
     CryptoEngine engine = new JDKCryptoEngine(CryptoInitializationVector.of("mysecret"));
+    CryptoMetrics metrics = new CryptoMetrics.NOP();
 
     @Container
     static LocalStackContainer localstack = new LocalStackContainer()
@@ -60,7 +62,7 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
         val size = CryptoKeySize.of(128);
         val algorithm = CryptoAlgorithm.AES_CBC;
 
-        val uut = new DynamoDBCryptoKeyRepository(engine, client, TABLE_NAME);
+        val uut = new DynamoDBCryptoKeyRepository(engine, client, metrics, TABLE_NAME);
         val result = uut.findKeyFor(subjectId, algorithm, size);
 
         Assert.assertFalse(result.isPresent());
@@ -77,7 +79,7 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
 
         addExampleKey(subjectId, algorithm, size, key);
 
-        val uut = new DynamoDBCryptoKeyRepository(engine, client, TABLE_NAME);
+        val uut = new DynamoDBCryptoKeyRepository(engine, client, metrics, TABLE_NAME);
         val result = uut.findKeyFor(subjectId, algorithm, size);
 
         Assert.assertTrue(result.isPresent());
@@ -92,7 +94,7 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
         val size = CryptoKeySize.of(128);
         val algorithm = CryptoAlgorithm.AES_CBC;
 
-        val uut = new DynamoDBCryptoKeyRepository(engine, client, TABLE_NAME);
+        val uut = new DynamoDBCryptoKeyRepository(engine, client, metrics, TABLE_NAME);
         val createdKey = uut.getOrCreateKeyFor(subjectId, algorithm, size);
         val foundKey = uut.findKeyFor(subjectId, algorithm, size);
 
@@ -109,7 +111,7 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
         val size192 = CryptoKeySize.of(192);
         val algorithm = CryptoAlgorithm.AES_CBC;
 
-        val uut = new DynamoDBCryptoKeyRepository(engine, client, TABLE_NAME);
+        val uut = new DynamoDBCryptoKeyRepository(engine, client, metrics, TABLE_NAME);
 
         val createdKey128 = uut.getOrCreateKeyFor(subjectId, algorithm, size128);
         val createdKey192 = uut.getOrCreateKeyFor(subjectId, algorithm, size192);
@@ -137,7 +139,7 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
         val algorithm = CryptoAlgorithm.AES_CBC;
         val key = engine.generateKey(algorithm, size128);
 
-        val uut = new RaceConditionCryptoKeyRepository(engine, client, TABLE_NAME, key);
+        val uut = new RaceConditionCryptoKeyRepository(engine, client, metrics, TABLE_NAME, key);
 
         val createdKey = uut.getOrCreateKeyFor(subjectId, algorithm, size128);
 
@@ -147,8 +149,8 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
     class RaceConditionCryptoKeyRepository extends DynamoDBCryptoKeyRepository {
         private final CryptoKey key;
 
-        public RaceConditionCryptoKeyRepository(@NonNull CryptoEngine engine, @NonNull AmazonDynamoDB dynamoDB, @NonNull String tableName, CryptoKey key) {
-            super(engine, dynamoDB, tableName);
+        public RaceConditionCryptoKeyRepository(@NonNull CryptoEngine engine, @NonNull AmazonDynamoDB dynamoDB, @NonNull CryptoMetrics metrics, @NonNull String tableName, CryptoKey key) {
+            super(engine, dynamoDB, metrics, tableName);
 
             this.key = key;
         }

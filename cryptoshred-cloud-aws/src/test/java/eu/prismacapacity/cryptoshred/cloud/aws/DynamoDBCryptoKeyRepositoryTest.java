@@ -7,9 +7,12 @@ import eu.prismacapacity.cryptoshred.CryptoEngine;
 import eu.prismacapacity.cryptoshred.CryptoSubjectId;
 import eu.prismacapacity.cryptoshred.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
+import eu.prismacapacity.cryptoshred.metrics.CryptoMetrics;
+import eu.prismacapacity.cryptoshred.metrics.MetricsCallable;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -29,6 +32,9 @@ class DynamoDBCryptoKeyRepositoryTest {
     @Mock
     AmazonDynamoDB dynamoDB;
 
+    @Mock(answer = Answers.CALLS_REAL_METHODS)
+    CryptoMetrics metrics;
+
     private static final String TABLE_NAME = "foo";
 
     CryptoSubjectId subjectId = CryptoSubjectId.of(UUID.randomUUID());
@@ -39,7 +45,7 @@ class DynamoDBCryptoKeyRepositoryTest {
 
     @Test
     void testFindKeyForValidItem() {
-        val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, TABLE_NAME);
+        val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, metrics, TABLE_NAME);
 
         val item = new HashMap<String, AttributeValue>() {{
             put(Utils.generateKeyPropertyName(algorithm, size),
@@ -57,12 +63,14 @@ class DynamoDBCryptoKeyRepositoryTest {
         assertEquals(result.get(), key);
 
         verify(dynamoDB).getItem(any(GetItemRequest.class));
+        verify(metrics).notifyKeyLookUp();
+        verify(metrics).timed(anyString(), any(MetricsCallable.class));
 
     }
 
     @Test
     void testFindKeyForIfAbsent() {
-        val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, TABLE_NAME);
+        val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, metrics, TABLE_NAME);
 
         val responseMock = mock(GetItemResult.class);
 
@@ -78,7 +86,7 @@ class DynamoDBCryptoKeyRepositoryTest {
 
     @Test
     void testGetOrCreateKeyForAlreadyExistingKey() {
-        val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, TABLE_NAME);
+        val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, metrics, TABLE_NAME);
 
         val responseMock = mock(GetItemResult.class);
         val item = new HashMap<String, AttributeValue>() {{
@@ -99,7 +107,7 @@ class DynamoDBCryptoKeyRepositoryTest {
 
     @Test
     void testGetOrCreateKeyForNewKey() {
-        val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, TABLE_NAME);
+        val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, metrics, TABLE_NAME);
 
         val item = new HashMap<String, AttributeValue>() {{
             put(Utils.generateKeyPropertyName(algorithm, size),
@@ -123,11 +131,14 @@ class DynamoDBCryptoKeyRepositoryTest {
         verify(dynamoDB).getItem(any(GetItemRequest.class));
         verify(dynamoDB).updateItem(any(UpdateItemRequest.class));
         verifyNoMoreInteractions(dynamoDB);
+        verify(metrics).notifyKeyLookUp();
+        verify(metrics).notifyKeyCreation();
+        verify(metrics, times(2)).timed(anyString(), any(MetricsCallable.class));
     }
 
     @Test
     void testGetOrCreateKeyForRaceConditionBetweenMultipleClients() {
-        val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, TABLE_NAME);
+        val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, metrics, TABLE_NAME);
 
         when(engine.generateKey(algorithm, size)).thenReturn(key);
 
