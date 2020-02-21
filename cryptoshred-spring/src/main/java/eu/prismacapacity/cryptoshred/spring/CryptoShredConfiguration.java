@@ -22,7 +22,7 @@ public class CryptoShredConfiguration {
 	@Bean
 	public CryptoObjectMapper cryptoObjectMapper(
 
-			@Value("${cryptoshred.defaults.algorithm:AES}") String algo,
+			@NonNull @Value("${cryptoshred.defaults.algorithm:AES}") String algo,
 
 			@Value("${cryptoshred.defaults.keySize:256}") int size,
 
