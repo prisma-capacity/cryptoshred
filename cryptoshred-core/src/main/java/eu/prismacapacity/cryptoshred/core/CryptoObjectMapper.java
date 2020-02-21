@@ -20,53 +20,51 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-class CryptoObjectMapper implements CryptoContainerFactory {
+public class CryptoObjectMapper implements CryptoContainerFactory {
 
-    static final String JACKSON_INJECT_NAME = "cryptoshredding.CryptoObjectMapper";
+	static final String JACKSON_INJECT_NAME = "cryptoshredding.CryptoObjectMapper";
 
-    @NonNull
-    final CryptoKeyRepository keyRepository;
+	@NonNull
+	final CryptoKeyRepository keyRepository;
 
-    @NonNull
-    final CryptoMetrics metrics;
+	@NonNull
+	final CryptoMetrics metrics;
 
-    @NonNull
-    final CryptoAlgorithm defaultAlgorithm;
+	@NonNull
+	final CryptoAlgorithm defaultAlgorithm;
 
-    @NonNull
-    final CryptoKeySize defaultKeySize;
+	@NonNull
+	final CryptoKeySize defaultKeySize;
 
-    @NonNull
-    final CryptoEngine engine;
+	@NonNull
+	final CryptoEngine engine;
 
-    @NonNull
-    @lombok.experimental.Delegate
-    final ObjectMapper mapper;
+	@NonNull
+	@lombok.experimental.Delegate
+	final ObjectMapper mapper;
 
-    @Override
-    public final @NonNull <T> CryptoContainer<T> wrap(@NonNull T value, @NonNull CryptoSubjectId id)
-            throws JsonProcessingException {
-        return wrap(value, id, defaultAlgorithm, defaultKeySize);
-    }
+	@Override
+	public final @NonNull <T> CryptoContainer<T> wrap(@NonNull T value, @NonNull CryptoSubjectId id)
+			throws JsonProcessingException {
+		return wrap(value, id, defaultAlgorithm, defaultKeySize);
+	}
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public @NonNull <T> CryptoContainer<T> wrap(@NonNull T value, @NonNull CryptoSubjectId id,
-            @NonNull CryptoAlgorithm algorithm, @NonNull CryptoKeySize keySize)
-            throws JsonProcessingException {
+	@Override
+	@SuppressWarnings("unchecked")
+	public @NonNull <T> CryptoContainer<T> wrap(@NonNull T value, @NonNull CryptoSubjectId id,
+			@NonNull CryptoAlgorithm algorithm, @NonNull CryptoKeySize keySize) throws JsonProcessingException {
 
-        CryptoKey key = keyRepository.getOrCreateKeyFor(id, algorithm, keySize);
-        byte[] bytes;
-        bytes = writeValueAsBytes(value);
-        byte[] encryptToBytes = engine.encrypt(bytes, algorithm, key, this);
+		CryptoKey key = keyRepository.getOrCreateKeyFor(id, algorithm, keySize);
+		byte[] bytes;
+		bytes = writeValueAsBytes(value);
+		byte[] encryptToBytes = engine.encrypt(bytes, algorithm, key, this);
 
-        return CryptoContainer.fromValue((Class<T>) value.getClass(), algorithm, keySize, id,
-                encryptToBytes, value,
-                this);
+		return CryptoContainer.fromValue((Class<T>) value.getClass(), algorithm, keySize, id, encryptToBytes, value,
+				this);
 
-    }
+	}
 
-    <T> T unwrap(@NonNull CryptoContainer<T> cryptoContainer) {
+	<T> T unwrap(@NonNull CryptoContainer<T> cryptoContainer) {
 		byte[] bytes = cryptoContainer.getEncryptedBytes();
 		if (bytes != null) {
 			Optional<CryptoKey> key = keyRepository.findKeyFor(cryptoContainer.getSubjectId(),
@@ -86,7 +84,7 @@ class CryptoObjectMapper implements CryptoContainerFactory {
 				// key missing, nothing to see here...
 				metrics.notifyMissingKey();
 			}
-		
+
 			// no value, nothing to do here...
 		}
 		return null;
@@ -95,7 +93,7 @@ class CryptoObjectMapper implements CryptoContainerFactory {
 	@Accessors(chain = true, fluent = true)
 	@Data
 	@RequiredArgsConstructor
-	static class Builder {
+	public static class Builder {
 		@NonNull
 		final CryptoKeyRepository repository;
 		@NonNull
@@ -118,9 +116,8 @@ class CryptoObjectMapper implements CryptoContainerFactory {
 		}
 	}
 
-    public static Builder builder(@NonNull CryptoKeyRepository repository,
-            @NonNull CryptoEngine engine) {
-        return new Builder(repository, engine);
-    }
+	public static Builder builder(@NonNull CryptoKeyRepository repository, @NonNull CryptoEngine engine) {
+		return new Builder(repository, engine);
+	}
 
 }
