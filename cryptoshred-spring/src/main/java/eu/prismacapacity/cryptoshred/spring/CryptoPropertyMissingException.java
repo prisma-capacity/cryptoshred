@@ -1,8 +1,10 @@
 package eu.prismacapacity.cryptoshred.spring;
 
+import lombok.NonNull;
+
 public class CryptoPropertyMissingException extends IllegalArgumentException {
 
-	public CryptoPropertyMissingException(String string) {
+	public CryptoPropertyMissingException(@NonNull String string) {
 		super(string);
 	}
 
