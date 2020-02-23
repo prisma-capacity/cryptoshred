@@ -8,9 +8,23 @@ coverage:
   range: "75...100"
 
   status:
-    project: yes
-    patch: yes
-    changes: no
+    project:
+      default:
+        # basic
+        target: auto
+        threshold: 2%
+        base: auto 
+        flags: 
+          - unit
+        paths: 
+          - "src"
+       # advanced
+        branches: 
+          - master
+        if_not_found: success
+        if_ci_failed: error
+        informational: false
+        only_pulls: false
 
 parsers:
   gcov:
