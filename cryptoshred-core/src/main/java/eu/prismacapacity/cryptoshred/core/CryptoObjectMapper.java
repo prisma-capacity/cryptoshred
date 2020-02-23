@@ -19,13 +19,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Optional;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +27,15 @@ import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CryptoObjectMapper implements CryptoContainerFactory {
 
@@ -95,6 +96,7 @@ public class CryptoObjectMapper implements CryptoContainerFactory {
 					return t;
 				} catch (IOException e) {
 					metrics.notifyDecryptionFailure(e);
+					log.warn("Exception while decryption", e);
 				}
 			} else {
 				// key missing, nothing to see here...

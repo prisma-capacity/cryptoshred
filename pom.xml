@@ -58,6 +58,7 @@
     <module>cryptoshred-spring</module>
     <module>cryptoshred-spring-boot-autoconfigure</module>
     <module>cryptoshred-spring-cloud-aws</module>
+    <module>cryptoshred-micrometer</module>
   </modules>
   <dependencies>
     <dependency>
