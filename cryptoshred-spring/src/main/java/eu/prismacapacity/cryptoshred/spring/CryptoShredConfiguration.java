@@ -31,6 +31,7 @@ import eu.prismacapacity.cryptoshred.core.CryptoObjectMapper;
 import eu.prismacapacity.cryptoshred.core.JDKCryptoEngine;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
+import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
 
 @Configuration
 public class CryptoShredConfiguration {
@@ -48,6 +49,8 @@ public class CryptoShredConfiguration {
 
 			@Autowired(required = false) CryptoEngine engine,
 
+			@Autowired(required = false) CryptoMetrics metrics,
+
 			@Autowired(required = false) ObjectMapper om
 
 	) {
@@ -62,6 +65,10 @@ public class CryptoShredConfiguration {
 		}
 
 		CryptoObjectMapper.Builder b = CryptoObjectMapper.builder(repository, engine);
+
+		if (metrics != null)
+			b.metrics(metrics);
+
 		if (om != null)
 			b.mapper(om);
 

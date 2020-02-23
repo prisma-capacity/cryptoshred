@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -e
+
+for X in $(find $(dirname $0)/pre-commit.d -perm -u=x ! -name '*~' -type f -print) ; do
+  REPO_NAME=$(basename $(git rev-parse --show-toplevel)) $X 
+done

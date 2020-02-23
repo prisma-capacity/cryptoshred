@@ -17,16 +17,31 @@ package eu.prismacapacity.cryptoshred.core.metrics;
 
 public interface CryptoMetrics {
 
-	default void notifyMissingKey() {
+	void notifyMissingKey();
+
+	void notifyDecryptionSuccess();
+
+	void notifyDecryptionFailure(Exception e);
+
+	static abstract class Base implements CryptoMetrics {
+
+		@Override
+		public void notifyMissingKey() {
+			// intentionally empty
+		}
+
+		@Override
+		public void notifyDecryptionSuccess() {
+			// intentionally empty
+		}
+
+		@Override
+		public void notifyDecryptionFailure(Exception e) {
+			// intentionally empty
+		}
 	}
 
-	default void notifyDecryptionSuccess() {
-	}
-
-	default void notifyDecryptionFailure(Exception e) {
-	}
-
-	static class NOP implements CryptoMetrics {
+	final static class NOP extends Base {
 	}
 
 }

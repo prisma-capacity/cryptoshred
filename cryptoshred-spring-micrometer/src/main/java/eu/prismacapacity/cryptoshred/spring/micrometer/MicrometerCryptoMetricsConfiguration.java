@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.prismacapacity.cryptoshred.spring.boot.autoconfiguration;
+package eu.prismacapacity.cryptoshred.spring.micrometer;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
-import eu.prismacapacity.cryptoshred.spring.cloud.aws.AWSDynamoDBKeyRepositoryConfiguration;
+import eu.prismacapacity.cryptoshred.micrometer.MicrometerCryptoMetrics;
 
 @Configuration
-@Import(AWSDynamoDBKeyRepositoryConfiguration.class)
-@ConditionalOnClass(AWSDynamoDBKeyRepositoryConfiguration.class)
-public class AWSDynamoDBRepositoryAutoConfiguration {
-
+public class MicrometerCryptoMetricsConfiguration {
+	@Bean
+	public MicrometerCryptoMetrics micrometerCryptoMetrics() {
+		return new MicrometerCryptoMetrics();
+	}
 }

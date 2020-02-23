@@ -30,13 +30,13 @@
 
   <dependencies>
     <dependency>
-    	<groupId>io.micrometer</groupId>
-    	<artifactId>micrometer-core</artifactId>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-core</artifactId>
     </dependency>
     <dependency>
-    	<groupId>eu.prismacapacity</groupId>
-    	<artifactId>cryptoshred-core</artifactId>
-    	<version>${project.version}</version>
+      <groupId>eu.prismacapacity</groupId>
+      <artifactId>cryptoshred-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>
