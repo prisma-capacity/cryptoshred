@@ -15,13 +15,15 @@
  */
 package eu.prismacapacity.cryptoshred.core.metrics;
 
+import lombok.NonNull;
+
 public interface CryptoMetrics {
 
 	void notifyMissingKey();
 
 	void notifyDecryptionSuccess();
 
-	void notifyDecryptionFailure(Exception e);
+	void notifyDecryptionFailure(@NonNull Exception e);
 
 	static abstract class Base implements CryptoMetrics {
 
@@ -36,7 +38,7 @@ public interface CryptoMetrics {
 		}
 
 		@Override
-		public void notifyDecryptionFailure(Exception e) {
+		public void notifyDecryptionFailure(@NonNull Exception e) {
 			// intentionally empty
 		}
 	}
