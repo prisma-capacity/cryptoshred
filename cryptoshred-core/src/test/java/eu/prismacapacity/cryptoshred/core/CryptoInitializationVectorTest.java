@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import eu.prismacapacity.cryptoshred.core.CryptoInitializationVector;
-
 public class CryptoInitializationVectorTest {
 	@Test
 	void testNullContracts() throws Exception {

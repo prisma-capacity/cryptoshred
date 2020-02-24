@@ -1,27 +1,40 @@
 package eu.prismacapacity.cryptoshred.cloud.aws;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.model.*;
-import com.amazonaws.waiters.WaiterParameters;
+import static org.junit.Assert.*;
 
-import eu.prismacapacity.cryptoshred.cloud.aws.utils.TestIntegration;
-import eu.prismacapacity.cryptoshred.core.*;
-import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
-import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
-import lombok.NonNull;
-import lombok.val;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.UUID;
+
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.UUID;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
+import com.amazonaws.services.dynamodbv2.model.DescribeTableRequest;
+import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
+import com.amazonaws.services.dynamodbv2.model.KeyType;
+import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
+import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
+import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
+import com.amazonaws.waiters.WaiterParameters;
 
-import static org.junit.Assert.*;
+import eu.prismacapacity.cryptoshred.cloud.aws.utils.TestIntegration;
+import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
+import eu.prismacapacity.cryptoshred.core.CryptoEngine;
+import eu.prismacapacity.cryptoshred.core.CryptoInitializationVector;
+import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
+import eu.prismacapacity.cryptoshred.core.JDKCryptoEngine;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
+import lombok.NonNull;
+import lombok.val;
 
 
 @Testcontainers

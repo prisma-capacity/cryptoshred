@@ -73,7 +73,7 @@ public class CryptoShredConfiguration {
 			b.mapper(om);
 
 		if (size < 128) {
-			throw new IllegalArgumentException("keySize is out or range: " + size);
+			throw new IllegalArgumentException("keySize is out of range: " + size);
 		}
 
 		b.defaultAlgo(CryptoAlgorithm.of(algo));

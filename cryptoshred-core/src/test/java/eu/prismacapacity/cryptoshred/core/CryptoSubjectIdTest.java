@@ -6,8 +6,6 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
-
 public class CryptoSubjectIdTest {
 	@Test
 	void testNullContracts() throws Exception {

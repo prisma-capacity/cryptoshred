@@ -6,8 +6,6 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
-import eu.prismacapacity.cryptoshred.core.CryptoEngineException;
-
 public class CryptoEngineExceptionTest {
 
 	@Test
