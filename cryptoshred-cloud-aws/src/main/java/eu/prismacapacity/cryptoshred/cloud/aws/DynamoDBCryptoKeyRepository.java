@@ -56,19 +56,17 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
     @Override
     public CryptoKey getOrCreateKeyFor(@NonNull CryptoSubjectId subjectId, @NonNull CryptoAlgorithm algorithm,
                                        @NonNull CryptoKeySize size) throws CryptoKeyNotFoundAfterCreatingException {
-        return findKeyFor(subjectId, algorithm, size).orElseGet(() -> createCryptoKey(subjectId, algorithm, size));
+        return findKeyFor(subjectId, algorithm, size)
+                .orElseGet(() -> createCryptoKey(subjectId, algorithm, size));
     }
 
     protected CryptoKey createCryptoKey(CryptoSubjectId subjectId, CryptoAlgorithm algorithm, CryptoKeySize size) {
-        metrics.notifyKeyCreation();
-
         val key = engine.generateKey(algorithm, size);
         val createRequest = CreateCryptoKeyRequest.of(subjectId, algorithm, size, key, tableName);
 
         try {
             val result = metrics.timed("createKeyInDynamoDbTable",
-                    () -> dynamoDB.updateItem(createRequest.toDynamoRequest())
-            );
+                    () -> dynamoDB.updateItem(createRequest.toDynamoRequest()));
 
             val resultKey = Utils.extractCryptoKeyFromItem(algorithm, size, result.getAttributes());
 
@@ -78,18 +76,21 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
                 throw new CryptoKeyNotFoundAfterCreatingException("Something weird happened. Check DynamoDB config.");
             }
 
+            metrics.notifyKeyCreation();
+
             return resultKey.get();
         } catch (ConditionalCheckFailedException ignored) {
             // this happens when the key was not found in the first step but someone created
-            // one in the meantime
-            // the updateItem call checks that the key for algorithm and size does not exist
-            // before updating/creating the item
+            // one in the meantime the updateItem call checks that the key for algorithm
+            // and size does not exist before updating/creating the item
             // so we can safely (consistent) read from the table and get our key
             val item = findKeyFor(subjectId, algorithm, size);
 
             if (!item.isPresent()) {
                 throw new IllegalStateException("DynamoDB consistent read failed.");
             }
+
+            metrics.notifyKeyCreationAfterConflict();
 
             return item.get();
         }

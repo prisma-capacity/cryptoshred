@@ -25,6 +25,9 @@ public interface CryptoMetrics {
 		return fn.call();
 	}
 
+	default void notifyKeyCreationAfterConflict() {
+	}
+
 	static class NOP implements CryptoMetrics {
 	}
 
