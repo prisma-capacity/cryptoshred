@@ -1,0 +1,47 @@
+#!/bin/bash
+
+set -e
+
+PREFIX="> pre-commit [$(basename $0)]\t\t"
+MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Xms768M"
+GREP_OPTIONS=
+
+function gitDiff()
+{
+  local hash
+  if ! [ -x "$(command -v md5sum)" ]; then
+    hash=`git diff | md5 `
+   else
+    hash=`git diff | md5sum `
+   fi
+  echo "$hash"
+}
+
+function fallback()
+{
+ echo -e  "$PREFIX checking using spotless"
+ mvn -o -T 1.5C -q spotless:check || ( echo -e "$PREFIX Please format your java files according to the format definition in src/eclipse" && echo -e "$PREFIX You can do that by typing 'mvn spotless:apply' if your IDE does not help with that." && exit 1)
+}
+
+
+if [ "1" == "$SPOTLESS_AUTO_APPLY" ]; then
+
+ if ! [ -x "$(command -v md5sum)" ] &&  ! [ -x "$(command -v md5)" ]; then
+    echo -e "$PREFIX auto-applying spotless changes requires either md5sum or md5 to be installed." >&2
+    fallback
+ fi
+
+ echo -e  "$PREFIX auto-applying spotless changes"
+ 
+ SPOTLESS_BEFORE=$(gitDiff)
+ mvn -T 1C -q spotless:apply 
+ SPOTLESS_AFTER=$(gitDiff)
+ 
+ if [ "$SPOTLESS_BEFORE" != "$SPOTLESS_AFTER" ]; then
+   echo -e  "$PREFIX Spotless had to change something. Please check if you are ok with the outcome before re-committing.\n\nModified Files:" && git status --porcelain |grep "M"|cut -f 2 -d ' ' |grep . && echo "" && exit 1
+ fi
+
+else
+ fallback
+fi
+

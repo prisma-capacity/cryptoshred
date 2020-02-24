@@ -1,16 +1,18 @@
 package eu.prismacapacity.cryptoshred.cloud.aws;
 
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import eu.prismacapacity.cryptoshred.CryptoAlgorithm;
-import eu.prismacapacity.cryptoshred.CryptoSubjectId;
-import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
-import lombok.val;
-import org.junit.Assert;
-import org.junit.jupiter.api.Test;
-
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.UUID;
+
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
+
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+
+import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
+import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
+import lombok.val;
 
 class UtilsTest {
 

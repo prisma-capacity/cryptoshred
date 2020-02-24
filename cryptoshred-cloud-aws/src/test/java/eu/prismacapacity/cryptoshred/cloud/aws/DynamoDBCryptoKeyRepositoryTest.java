@@ -2,13 +2,13 @@ package eu.prismacapacity.cryptoshred.cloud.aws;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.*;
-import eu.prismacapacity.cryptoshred.CryptoAlgorithm;
-import eu.prismacapacity.cryptoshred.CryptoEngine;
-import eu.prismacapacity.cryptoshred.CryptoSubjectId;
-import eu.prismacapacity.cryptoshred.keys.CryptoKey;
-import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
-import eu.prismacapacity.cryptoshred.metrics.CryptoMetrics;
-import eu.prismacapacity.cryptoshred.metrics.MetricsCallable;
+import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
+import eu.prismacapacity.cryptoshred.core.CryptoEngine;
+import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
+import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
+import eu.prismacapacity.cryptoshred.core.metrics.MetricsCallable;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 
@@ -33,7 +34,7 @@ class DynamoDBCryptoKeyRepositoryTest {
     AmazonDynamoDB dynamoDB;
 
     @Mock(answer = Answers.CALLS_REAL_METHODS)
-    CryptoMetrics metrics;
+    DummyMetrics metrics;
 
     private static final String TABLE_NAME = "foo";
 
@@ -43,7 +44,6 @@ class DynamoDBCryptoKeyRepositoryTest {
     CryptoKey key = CryptoKey.fromBytes("foo".getBytes());
 
     @Test
-
     void testNullContracts() {
         val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, metrics, TABLE_NAME);
 
@@ -184,5 +184,9 @@ class DynamoDBCryptoKeyRepositoryTest {
         verify(dynamoDB, times(2)).getItem(any(GetItemRequest.class));
         verify(dynamoDB).updateItem(any(UpdateItemRequest.class));
         verifyNoMoreInteractions(dynamoDB);
+    }
+
+    static class DummyMetrics extends CryptoMetrics.Base {
+
     }
 }
