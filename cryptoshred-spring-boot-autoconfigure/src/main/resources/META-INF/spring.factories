@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+eu.prismacapacity.cryptoshred.spring.boot.autoconfiguration.CryptoShredAutoConfiguration,\
+eu.prismacapacity.cryptoshred.spring.boot.autoconfiguration.MicrometerAutoConfiguration,\
+eu.prismacapacity.cryptoshred.spring.boot.autoconfiguration.AWSDynamoDBRepositoryAutoConfiguration

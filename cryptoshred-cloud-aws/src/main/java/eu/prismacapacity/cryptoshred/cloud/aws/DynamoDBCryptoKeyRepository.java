@@ -1,20 +1,36 @@
+/*
+ * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.prismacapacity.cryptoshred.cloud.aws;
 
 import java.util.Optional;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
-
-import eu.prismacapacity.cryptoshred.CryptoAlgorithm;
-import eu.prismacapacity.cryptoshred.CryptoEngine;
-import eu.prismacapacity.cryptoshred.CryptoSubjectId;
-import eu.prismacapacity.cryptoshred.keys.CryptoKey;
-import eu.prismacapacity.cryptoshred.keys.CryptoKeyNotFoundAfterCreatingException;
-import eu.prismacapacity.cryptoshred.keys.CryptoKeyRepository;
-import eu.prismacapacity.cryptoshred.keys.CryptoKeySize;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
+
+import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
+import eu.prismacapacity.cryptoshred.core.CryptoEngine;
+import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyNotFoundAfterCreatingException;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 
 /**
  * CryptoKeyRepository implementation based on AWS DynamoDB. Supports multiple
@@ -52,7 +68,6 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
 	public CryptoKey getOrCreateKeyFor(@NonNull CryptoSubjectId subjectId, @NonNull CryptoAlgorithm algorithm,
 			@NonNull CryptoKeySize size) throws CryptoKeyNotFoundAfterCreatingException {
 		return findKeyFor(subjectId, algorithm, size).orElseGet(() -> createCryptoKey(subjectId, algorithm, size));
-
 	}
 
 	protected CryptoKey createCryptoKey(CryptoSubjectId subjectId, CryptoAlgorithm algorithm, CryptoKeySize size) {
