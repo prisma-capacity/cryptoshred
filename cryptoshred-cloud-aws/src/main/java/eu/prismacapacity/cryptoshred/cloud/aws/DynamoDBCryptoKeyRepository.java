@@ -60,8 +60,7 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
 
 		val getRequest = GetCryptoKeyRequest.of(subjectId, algorithm, size, tableName);
 
-		val item = metrics.timed("cryptoshred_find_key_in_dynamodb_table",
-				() -> dynamoDB.getItem(getRequest.toDynamoRequest()).getItem());
+		val item = metrics.timedFindKey(() -> dynamoDB.getItem(getRequest.toDynamoRequest()).getItem());
 
 		if (item == null) {
 			return Optional.empty();
@@ -81,8 +80,7 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
 		val createRequest = CreateCryptoKeyRequest.of(subjectId, algorithm, size, key, tableName);
 
 		try {
-			val result = metrics.timed("cryptoshred_create_key_in_dynamodb_table",
-					() -> dynamoDB.updateItem(createRequest.toDynamoRequest()));
+			val result = metrics.timedCreateKey(() -> dynamoDB.updateItem(createRequest.toDynamoRequest()));
 
 			val resultKey = Utils.extractCryptoKeyFromItem(algorithm, size, result.getAttributes());
 

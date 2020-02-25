@@ -18,7 +18,6 @@ package eu.prismacapacity.cryptoshred.micrometer;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
 import eu.prismacapacity.cryptoshred.core.metrics.MetricsCallable;
@@ -78,18 +77,18 @@ public class MicrometerCryptoMetrics implements CryptoMetrics {
 		keyCreation.increment();
 	}
 
-	@Override
-	public void timed(String timerName, Runnable fn) {
-		val timer = reg.timer(timerName);
-
-		timer.record(fn);
+	private <T> T timed(String timerName, MetricsCallable<T> fn) {
+		return reg.timer(timerName).record(fn::call);
 	}
 
 	@Override
-	public <T> T timed(String timerName, MetricsCallable<T> fn) {
-		val timer = reg.timer(timerName);
+	public <T> T timedCreateKey(MetricsCallable<T> fn) {
+		return timed("cryptoshred_create_key_in_dynamodb_table", fn);
+	}
 
-		return timer.record(fn::call);
+	@Override
+	public <T> T timedFindKey(MetricsCallable<T> fn) {
+		return timed("cryptoshred_find_key_in_dynamodb_table", fn);
 	}
 
 	@Override

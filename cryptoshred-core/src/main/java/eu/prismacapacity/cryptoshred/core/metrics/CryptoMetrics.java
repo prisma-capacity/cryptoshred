@@ -29,9 +29,9 @@ public interface CryptoMetrics {
 
 	void notifyKeyCreation();
 
-	void timed(String timerName, Runnable fn);
+	<T> T timedFindKey(MetricsCallable<T> fn);
 
-	<T> T timed(String timerName, MetricsCallable<T> fn);
+	<T> T timedCreateKey(MetricsCallable<T> fn);
 
 	void notifyKeyCreationAfterConflict();
 
@@ -63,12 +63,12 @@ public interface CryptoMetrics {
 		}
 
 		@Override
-		public void timed(String timerName, Runnable fn) {
-			fn.run();
+		public <T> T timedFindKey(MetricsCallable<T> fn) {
+			return fn.call();
 		}
 
 		@Override
-		public <T> T timed(String timerName, MetricsCallable<T> fn) {
+		public <T> T timedCreateKey(MetricsCallable<T> fn) {
 			return fn.call();
 		}
 
