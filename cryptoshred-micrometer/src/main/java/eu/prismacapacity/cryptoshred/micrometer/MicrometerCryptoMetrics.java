@@ -16,20 +16,19 @@
 package eu.prismacapacity.cryptoshred.micrometer;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
 import eu.prismacapacity.cryptoshred.core.metrics.MetricsCallable;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Metrics;
 
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class MicrometerCryptoMetrics implements CryptoMetrics {
 
-	private final MeterRegistry reg = Metrics.globalRegistry;
+	private final MeterRegistry registry;
 	@NonNull
 	private final Counter missingKey;
 	@NonNull
@@ -43,13 +42,14 @@ public class MicrometerCryptoMetrics implements CryptoMetrics {
 	@NonNull
 	private final Counter keyCreationAfterConflict;
 
-	public MicrometerCryptoMetrics() {
-		missingKey = reg.counter("cryptoshred_missing_key");
-		decryptionSuccess = reg.counter("cryptoshred_decryption_success");
-		decryptionFailure = reg.counter("cryptoshred_decryption_failure");
-		keyLookUp = reg.counter("cryptoshred_key_lookup");
-		keyCreation = reg.counter("cryptoshred_key_creation");
-		keyCreationAfterConflict = reg.counter("cryptoshred_key_creation_after_conflict");
+	public MicrometerCryptoMetrics(@NonNull MeterRegistry reg) {
+		this.registry = reg;
+		missingKey = reg.counter("cryptoshred.missing.key");
+		decryptionSuccess = reg.counter("cryptoshred.decryption.success");
+		decryptionFailure = reg.counter("cryptoshred.decryption.failure");
+		keyLookUp = reg.counter("cryptoshred.key.lookup");
+		keyCreation = reg.counter("cryptoshred.key.creation");
+		keyCreationAfterConflict = reg.counter("cryptoshred.key.creation.after.conflict");
 	}
 
 	@Override
@@ -78,17 +78,17 @@ public class MicrometerCryptoMetrics implements CryptoMetrics {
 	}
 
 	private <T> T timed(String timerName, MetricsCallable<T> fn) {
-		return reg.timer(timerName).record(fn::call);
+		return registry.timer(timerName).record(fn::call);
 	}
 
 	@Override
 	public <T> T timedCreateKey(MetricsCallable<T> fn) {
-		return timed("cryptoshred_create_key_in_dynamodb_table", fn);
+		return timed("cryptoshred_create_key", fn);
 	}
 
 	@Override
 	public <T> T timedFindKey(MetricsCallable<T> fn) {
-		return timed("cryptoshred_find_key_in_dynamodb_table", fn);
+		return timed("cryptoshred_find_key", fn);
 	}
 
 	@Override
