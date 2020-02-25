@@ -3,7 +3,10 @@ package eu.prismacapacity.cryptoshred.micrometer;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 
+import io.micrometer.core.instrument.Timer;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -79,7 +82,6 @@ public class MicrometerCryptoMetricsTest {
 		uut.notifyKeyLookUp();
 		verify(keyLookUp).increment();
 		verifyNoMoreInteractions(keyLookUp);
-		verifyNoInteractions(keyLookUp, missingKey);
 	}
 
 	@Test
@@ -90,7 +92,6 @@ public class MicrometerCryptoMetricsTest {
 		uut.notifyKeyCreation();
 		verify(keyCreation).increment();
 		verifyNoMoreInteractions(keyCreation);
-		verifyNoInteractions(keyCreation, missingKey);
 	}
 
 	@Test
@@ -101,6 +102,37 @@ public class MicrometerCryptoMetricsTest {
 		uut.notifyKeyCreationAfterConflict();
 		verify(keyCreationAfterConflict).increment();
 		verifyNoMoreInteractions(keyCreationAfterConflict);
-		verifyNoInteractions(keyCreationAfterConflict, missingKey);
+	}
+
+	@Test
+	void timedCreateKey() throws Exception {
+		uut = new MicrometerCryptoMetrics(registry, missingKey, decryptionSuccess, decryptionFailure, keyLookUp,
+				keyCreation, keyCreationAfterConflict);
+
+		val timer = mock(Timer.class);
+		when(registry.timer("cryptoshred_create_key")).thenReturn(timer);
+		when(timer.record(any(Supplier.class))).thenReturn(null);
+
+		uut.timedCreateKey(() -> null);
+
+		verify(timer).record(any(Supplier.class));
+		verify(registry).timer("cryptoshred_create_key");
+		verifyNoMoreInteractions(registry, timer);
+	}
+
+	@Test
+	void timedFindKey() throws Exception {
+		uut = new MicrometerCryptoMetrics(registry, missingKey, decryptionSuccess, decryptionFailure, keyLookUp,
+				keyCreation, keyCreationAfterConflict);
+
+		val timer = mock(Timer.class);
+		when(registry.timer("cryptoshred_find_key")).thenReturn(timer);
+		when(timer.record(any(Supplier.class))).thenReturn(null);
+
+		uut.timedFindKey(() -> null);
+
+		verify(timer).record(any(Supplier.class));
+		verify(registry).timer("cryptoshred_find_key");
+		verifyNoMoreInteractions(registry, timer);
 	}
 }

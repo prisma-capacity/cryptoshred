@@ -19,11 +19,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import eu.prismacapacity.cryptoshred.micrometer.MicrometerCryptoMetrics;
+import io.micrometer.core.instrument.MeterRegistry;
 
 @Configuration
 public class MicrometerCryptoMetricsConfiguration {
 	@Bean
-	public MicrometerCryptoMetrics micrometerCryptoMetrics() {
-		return new MicrometerCryptoMetrics();
+	public MicrometerCryptoMetrics micrometerCryptoMetrics(MeterRegistry reg) {
+		return new MicrometerCryptoMetrics(reg);
 	}
 }
