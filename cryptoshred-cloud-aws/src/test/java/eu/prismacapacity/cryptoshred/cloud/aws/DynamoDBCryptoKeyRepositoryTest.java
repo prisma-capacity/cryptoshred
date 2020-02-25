@@ -1,6 +1,6 @@
 package eu.prismacapacity.cryptoshred.cloud.aws;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -26,137 +27,168 @@ import eu.prismacapacity.cryptoshred.core.CryptoEngine;
 import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
+import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
+import eu.prismacapacity.cryptoshred.core.metrics.MetricsCallable;
 import lombok.val;
-
 
 @ExtendWith(MockitoExtension.class)
 class DynamoDBCryptoKeyRepositoryTest {
-    @Mock
-    CryptoEngine engine;
+	@Mock
+	CryptoEngine engine;
 
-    @Mock
-    AmazonDynamoDB dynamoDB;
+	@Mock
+	AmazonDynamoDB dynamoDB;
 
-    private static final String TABLE_NAME = "foo";
+	@Mock(answer = Answers.CALLS_REAL_METHODS)
+	DummyMetrics metrics;
 
-    CryptoSubjectId subjectId = CryptoSubjectId.of(UUID.randomUUID());
-    CryptoAlgorithm algorithm = CryptoAlgorithm.AES_CBC;
-    CryptoKeySize size = CryptoKeySize.BIT_256;
-    CryptoKey key = CryptoKey.fromBytes("foo".getBytes());
+	private static final String TABLE_NAME = "foo";
 
+	CryptoSubjectId subjectId = CryptoSubjectId.of(UUID.randomUUID());
+	CryptoAlgorithm algorithm = CryptoAlgorithm.AES_CBC;
+	CryptoKeySize size = CryptoKeySize.BIT_256;
+	CryptoKey key = CryptoKey.fromBytes("foo".getBytes());
 
-    @Test
-    void testFindKeyForValidItem() {
-        val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, TABLE_NAME);
+	@Test
+	void testNullContracts() {
+		val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, metrics, TABLE_NAME);
 
-        val item = new HashMap<String, AttributeValue>() {{
-            put(Utils.generateKeyPropertyName(algorithm, size),
-                    new AttributeValue().withB(ByteBuffer.wrap(key.getBytes())));
-        }};
+		assertThrows(NullPointerException.class, () -> uut.findKeyFor(null, algorithm, size));
 
-        val responseMock = mock(GetItemResult.class);
+		assertThrows(NullPointerException.class, () -> uut.findKeyFor(subjectId, null, size));
 
-        when(dynamoDB.getItem(any(GetItemRequest.class))).thenReturn(responseMock);
-        when(responseMock.getItem()).thenReturn(item);
+		assertThrows(NullPointerException.class, () -> uut.findKeyFor(subjectId, algorithm, null));
 
-        val result = uut.findKeyFor(subjectId, algorithm, size);
+		assertThrows(NullPointerException.class, () -> uut.getOrCreateKeyFor(null, algorithm, size));
 
-        assertTrue(result.isPresent());
-        assertEquals(result.get(), key);
+		assertThrows(NullPointerException.class, () -> uut.getOrCreateKeyFor(subjectId, null, size));
 
-        verify(dynamoDB).getItem(any(GetItemRequest.class));
+		assertThrows(NullPointerException.class, () -> uut.getOrCreateKeyFor(subjectId, algorithm, null));
+	}
 
-    }
+	@Test
+	void testFindKeyForValidItem() {
+		val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, metrics, TABLE_NAME);
 
-    @Test
-    void testFindKeyForIfAbsent() {
-        val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, TABLE_NAME);
+		val item = new HashMap<String, AttributeValue>() {
+			{
+				put(Utils.generateKeyPropertyName(algorithm, size),
+						new AttributeValue().withB(ByteBuffer.wrap(key.getBytes())));
+			}
+		};
 
-        val responseMock = mock(GetItemResult.class);
+		val responseMock = mock(GetItemResult.class);
 
-        when(dynamoDB.getItem(any(GetItemRequest.class))).thenReturn(responseMock);
-        when(responseMock.getItem()).thenReturn(null);
+		when(dynamoDB.getItem(any(GetItemRequest.class))).thenReturn(responseMock);
+		when(responseMock.getItem()).thenReturn(item);
 
-        val result = uut.findKeyFor(subjectId, algorithm, size);
+		val result = uut.findKeyFor(subjectId, algorithm, size);
 
-        assertFalse(result.isPresent());
+		assertTrue(result.isPresent());
+		assertEquals(result.get(), key);
 
-        verify(dynamoDB).getItem(any(GetItemRequest.class));
-    }
+		verify(dynamoDB).getItem(any(GetItemRequest.class));
+		verify(metrics).notifyKeyLookUp();
+		verify(metrics).timedFindKey(any(MetricsCallable.class));
 
-    @Test
-    void testGetOrCreateKeyForAlreadyExistingKey() {
-        val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, TABLE_NAME);
+	}
 
-        val responseMock = mock(GetItemResult.class);
-        val item = new HashMap<String, AttributeValue>() {{
-            put(Utils.generateKeyPropertyName(algorithm, size),
-                    new AttributeValue().withB(ByteBuffer.wrap(key.getBytes())));
-        }};
+	@Test
+	void testFindKeyForIfAbsent() {
+		val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, metrics, TABLE_NAME);
 
-        when(dynamoDB.getItem(any(GetItemRequest.class))).thenReturn(responseMock);
-        when(responseMock.getItem()).thenReturn(item);
+		val responseMock = mock(GetItemResult.class);
 
-        val resultKey = uut.getOrCreateKeyFor(subjectId, algorithm, size);
+		when(dynamoDB.getItem(any(GetItemRequest.class))).thenReturn(responseMock);
+		when(responseMock.getItem()).thenReturn(null);
 
-        assertEquals(key, resultKey);
+		val result = uut.findKeyFor(subjectId, algorithm, size);
 
-        verify(dynamoDB).getItem(any(GetItemRequest.class));
-        verifyNoMoreInteractions(dynamoDB);
-    }
+		assertFalse(result.isPresent());
 
-    @Test
-    void testGetOrCreateKeyForNewKey() {
-        val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, TABLE_NAME);
+		verify(dynamoDB).getItem(any(GetItemRequest.class));
+	}
 
-        val item = new HashMap<String, AttributeValue>() {{
-            put(Utils.generateKeyPropertyName(algorithm, size),
-                    new AttributeValue().withB(ByteBuffer.wrap(key.getBytes())));
-        }};
+	@Test
+	void testGetOrCreateKeyForAlreadyExistingKey() {
+		val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, metrics, TABLE_NAME);
 
-        val getResponseMock = mock(GetItemResult.class);
-        when(dynamoDB.getItem(any(GetItemRequest.class))).thenReturn(getResponseMock);
-        when(getResponseMock.getItem()).thenReturn(null);
+		val responseMock = mock(GetItemResult.class);
+		val item = Maps.of(Utils.generateKeyPropertyName(algorithm, size),
+				new AttributeValue().withB(ByteBuffer.wrap(key.getBytes())));
 
-        val updateResponseMock = mock(UpdateItemResult.class);
-        when(dynamoDB.updateItem(any(UpdateItemRequest.class))).thenReturn(updateResponseMock);
-        when(updateResponseMock.getAttributes()).thenReturn(item);
+		when(dynamoDB.getItem(any(GetItemRequest.class))).thenReturn(responseMock);
+		when(responseMock.getItem()).thenReturn(item);
 
-        when(engine.generateKey(algorithm, size)).thenReturn(key);
+		val resultKey = uut.getOrCreateKeyFor(subjectId, algorithm, size);
 
-        val resultKey = uut.getOrCreateKeyFor(subjectId, algorithm, size);
+		assertEquals(key, resultKey);
 
-        assertEquals(key, resultKey);
+		verify(dynamoDB).getItem(any(GetItemRequest.class));
+		verifyNoMoreInteractions(dynamoDB);
+	}
 
-        verify(dynamoDB).getItem(any(GetItemRequest.class));
-        verify(dynamoDB).updateItem(any(UpdateItemRequest.class));
-        verifyNoMoreInteractions(dynamoDB);
-    }
+	@SuppressWarnings("unchecked")
+	@Test
+	void testGetOrCreateKeyForNewKey() {
+		val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, metrics, TABLE_NAME);
 
-    @Test
-    void testGetOrCreateKeyForRaceConditionBetweenMultipleClients() {
-        val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, TABLE_NAME);
+		val item = Maps.of(Utils.generateKeyPropertyName(algorithm, size),
+				new AttributeValue().withB(ByteBuffer.wrap(key.getBytes())));
 
-        when(engine.generateKey(algorithm, size)).thenReturn(key);
+		val getResponseMock = mock(GetItemResult.class);
+		when(dynamoDB.getItem(any(GetItemRequest.class))).thenReturn(getResponseMock);
+		when(getResponseMock.getItem()).thenReturn(null);
 
-        val getResponseMock = mock(GetItemResult.class);
-        when(dynamoDB.getItem(any(GetItemRequest.class))).thenReturn(getResponseMock);
-        val item = new HashMap<String, AttributeValue>() {{
-            put(Utils.generateKeyPropertyName(algorithm, size),
-                    new AttributeValue().withB(ByteBuffer.wrap(key.getBytes())));
-        }};
+		val updateResponseMock = mock(UpdateItemResult.class);
+		when(dynamoDB.updateItem(any(UpdateItemRequest.class))).thenReturn(updateResponseMock);
+		when(updateResponseMock.getAttributes()).thenReturn(item);
 
-        //noinspection unchecked
-        when(getResponseMock.getItem()).thenReturn(null, item);
+		when(engine.generateKey(algorithm, size)).thenReturn(key);
 
-        when(dynamoDB.updateItem(any(UpdateItemRequest.class))).thenThrow(new ConditionalCheckFailedException("foo"));
+		val resultKey = uut.getOrCreateKeyFor(subjectId, algorithm, size);
 
-        val resultKey = uut.getOrCreateKeyFor(subjectId, algorithm, size);
+		assertEquals(key, resultKey);
 
-        assertEquals(key, resultKey);
+		verify(dynamoDB).getItem(any(GetItemRequest.class));
+		verify(dynamoDB).updateItem(any(UpdateItemRequest.class));
+		verifyNoMoreInteractions(dynamoDB);
+		verify(metrics).notifyKeyLookUp();
+		verify(metrics).notifyKeyCreation();
+		verify(metrics).timedCreateKey(any(MetricsCallable.class));
+		verify(metrics).timedFindKey(any(MetricsCallable.class));
+	}
 
-        verify(dynamoDB, times(2)).getItem(any(GetItemRequest.class));
-        verify(dynamoDB).updateItem(any(UpdateItemRequest.class));
-        verifyNoMoreInteractions(dynamoDB);
-    }
+	@Test
+	void testGetOrCreateKeyForRaceConditionBetweenMultipleClients() {
+		val uut = new DynamoDBCryptoKeyRepository(engine, dynamoDB, metrics, TABLE_NAME);
+
+		when(engine.generateKey(algorithm, size)).thenReturn(key);
+
+		val getResponseMock = mock(GetItemResult.class);
+		when(dynamoDB.getItem(any(GetItemRequest.class))).thenReturn(getResponseMock);
+		val item = new HashMap<String, AttributeValue>() {
+			{
+				put(Utils.generateKeyPropertyName(algorithm, size),
+						new AttributeValue().withB(ByteBuffer.wrap(key.getBytes())));
+			}
+		};
+
+		// noinspection unchecked
+		when(getResponseMock.getItem()).thenReturn(null, item);
+
+		when(dynamoDB.updateItem(any(UpdateItemRequest.class))).thenThrow(new ConditionalCheckFailedException("foo"));
+
+		val resultKey = uut.getOrCreateKeyFor(subjectId, algorithm, size);
+
+		assertEquals(key, resultKey);
+
+		verify(dynamoDB, times(2)).getItem(any(GetItemRequest.class));
+		verify(dynamoDB).updateItem(any(UpdateItemRequest.class));
+		verifyNoMoreInteractions(dynamoDB);
+	}
+
+	static class DummyMetrics extends CryptoMetrics.Base {
+
+	}
 }

@@ -25,6 +25,16 @@ public interface CryptoMetrics {
 
 	void notifyDecryptionFailure(@NonNull Exception e);
 
+	void notifyKeyLookUp();
+
+	void notifyKeyCreation();
+
+	<T> T timedFindKey(MetricsCallable<T> fn);
+
+	<T> T timedCreateKey(MetricsCallable<T> fn);
+
+	void notifyKeyCreationAfterConflict();
+
 	static abstract class Base implements CryptoMetrics {
 
 		@Override
@@ -41,6 +51,32 @@ public interface CryptoMetrics {
 		public void notifyDecryptionFailure(@NonNull Exception e) {
 			// intentionally empty
 		}
+
+		@Override
+		public void notifyKeyLookUp() {
+			// intentionally empty
+		}
+
+		@Override
+		public void notifyKeyCreation() {
+			// intentionally empty
+		}
+
+		@Override
+		public <T> T timedFindKey(MetricsCallable<T> fn) {
+			return fn.call();
+		}
+
+		@Override
+		public <T> T timedCreateKey(MetricsCallable<T> fn) {
+			return fn.call();
+		}
+
+		@Override
+		public void notifyKeyCreationAfterConflict() {
+			// intentionally empty
+		}
+
 	}
 
 	final static class NOP extends Base {

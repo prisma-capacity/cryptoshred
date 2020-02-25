@@ -24,17 +24,17 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import eu.prismacapacity.cryptoshred.cloud.aws.DynamoDBCryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.CryptoEngine;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
+import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
 
 @Configuration
 public class AWSDynamoDBKeyRepositoryConfiguration {
 	@Bean
-	public CryptoKeyRepository cryptoKeyRepository(CryptoEngine engine, AmazonDynamoDB dynamoDB,
-
+	public CryptoKeyRepository cryptoKeyRepository(CryptoEngine engine, AmazonDynamoDB dynamoDB, CryptoMetrics metrics,
 			@Value("${cryptoshred.cloud.aws.dynamo.tablename:#{null}}") String tableName) {
 
 		if (tableName == null)
 			throw new IllegalArgumentException("Property 'cryptoshred.cloud.aws.dynamo.tablename' is required.");
 
-		return new DynamoDBCryptoKeyRepository(engine, dynamoDB, tableName);
+		return new DynamoDBCryptoKeyRepository(engine, dynamoDB, metrics, tableName);
 	}
 }

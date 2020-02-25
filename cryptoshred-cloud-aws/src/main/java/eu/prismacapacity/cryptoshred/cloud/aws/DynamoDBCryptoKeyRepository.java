@@ -31,13 +31,13 @@ import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyNotFoundAfterCreatingException;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
+import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
 
 /**
  * CryptoKeyRepository implementation based on AWS DynamoDB. Supports multiple
  * keys (algorithm + size) for the same subject
  *
  * @author otbe
- *
  */
 @RequiredArgsConstructor
 public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
@@ -48,14 +48,19 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
 	private final AmazonDynamoDB dynamoDB;
 
 	@NonNull
+	private final CryptoMetrics metrics;
+
+	@NonNull
 	private final String tableName;
 
 	@Override
 	public Optional<CryptoKey> findKeyFor(@NonNull CryptoSubjectId subjectId, @NonNull CryptoAlgorithm algorithm,
 			@NonNull CryptoKeySize size) {
+		metrics.notifyKeyLookUp();
+
 		val getRequest = GetCryptoKeyRequest.of(subjectId, algorithm, size, tableName);
 
-		val item = dynamoDB.getItem(getRequest.toDynamoRequest()).getItem();
+		val item = metrics.timedFindKey(() -> dynamoDB.getItem(getRequest.toDynamoRequest()).getItem());
 
 		if (item == null) {
 			return Optional.empty();
@@ -75,7 +80,8 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
 		val createRequest = CreateCryptoKeyRequest.of(subjectId, algorithm, size, key, tableName);
 
 		try {
-			val result = dynamoDB.updateItem(createRequest.toDynamoRequest());
+			val result = metrics.timedCreateKey(() -> dynamoDB.updateItem(createRequest.toDynamoRequest()));
+
 			val resultKey = Utils.extractCryptoKeyFromItem(algorithm, size, result.getAttributes());
 
 			if (!resultKey.isPresent()) {
@@ -84,18 +90,21 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
 				throw new CryptoKeyNotFoundAfterCreatingException("Something weird happened. Check DynamoDB config.");
 			}
 
+			metrics.notifyKeyCreation();
+
 			return resultKey.get();
 		} catch (ConditionalCheckFailedException ignored) {
 			// this happens when the key was not found in the first step but someone created
-			// one in the meantime
-			// the updateItem call checks that the key for algorithm and size does not exist
-			// before updating/creating the item
+			// one in the meantime the updateItem call checks that the key for algorithm
+			// and size does not exist before updating/creating the item
 			// so we can safely (consistent) read from the table and get our key
 			val item = findKeyFor(subjectId, algorithm, size);
 
 			if (!item.isPresent()) {
 				throw new IllegalStateException("DynamoDB consistent read failed.");
 			}
+
+			metrics.notifyKeyCreationAfterConflict();
 
 			return item.get();
 		}
