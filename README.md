@@ -37,27 +37,27 @@ In order to make use of that technique, you need to encrypt data before writing 
 In order to encrypt a particular piece of data, you use a 'CryptoContainerFactory' to wrap a CryptoContainer around the actual data before persisting.
 
 ```java
-	@Data
-	public class Person { // might be an Enitity, a POJO you serialize or anything you want to persist
-		int age;
-		CryptoContainer<String> name;
-	}
+@Data
+public class Person { // might be an Enitity, a POJO you serialize or anything you want to persist
+  int age;
+  CryptoContainer<String> name;
+}
 ```
 Of course, in order to wrap the data (and encrypt it, you'd need to provide a 'CryptoSubjectId', that references the actual key, that you'd want to throw away in order to do the 'deletion' afterwards)
 
 ```java
-		CryptoContainerFactory factory = ... // maybe injected from Spring or similar
-		CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID()); // simple value object
+CryptoContainerFactory factory = ... // maybe injected from Spring or similar
+CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID()); // simple value object
 
-		Person p = new Person();
-		p.name = factory.wrap("Peter", id);
-		p.age = 30;
+Person p = new Person();
+p.name = factory.wrap("Peter", id);
+p.age = 30;
 
-		// go persist the Person
+// go persist the Person
 ```
 A CryptoContainer consists of the following data:
 
-* SubjectId
+* SubjectId (which is associated to the actual key used for en/de-cryption)
 * Algorith used
 * KeySize used
 * Type of Object // String in this example
@@ -66,25 +66,22 @@ A CryptoContainer consists of the following data:
 You can wrap any Jackson-serializable object like for instance
 
 ```java
+CryptoKeyRepository repo = new InMemCryptoKeyRepository(engine); // don't do this at home
+CryptoObjectMapper om = CryptoObjectMapper.builder(repo, engine)
+	.defaultKeySize(CryptoKeySize.of(256)) // optional
+	.defaultAlgo(CryptoAlgorithm.AES_CBC)  // optional
+	.build();
 
-		CryptoObjectMapper om = CryptoObjectMapper.builder(
-			new InMemCryptoKeyRepository(engine), engine)
-			.defaultKeySize(CryptoKeySize.of(256)) // optional
-			.defaultAlgo(CryptoAlgorithm.AES_CBC)
-			.build();
+CryptoContainerFactory factory = om; 	// maybe injected from Spring or similar
+					// actually implemented by CryptoObjectMapper
 
+CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID()); // simple value object, you would want to use a userId for that, and not a silly random.
 
-		CryptoContainerFactory factory = om; // maybe injected from Spring or similar
-											 // actually implemented by CryptoObjectMapper
-
-		CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID()); // simple value object
-
-		Person p = new Person();
-		p.name = factory.wrap("Peter", id);
-		p.age = 30;
-		p.credicard = factory.wrap(new CreditCardInfo("12341234",CrediCardTypes.VISA));
-
-		// go persist the Person
+Person p = new Person();
+p.name = factory.wrap("Peter", id);
+p.age = 30;
+p.credicard = factory.wrap(new CreditCardInfo("12341234",CrediCardTypes.VISA));
+// go persist the Person
 ```
 
 ### Decryption
