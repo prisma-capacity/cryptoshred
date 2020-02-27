@@ -7,11 +7,11 @@
 
 ### Motivation
 
-Cryptoshredding is a well-known technique to 'erase' encryted data by throwing away the necessary key for decryption. 
-Two of the advantages are
+Cryptoshredding is a well-known technique to 'erase' encrypted data by throwing away the key necessary for decryption. 
+Two out of numerous advantages are
 
 * You do not have to actually remove (or update) data, so that it can be immutable
-* You don't have to keep track of where it is used, as long as it stays encrypted.
+* You don't have to keep track of where it is used, as long as it stays encrypted
 
 see https://en.wikipedia.org/wiki/Crypto-shredding
 
