@@ -90,14 +90,14 @@ When using CryptoObjectMapper to deserialize a 'CryptoContainer', all necessary 
 
 ```java
 
-		String json = om.writeValueAsString(p);
+String json = om.writeValueAsString(p);
 
-		Person p2 = om.readValue(json, Person.class);
-		assertTrue(p2.name.isPresent());
-		assertEquals("Peter",p2.name.get());
+Person p2 = om.readValue(json, Person.class);
+assertTrue(p2.name.isPresent());
+assertEquals("Peter",p2.name.get());
 
-		// if you deleted the key in between, name.isPresent() would be false.
-		// of course you should rather use p2.name.orElse("unknown") or something rather than get, but you know all that from 
+// if you deleted the key in between, name.isPresent() would be false.
+// of course you should rather use p2.name.orElse("unknown") or something rather than get, but you know all that from 
 ```
 
 
