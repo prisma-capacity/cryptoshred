@@ -104,6 +104,13 @@ assertEquals("Peter",p2.name.get());
 // if you deleted the key in between, name.isPresent() would be false.
 // of course you should rather use p2.name.orElse("unknown") or something rather than get, but you know all that from 
 ```
+<hr />
+<div align="right">This project is sponsored by
+<a href="https://www.prisma-capacity.eu/careers#job-offers"><img
+align="bottom" alt="PRISMA European Capacity Platform GmbH" class="inline"
+src="prisma.png"
+/></a>
+</div>
 
 
 
