@@ -1,4 +1,4 @@
-<div align="right"><a href="https://www.prisma-capacity.eu/careers#job-offers">
+<div align="right"><a target="myNextJob" href="https://www.prisma-capacity.eu/careers#job-offers">
     <img class="inline" src="prisma.png">
 </a></div>
 
