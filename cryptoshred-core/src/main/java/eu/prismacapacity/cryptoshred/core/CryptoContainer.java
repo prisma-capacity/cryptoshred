@@ -73,11 +73,10 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
 			String algo = tree.get(JSON_KEY_ALGO).asText();
 			byte[] encrypted = tree.get(JSON_KEY_ENCRYPTED_BYTES).binaryValue();
 
+			CryptoObjectMapper om = (CryptoObjectMapper) ctxt
+					.findInjectableValue(CryptoObjectMapper.JACKSON_INJECT_NAME, new BeanProperty.Bogus(), null);
 			CryptoContainer<?> cc = new CryptoContainer<>(targetType, CryptoAlgorithm.of(algo),
-					CryptoKeySize.of(keySize), CryptoSubjectId.of(UUID.fromString(subjectId)), encrypted);
-
-			cc.mapper = (CryptoObjectMapper) ctxt.findInjectableValue(CryptoObjectMapper.JACKSON_INJECT_NAME,
-					new BeanProperty.Bogus(), cc);
+					CryptoKeySize.of(keySize), CryptoSubjectId.of(UUID.fromString(subjectId)), encrypted, om);
 
 			return cc;
 		}
@@ -106,18 +105,20 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
 
 	}
 
-	private CryptoContainer(@NonNull Class<T> type, @NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size,
-			@NonNull CryptoSubjectId subjectId, @NonNull byte[] encryptedBytes) {
+	protected CryptoContainer(@NonNull Class<T> type, @NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size,
+			@NonNull CryptoSubjectId subjectId, @NonNull byte[] encryptedBytes,
+			@NonNull CryptoObjectMapper cryptoObjectMapper) {
 		this.type = type;
 		this.algo = algo;
 		this.size = size;
 		this.subjectId = subjectId;
 		this.encryptedBytes = encryptedBytes;
+		this.mapper = cryptoObjectMapper;
 	}
 
-	private CryptoContainer(@NonNull Class<T> class1, @NonNull CryptoAlgorithm algorithm,
-			@NonNull CryptoKeySize keySize, @NonNull CryptoSubjectId id, @NonNull byte[] encryptedBytes,
-			@NonNull T value, @NonNull CryptoObjectMapper cryptoObjectMapper) {
+	protected CryptoContainer(@NonNull Class<T> class1, @NonNull CryptoAlgorithm algorithm,
+			@NonNull CryptoKeySize keySize, @NonNull CryptoSubjectId id, byte[] encryptedBytes, T value,
+			@NonNull CryptoObjectMapper cryptoObjectMapper) {
 		this.cachedValue = Optional.ofNullable(value);
 		this.mapper = cryptoObjectMapper;
 		this.type = class1;
@@ -125,12 +126,6 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
 		this.size = keySize;
 		this.encryptedBytes = encryptedBytes;
 		this.subjectId = id;
-	}
-
-	static <T> CryptoContainer<T> fromValue(@NonNull Class<T> type, @NonNull CryptoAlgorithm algorithm,
-			@NonNull CryptoKeySize keySize, @NonNull CryptoSubjectId id, @NonNull byte[] encryptedBytes,
-			@NonNull T value, CryptoObjectMapper cryptoObjectMapper) {
-		return new CryptoContainer<T>(type, algorithm, keySize, id, encryptedBytes, value, cryptoObjectMapper);
 	}
 
 	@Getter
@@ -154,6 +149,7 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
 
 	private transient CryptoObjectMapper mapper;
 
+	@Override
 	protected T value() {
 		if (cachedValue == null) {
 			cachedValue = Optional.ofNullable(mapper.unwrap(this));

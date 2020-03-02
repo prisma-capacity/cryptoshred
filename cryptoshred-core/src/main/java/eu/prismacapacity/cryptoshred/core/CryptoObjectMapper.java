@@ -68,7 +68,7 @@ public class CryptoObjectMapper implements CryptoContainerFactory {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public @NonNull <T> CryptoContainer<T> wrap(@NonNull T value, @NonNull CryptoSubjectId id,
 			@NonNull CryptoAlgorithm algorithm, @NonNull CryptoKeySize keySize) throws JsonProcessingException {
 
@@ -77,9 +77,14 @@ public class CryptoObjectMapper implements CryptoContainerFactory {
 		bytes = writeValueAsBytes(value);
 		byte[] encryptToBytes = engine.encrypt(bytes, algorithm, key, this);
 
-		return CryptoContainer.fromValue((Class<T>) value.getClass(), algorithm, keySize, id, encryptToBytes, value,
-				this);
+		return new CryptoContainer(value.getClass(), algorithm, keySize, id, encryptToBytes, value, this);
 
+	}
+
+	@Override
+	public @NonNull <T> CryptoContainer<T> restore(@NonNull Class<T> type, @NonNull CryptoSubjectId id,
+			CryptoAlgorithm algo, CryptoKeySize size, byte[] encryptedBytes) {
+		return new CryptoContainer<>(type, algo, size, id, encryptedBytes, this);
 	}
 
 	<T> T unwrap(@NonNull CryptoContainer<T> cryptoContainer) {
