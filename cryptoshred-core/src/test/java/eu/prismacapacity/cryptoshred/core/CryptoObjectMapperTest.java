@@ -16,16 +16,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 public class CryptoObjectMapperTest {
+	CryptoEngine engine = new JDKCryptoEngine(CryptoInitializationVector.of("mysecret"));
+
+	CryptoObjectMapper om = CryptoObjectMapper.builder(new InMemCryptoKeyRepository(engine), engine)
+			.defaultKeySize(CryptoKeySize.of(128)).build();
+
+	CryptoContainerFactory factory = om; // optional
 
 	@Test
 	void testHappyPath() throws Exception {
 		// arrange
-		CryptoEngine engine = new JDKCryptoEngine(CryptoInitializationVector.of("mysecret"));
-
-		CryptoObjectMapper om = CryptoObjectMapper.builder(new InMemCryptoKeyRepository(engine), engine)
-				.defaultKeySize(CryptoKeySize.of(128)).build();
-
-		CryptoContainerFactory factory = om; // optional
 
 		CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
 
@@ -64,6 +64,26 @@ public class CryptoObjectMapperTest {
 		assertEquals(String.class, c2.get().getClass());
 		assertEquals("hubbi", c2.get());
 
+	}
+
+	@Test
+	void testManualContainerComposition() throws Exception {
+		CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
+
+		CryptoContainer<String> c = factory.wrap("Peter", id);
+		CryptoSubjectId subjectId = c.getSubjectId();
+		CryptoAlgorithm algo = c.getAlgo();
+		CryptoKeySize size = c.getSize();
+		byte[] encryptedBytes = c.getEncryptedBytes();
+
+		CryptoContainer<String> c2 = factory.restore(String.class, subjectId, algo, size, encryptedBytes);
+
+		assertEquals(c.getSubjectId(), c2.getSubjectId());
+		assertEquals(c.getAlgo(), c2.getAlgo());
+		assertEquals(c.getSize(), c2.getSize());
+		assertEquals(c.getEncryptedBytes(), c2.getEncryptedBytes());
+
+		assertEquals(c.get(), c2.get());
 	}
 
 	@Data
