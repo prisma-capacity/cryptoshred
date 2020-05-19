@@ -9,7 +9,7 @@
     <version>0.1.6</version>
   </parent>
   <artifactId>cryptoshred</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.2</version>
   <packaging>pom</packaging>
   <name>cryptoshredding lib</name>
   <description>TODO</description>
