@@ -89,7 +89,7 @@ CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID()); // simple value obje
 Person p = new Person();
 p.name = factory.wrap("Peter", id);
 p.age = 30;
-p.credicard = factory.wrap(new CreditCardInfo("12341234",CrediCardTypes.VISA));
+p.creditcard = factory.wrap(new CreditCardInfo("12341234",CrediCardTypes.VISA));
 // go persist the Person
 ```
 
