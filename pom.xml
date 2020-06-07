@@ -118,6 +118,14 @@
   </dependencies>
   <build>
     <plugins>
+    <plugin>
+    <groupId>org.eluder.coveralls</groupId>
+    <artifactId>coveralls-maven-plugin</artifactId>
+    <version>3.0.1</version>
+    <configuration>
+        <repoToken>${COVERALLS_TOKEN}</repoToken>
+    </configuration>
+</plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.0.0-M4</version>
