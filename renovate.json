@@ -1,0 +1,27 @@
+{
+  "extends": [
+    "config:base",
+    ":automergeMinor",
+    ":label(ready)"
+  ],
+  "stabilityDays": 1,
+  "prCreation": "immediate",
+  "packageRules": [
+    {
+      "updateTypes": [
+        "major"
+      ],
+      "masterIssueApproval": true
+    },
+    {
+      "languages": [
+        "js"
+      ],
+      "enabled": false,
+      "recreateClosed": false
+    }
+  ],
+  "labels": [
+    "dependencies"
+  ]
+}
