@@ -25,12 +25,10 @@ import lombok.NonNull;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -57,8 +55,7 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
 		private JavaType contextualType;
 
 		@Override
-		public CryptoContainer<?> deserialize(JsonParser jp, DeserializationContext ctxt)
-				throws IOException, JsonProcessingException {
+		public CryptoContainer<?> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
 
 			JavaType boundType = contextualType.getBindings().getBoundType(0);
 			if (boundType == null)
@@ -82,8 +79,7 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
 		}
 
 		@Override
-		public JsonDeserializer<CryptoContainer<?>> createContextual(DeserializationContext ctx, BeanProperty prop)
-				throws JsonMappingException {
+		public JsonDeserializer<CryptoContainer<?>> createContextual(DeserializationContext ctx, BeanProperty prop) {
 			contextualType = ctx.getContextualType();
 			return this;
 		}
@@ -129,25 +125,25 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
 	}
 
 	@Getter
-	private Class<?> type;
+	private final Class<?> type;
 
 	@Getter
-	private CryptoAlgorithm algo;
+	private final CryptoAlgorithm algo;
 
 	@Getter
-	private CryptoKeySize size;
+	private final CryptoKeySize size;
 
 	@Getter
-	private CryptoSubjectId subjectId;
+	private final CryptoSubjectId subjectId;
 
 	// the encrypted value
 	@Getter(value = AccessLevel.PACKAGE)
-	private byte[] encryptedBytes;
+	private final byte[] encryptedBytes;
 
 	// set after decryption or before encryption for short circuit retrieval
 	private transient Optional<T> cachedValue;
 
-	private transient CryptoObjectMapper mapper;
+	private final transient CryptoObjectMapper mapper;
 
 	@Override
 	protected T value() {

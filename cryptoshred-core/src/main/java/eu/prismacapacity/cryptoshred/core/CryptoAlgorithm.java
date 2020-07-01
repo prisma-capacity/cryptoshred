@@ -23,5 +23,5 @@ import lombok.Value;
 public class CryptoAlgorithm {
 	public static final CryptoAlgorithm AES_CBC = of("AES");
 	@NonNull
-	final String id;
+	String id;
 }

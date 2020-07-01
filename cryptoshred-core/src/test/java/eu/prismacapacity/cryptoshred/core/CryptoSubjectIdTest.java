@@ -8,10 +8,8 @@ import org.junit.jupiter.api.Test;
 
 public class CryptoSubjectIdTest {
 	@Test
-	void testNullContracts() throws Exception {
-		assertThrows(NullPointerException.class, () -> {
-			CryptoSubjectId.of(null);
-		});
+	void testNullContracts() {
+		assertThrows(NullPointerException.class, () -> CryptoSubjectId.of(null));
 
 		CryptoSubjectId.of(UUID.randomUUID());
 	}

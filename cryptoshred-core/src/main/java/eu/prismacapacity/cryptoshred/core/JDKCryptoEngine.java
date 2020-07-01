@@ -40,11 +40,11 @@ import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 @RequiredArgsConstructor
 public class JDKCryptoEngine implements CryptoEngine {
 
-	private Map<CryptoAlgorithm, String> exactCipherNames = createExactCipherMapping();
+	private final Map<CryptoAlgorithm, String> exactCipherNames = createExactCipherMapping();
 
 	private static Map<CryptoAlgorithm, String> createExactCipherMapping() {
 		// initialize with known algorithms
-		HashMap<CryptoAlgorithm, String> map = new HashMap<CryptoAlgorithm, String>();
+		HashMap<CryptoAlgorithm, String> map = new HashMap<>();
 		map.put(CryptoAlgorithm.AES_CBC, "AES/CBC/PKCS5PADDING");
 		return Collections.unmodifiableMap(map);
 	}
