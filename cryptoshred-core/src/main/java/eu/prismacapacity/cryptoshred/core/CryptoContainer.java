@@ -129,25 +129,25 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
 	}
 
 	@Getter
-	private Class<?> type;
+	private final Class<?> type;
 
 	@Getter
-	private CryptoAlgorithm algo;
+	private final CryptoAlgorithm algo;
 
 	@Getter
-	private CryptoKeySize size;
+	private final CryptoKeySize size;
 
 	@Getter
-	private CryptoSubjectId subjectId;
+	private final CryptoSubjectId subjectId;
 
 	// the encrypted value
 	@Getter(value = AccessLevel.PACKAGE)
-	private byte[] encryptedBytes;
+	private final byte[] encryptedBytes;
 
 	// set after decryption or before encryption for short circuit retrieval
 	private transient Optional<T> cachedValue;
 
-	private transient CryptoObjectMapper mapper;
+	private final transient CryptoObjectMapper mapper;
 
 	@Override
 	protected T value() {

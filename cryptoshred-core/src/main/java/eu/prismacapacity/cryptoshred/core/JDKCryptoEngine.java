@@ -40,7 +40,7 @@ import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 @RequiredArgsConstructor
 public class JDKCryptoEngine implements CryptoEngine {
 
-	private Map<CryptoAlgorithm, String> exactCipherNames = createExactCipherMapping();
+	private final Map<CryptoAlgorithm, String> exactCipherNames = createExactCipherMapping();
 
 	private static Map<CryptoAlgorithm, String> createExactCipherMapping() {
 		// initialize with known algorithms

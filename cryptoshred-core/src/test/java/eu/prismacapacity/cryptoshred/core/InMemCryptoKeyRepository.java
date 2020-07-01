@@ -12,7 +12,7 @@ import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 public class InMemCryptoKeyRepository implements CryptoKeyRepository {
 
 	final Map<CryptoSubjectId, CryptoKey> keys = new HashMap<>();
-	private CryptoEngine engine;
+	private final CryptoEngine engine;
 
 	public InMemCryptoKeyRepository(CryptoEngine engine) {
 		this.engine = engine;
