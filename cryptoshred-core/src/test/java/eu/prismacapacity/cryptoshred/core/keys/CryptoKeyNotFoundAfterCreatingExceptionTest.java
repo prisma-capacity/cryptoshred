@@ -9,14 +9,14 @@ import org.junit.jupiter.api.Test;
 public class CryptoKeyNotFoundAfterCreatingExceptionTest {
 
 	@Test
-	public void testCryptoKeyNotFoundAfterCreatingExceptionException() throws Exception {
+	public void testCryptoKeyNotFoundAfterCreatingExceptionException() {
 
 		Exception io = new IOException();
 		assertSame(io, new CryptoKeyNotFoundAfterCreatingException(io).getCause());
 	}
 
 	@Test
-	public void testCryptoKeyNotFoundAfterCreatingExceptionString() throws Exception {
+	public void testCryptoKeyNotFoundAfterCreatingExceptionString() {
 		String io = "io";
 		assertSame(io, new CryptoKeyNotFoundAfterCreatingException(io).getMessage());
 	}

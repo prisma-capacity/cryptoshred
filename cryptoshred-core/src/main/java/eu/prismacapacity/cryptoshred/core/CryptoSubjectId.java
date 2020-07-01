@@ -23,5 +23,5 @@ import lombok.Value;
 @Value(staticConstructor = "of")
 public class CryptoSubjectId {
 	@NonNull
-	final UUID id;
+	UUID id;
 }

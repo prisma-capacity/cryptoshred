@@ -7,11 +7,9 @@ import org.junit.jupiter.api.Test;
 public class CryptoKeySizeTest {
 
 	@Test
-	public void testOf() throws Exception {
+	public void testOf() {
 
-		assertThrows(IllegalArgumentException.class, () -> {
-			CryptoKeySize.of(0);
-		});
+		assertThrows(IllegalArgumentException.class, () -> CryptoKeySize.of(0));
 
 		assertEquals(128, CryptoKeySize.of(128).asInt());
 		assertTrue(CryptoKeySize.of(128).toString().contains("128"));

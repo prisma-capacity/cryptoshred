@@ -35,7 +35,7 @@ public interface CryptoMetrics {
 
 	void notifyKeyCreationAfterConflict();
 
-	static abstract class Base implements CryptoMetrics {
+	abstract class Base implements CryptoMetrics {
 
 		@Override
 		public void notifyMissingKey() {
@@ -79,7 +79,7 @@ public interface CryptoMetrics {
 
 	}
 
-	final static class NOP extends Base {
+	final class NOP extends Base {
 	}
 
 }

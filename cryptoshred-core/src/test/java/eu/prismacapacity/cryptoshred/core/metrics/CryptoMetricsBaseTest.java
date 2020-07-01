@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 public class CryptoMetricsBaseTest {
 
-	CryptoMetrics.Base uut = new CryptoMetrics.Base() {
+	final CryptoMetrics.Base uut = new CryptoMetrics.Base() {
 	};
 
 	@Test
