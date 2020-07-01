@@ -7,12 +7,8 @@ import org.junit.jupiter.api.Test;
 public class CryptoKeyTest {
 	@Test
 	void testNullContracts() throws Exception {
-		assertThrows(NullPointerException.class, () -> {
-			CryptoKey.fromBase64(null);
-		});
-		assertThrows(NullPointerException.class, () -> {
-			CryptoKey.fromBytes(null);
-		});
+		assertThrows(NullPointerException.class, () -> CryptoKey.fromBase64(null));
+		assertThrows(NullPointerException.class, () -> CryptoKey.fromBytes(null));
 
 	}
 

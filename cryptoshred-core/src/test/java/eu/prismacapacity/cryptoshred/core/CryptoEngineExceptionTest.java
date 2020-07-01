@@ -10,9 +10,7 @@ public class CryptoEngineExceptionTest {
 
 	@Test
 	public void testCryptoEngineException() throws Exception {
-		assertThrows(NullPointerException.class, () -> {
-			new CryptoEngineException(null);
-		});
+		assertThrows(NullPointerException.class, () -> new CryptoEngineException(null));
 
 		new CryptoEngineException(new IOException());
 	}

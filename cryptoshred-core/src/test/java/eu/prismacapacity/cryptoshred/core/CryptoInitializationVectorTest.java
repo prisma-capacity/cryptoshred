@@ -7,9 +7,7 @@ import org.junit.jupiter.api.Test;
 public class CryptoInitializationVectorTest {
 	@Test
 	void testNullContracts() throws Exception {
-		assertThrows(NullPointerException.class, () -> {
-			CryptoInitializationVector.of(null);
-		});
+		assertThrows(NullPointerException.class, () -> CryptoInitializationVector.of(null));
 
 		CryptoInitializationVector.of("hey");
 	}
