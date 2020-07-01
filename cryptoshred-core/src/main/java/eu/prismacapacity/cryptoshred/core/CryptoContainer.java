@@ -25,13 +25,7 @@ import lombok.NonNull;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.BeanProperty;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
@@ -125,25 +119,25 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
 	}
 
 	@Getter
-	private final Class<?> type;
+	private Class<?> type;
 
 	@Getter
-	private final CryptoAlgorithm algo;
+	private CryptoAlgorithm algo;
 
 	@Getter
-	private final CryptoKeySize size;
+	private CryptoKeySize size;
 
 	@Getter
-	private final CryptoSubjectId subjectId;
+	private CryptoSubjectId subjectId;
 
 	// the encrypted value
 	@Getter(value = AccessLevel.PACKAGE)
-	private final byte[] encryptedBytes;
+	private byte[] encryptedBytes;
 
 	// set after decryption or before encryption for short circuit retrieval
 	private transient Optional<T> cachedValue;
 
-	private final transient CryptoObjectMapper mapper;
+	private transient CryptoObjectMapper mapper;
 
 	@Override
 	protected T value() {
