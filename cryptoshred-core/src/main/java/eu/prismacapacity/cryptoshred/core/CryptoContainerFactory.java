@@ -22,13 +22,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 
 public interface CryptoContainerFactory {
-	public @NonNull <T> CryptoContainer<T> wrap(@NonNull T t, @NonNull CryptoSubjectId id)
-			throws JsonProcessingException;
+	@NonNull
+	<T> CryptoContainer<T> wrap(@NonNull T t, @NonNull CryptoSubjectId id) throws JsonProcessingException;
 
-	public @NonNull <T> CryptoContainer<T> wrap(@NonNull T value, @NonNull CryptoSubjectId id,
-			@NonNull CryptoAlgorithm algorithm, @NonNull CryptoKeySize keySize) throws JsonProcessingException;
+	@NonNull
+	<T> CryptoContainer<T> wrap(@NonNull T value, @NonNull CryptoSubjectId id, @NonNull CryptoAlgorithm algorithm,
+			@NonNull CryptoKeySize keySize) throws JsonProcessingException;
 
-	public @NonNull <T> CryptoContainer<T> restore(@NonNull Class<T> type, @NonNull CryptoSubjectId id,
-			CryptoAlgorithm algo, CryptoKeySize size, byte[] encryptedBytes) throws JsonProcessingException;
+	@NonNull
+	<T> CryptoContainer<T> restore(@NonNull Class<T> type, @NonNull CryptoSubjectId id, CryptoAlgorithm algo,
+			CryptoKeySize size, byte[] encryptedBytes) throws JsonProcessingException;
 
 }
