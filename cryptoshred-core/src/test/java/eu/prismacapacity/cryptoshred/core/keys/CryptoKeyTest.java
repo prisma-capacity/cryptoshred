@@ -6,14 +6,14 @@ import org.junit.jupiter.api.Test;
 
 public class CryptoKeyTest {
 	@Test
-	void testNullContracts() throws Exception {
+	void testNullContracts() {
 		assertThrows(NullPointerException.class, () -> CryptoKey.fromBase64(null));
 		assertThrows(NullPointerException.class, () -> CryptoKey.fromBytes(null));
 
 	}
 
 	@Test
-	void testSymetry() throws Exception {
+	void testSymetry() {
 		CryptoKey key1 = CryptoKey.fromBytes("Foo".getBytes());
 		CryptoKey key2 = CryptoKey.fromBase64(key1.getBase64());
 
@@ -23,7 +23,7 @@ public class CryptoKeyTest {
 	}
 
 	@Test
-	void testToString() throws Exception {
+	void testToString() {
 		CryptoKey key1 = CryptoKey.fromBytes("Foo".getBytes());
 
 		assertEquals(key1.getBase64(), key1.toString());

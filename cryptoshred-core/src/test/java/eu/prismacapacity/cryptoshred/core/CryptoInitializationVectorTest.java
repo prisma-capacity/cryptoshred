@@ -6,19 +6,19 @@ import org.junit.jupiter.api.Test;
 
 public class CryptoInitializationVectorTest {
 	@Test
-	void testNullContracts() throws Exception {
+	void testNullContracts() {
 		assertThrows(NullPointerException.class, () -> CryptoInitializationVector.of(null));
 
 		CryptoInitializationVector.of("hey");
 	}
 
 	@Test
-	void testExtensionTo16Byte() throws Exception {
+	void testExtensionTo16Byte() {
 		assertEquals(16, CryptoInitializationVector.of("hey").getBytes().length);
 	}
 
 	@Test
-	void testTruncationTo16Byte() throws Exception {
+	void testTruncationTo16Byte() {
 		assertEquals(16, CryptoInitializationVector.of("MhmmmmmmmmmThisIsATastyBurger").getBytes().length);
 	}
 
