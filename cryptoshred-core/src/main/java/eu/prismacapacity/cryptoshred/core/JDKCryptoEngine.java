@@ -44,7 +44,7 @@ public class JDKCryptoEngine implements CryptoEngine {
 
 	private static Map<CryptoAlgorithm, String> createExactCipherMapping() {
 		// initialize with known algorithms
-		HashMap<CryptoAlgorithm, String> map = new HashMap<CryptoAlgorithm, String>();
+		HashMap<CryptoAlgorithm, String> map = new HashMap<>();
 		map.put(CryptoAlgorithm.AES_CBC, "AES/CBC/PKCS5PADDING");
 		return Collections.unmodifiableMap(map);
 	}
