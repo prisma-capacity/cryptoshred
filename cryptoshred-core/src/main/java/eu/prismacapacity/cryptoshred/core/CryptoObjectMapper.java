@@ -15,30 +15,20 @@
  */
 package eu.prismacapacity.cryptoshred.core;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Optional;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class CryptoObjectMapper implements CryptoContainerFactory {
+public class CryptoObjectMapper {// implements CryptoContainerFactory {
 
 	static final String JACKSON_INJECT_NAME = "cryptoshredding.CryptoObjectMapper";
 
@@ -61,87 +51,45 @@ public class CryptoObjectMapper implements CryptoContainerFactory {
 	@lombok.experimental.Delegate
 	final ObjectMapper mapper;
 
-	@Override
-	public final @NonNull <T> CryptoContainer<T> wrap(@NonNull T value, @NonNull CryptoSubjectId id)
-			throws JsonProcessingException {
-		return wrap(value, id, defaultAlgorithm, defaultKeySize);
-	}
+	//
+	// @Override
+	// public @NonNull <T> CryptoContainer<T> restore(
+	// @NonNull Class<T> type, @NonNull CryptoSubjectId id,
+	// CryptoAlgorithm algo, CryptoKeySize size, byte[] encryptedBytes
+	// ) {
+	// return new CryptoContainer<>(type, algo, size, id, encryptedBytes, this);
+	// }
 
-	@Override
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	public @NonNull <T> CryptoContainer<T> wrap(@NonNull T value, @NonNull CryptoSubjectId id,
-			@NonNull CryptoAlgorithm algorithm, @NonNull CryptoKeySize keySize) throws JsonProcessingException {
-
-		CryptoKey key = keyRepository.getOrCreateKeyFor(id, algorithm, keySize);
-		byte[] bytes;
-		bytes = writeValueAsBytes(value);
-		byte[] encryptToBytes = engine.encrypt(bytes, algorithm, key, this);
-
-		return new CryptoContainer(value.getClass(), algorithm, keySize, id, encryptToBytes, value, this);
-
-	}
-
-	@Override
-	public @NonNull <T> CryptoContainer<T> restore(@NonNull Class<T> type, @NonNull CryptoSubjectId id,
-			CryptoAlgorithm algo, CryptoKeySize size, byte[] encryptedBytes) {
-		return new CryptoContainer<>(type, algo, size, id, encryptedBytes, this);
-	}
-
-	<T> T unwrap(@NonNull CryptoContainer<T> cryptoContainer) {
-		byte[] bytes = cryptoContainer.getEncryptedBytes();
-		if (bytes != null) {
-			Optional<CryptoKey> key = keyRepository.findKeyFor(cryptoContainer.getSubjectId(),
-					cryptoContainer.getAlgo(), cryptoContainer.getSize());
-
-			if (key.isPresent()) {
-
-				byte[] decrypted = engine.decrypt(cryptoContainer.getAlgo(), key.get(), bytes);
-				try {
-					T t = readerFor(cryptoContainer.getType()).readValue(decrypted);
-					metrics.notifyDecryptionSuccess();
-					return t;
-				} catch (IOException e) {
-					metrics.notifyDecryptionFailure(e);
-					log.warn("Exception while decryption", e);
-				}
-			} else {
-				// key missing, nothing to see here...
-				metrics.notifyMissingKey();
-			}
-
-			// no value, nothing to do here...
-		}
-		return null;
-	}
-
-	@Accessors(chain = true, fluent = true)
-	@Data
-	@RequiredArgsConstructor
-	public static class Builder {
-		@NonNull
-		final CryptoKeyRepository repository;
-		@NonNull
-		final CryptoEngine engine;
-
-		ObjectMapper mapper = null;
-		CryptoMetrics metrics = new CryptoMetrics.NOP();
-		CryptoAlgorithm defaultAlgo = CryptoAlgorithm.AES_CBC;
-		CryptoKeySize defaultKeySize = CryptoKeySize.BIT_256;
-
-		public CryptoObjectMapper build() {
-			CryptoObjectMapper com = new CryptoObjectMapper(repository, metrics, defaultAlgo, defaultKeySize, engine,
-					mapper != null ? mapper : new ObjectMapper());
-
-			HashMap<String, Object> hashMap = new HashMap<>();
-			hashMap.put(JACKSON_INJECT_NAME, com);
-			com.setInjectableValues(new InjectableValues.Std(hashMap));
-
-			return com;
-		}
-	}
-
-	public static Builder builder(@NonNull CryptoKeyRepository repository, @NonNull CryptoEngine engine) {
-		return new Builder(repository, engine);
-	}
+	// @Accessors(chain = true, fluent = true)
+	// @Data
+	// @RequiredArgsConstructor
+	// public static class Builder {
+	// @NonNull
+	// final CryptoKeyRepository repository;
+	// @NonNull
+	// final CryptoEngine engine;
+	//
+	// ObjectMapper mapper = null;
+	// CryptoMetrics metrics = new CryptoMetrics.NOP();
+	// CryptoAlgorithm defaultAlgo = CryptoAlgorithm.AES_CBC;
+	// CryptoKeySize defaultKeySize = CryptoKeySize.BIT_256;
+	//
+	// public CryptoObjectMapper build() {
+	// CryptoObjectMapper com = new CryptoObjectMapper(repository, metrics,
+	// defaultAlgo, defaultKeySize, engine,
+	// mapper != null ? mapper : new ObjectMapper());
+	//
+	// HashMap<String, Object> hashMap = new HashMap<>();
+	// hashMap.put(JACKSON_INJECT_NAME, com);
+	// com.setInjectableValues(new InjectableValues.Std(hashMap));
+	//
+	// return com;
+	// }
+	// }
+	//
+	// public static Builder builder(@NonNull CryptoKeyRepository repository,
+	// @NonNull CryptoEngine engine) {
+	// return new Builder(repository, engine);
+	// }
 
 }

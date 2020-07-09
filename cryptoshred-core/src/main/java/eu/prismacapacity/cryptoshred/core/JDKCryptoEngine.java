@@ -22,12 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
+import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -67,8 +62,7 @@ public class JDKCryptoEngine implements CryptoEngine {
 	}
 
 	@Override
-	public byte[] encrypt(@NonNull byte[] unencypted, @NonNull CryptoAlgorithm algorithm, @NonNull CryptoKey key,
-			@NonNull CryptoObjectMapper mapper) {
+	public byte[] encrypt(@NonNull byte[] unencypted, @NonNull CryptoAlgorithm algorithm, @NonNull CryptoKey key) {
 
 		IvParameterSpec iv = new IvParameterSpec(initVector.getBytes());
 		try {
