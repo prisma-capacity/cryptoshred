@@ -37,13 +37,12 @@ In order to make use of that technique, you need to encrypt data before writing 
 * Pluggable Key Repository
   * optional Amazon DynamoDB impl.
 * optional Spring-Boot autoconfiguration module
-* optional Spring (not Boot) configuration module
 * Jackson based deserialization to Java Objects
 * Evolutionary approach to key definition creation and migration
 
 ### Encryption
 
-In order to encrypt a particular piece of data, you use a 'CryptoContainerFactory' to wrap a CryptoContainer around the actual data before persisting.
+In order to encrypt a particular piece of data, you wrap it in a CryptoContainer before persisting (serializing).
 
 ```java
 @Data
@@ -52,14 +51,13 @@ public class Person { // might be an Enitity, a POJO you serialize or anything y
   CryptoContainer<String> name;
 }
 ```
-Of course, in order to wrap the data (and encrypt it, you'd need to provide a 'CryptoSubjectId', that references the actual key, that you'd want to throw away in order to do the 'deletion' afterwards)
+In order to wrap the data you'll also need to provide a 'CryptoSubjectId', that references the actual key, that you'd want to throw away in order to do the 'deletion' afterwards)
 
 ```java
-CryptoContainerFactory factory = ... // maybe injected from Spring or similar
 CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID()); // simple value object
 
 Person p = new Person();
-p.name = factory.wrap("Peter", id);
+p.name = new CryptoContainer<>("Peter", id);
 p.age = 30;
 
 // go persist the Person
@@ -67,7 +65,7 @@ p.age = 30;
 A CryptoContainer consists of the following data:
 
 * SubjectId (which is associated to the actual key used for en/de-cryption)
-* Algorith used
+* Algorithm used
 * KeySize used
 * Type of Object // String in this example
 * Encoded byte array of the serialized form of the Object wrapped.
@@ -76,26 +74,21 @@ You can wrap any Jackson-serializable object like for instance
 
 ```java
 CryptoKeyRepository repo = new InMemCryptoKeyRepository(engine); // don't do this at home
-CryptoObjectMapper om = CryptoObjectMapper.builder(repo, engine)
-	.defaultKeySize(CryptoKeySize.of(256)) // optional
-	.defaultAlgo(CryptoAlgorithm.AES_CBC)  // optional
-	.build();
-
-CryptoContainerFactory factory = om; 	// maybe injected from Spring or similar
-					// actually implemented by CryptoObjectMapper
+ObjectMapper om = new ObjectMapper();
+om.registerModule(new CryptoModule(engine,repo)); // not needed when using Spring Boot autoconfiguration
 
 CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID()); // simple value object, you would want to use a userId for that, and not a silly random.
 
 Person p = new Person();
-p.name = factory.wrap("Peter", id);
+p.name = new CryptoContainer<>("Peter", id);
 p.age = 30;
-p.creditcard = factory.wrap(new CreditCardInfo("12341234",CrediCardTypes.VISA));
+p.creditcard = new CryptoContainer<>(new CreditCardInfo("12341234",CrediCardTypes.VISA),id);
 // go persist the Person
 ```
 
 ### Decryption
 
-When using CryptoObjectMapper to deserialize a 'CryptoContainer', all necessary dependencies are injected into the Container automatically, so you can use the 'CryptoContainer' just like an Optional (it copied all the methods from 'java.util.Optional').
+When using ObjectMapper to deserialize a 'CryptoContainer', all necessary dependencies are injected into the Container automatically, so you can use the 'CryptoContainer' just like an Optional (it copied all the methods from 'java.util.Optional').
 
 ```java
 
@@ -106,7 +99,7 @@ assertTrue(p2.name.isPresent());
 assertEquals("Peter",p2.name.get());
 
 // if you deleted the key in between, name.isPresent() would be false.
-// of course you should rather use p2.name.orElse("unknown") or something rather than get, but you know all that from 
+// of course you should rather use p2.name.orElse("unknown") or something rather than get, but you know all that from using Optional...
 ```
 
 
