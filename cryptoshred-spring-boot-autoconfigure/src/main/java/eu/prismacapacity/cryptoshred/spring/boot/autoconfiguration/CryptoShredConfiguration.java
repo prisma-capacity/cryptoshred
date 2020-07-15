@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.prismacapacity.cryptoshred.spring;
+package eu.prismacapacity.cryptoshred.spring.boot.autoconfiguration;
 
 import lombok.NonNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -33,10 +37,22 @@ import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
 public class CryptoShredConfiguration {
 
 	@Bean
-	public ObjectMapper cryptoObjectMapper(@NonNull @Value("${cryptoshred.defaults.algorithm:AES}") String algo,
+	@ConditionalOnMissingBean
+	public ObjectMapper objectMapper(@NonNull @Value("${cryptoshred.defaults.algorithm:AES}") String algo,
 			@Value("${cryptoshred.defaults.keySize:256}") int size,
 			@Value("${cryptoshred.initVector:#{null}}") String initVector, @NonNull CryptoKeyRepository repository,
 			@Autowired(required = false) CryptoEngine engine, @Autowired(required = false) CryptoMetrics metrics) {
+		return reconfiguredObjectMapper(algo, size, initVector, repository, engine, metrics, new ObjectMapper());
+	}
+
+	@Bean
+	@ConditionalOnBean
+	@Order(Ordered.HIGHEST_PRECEDENCE)
+	public ObjectMapper reconfiguredObjectMapper(@NonNull @Value("${cryptoshred.defaults.algorithm:AES}") String algo,
+			@Value("${cryptoshred.defaults.keySize:256}") int size,
+			@Value("${cryptoshred.initVector:#{null}}") String initVector, @NonNull CryptoKeyRepository repository,
+			@Autowired(required = false) CryptoEngine engine, @Autowired(required = false) CryptoMetrics metrics,
+			@NonNull ObjectMapper om) {
 
 		if (engine == null) {
 			// then we'll need an initVector
@@ -48,10 +64,18 @@ public class CryptoShredConfiguration {
 			engine = new JDKCryptoEngine(CryptoInitializationVector.of(initVector));
 		}
 
-		ObjectMapper om = new ObjectMapper();
 		om.registerModule(
 				new CryptoModule(engine, repository, CryptoAlgorithm.of(algo), CryptoKeySize.of(size), metrics));
 		return om;
 	}
 
+	public static class CryptoPropertyMissingException extends IllegalArgumentException {
+
+		public CryptoPropertyMissingException(@NonNull String string) {
+			super(string);
+		}
+
+		private static final long serialVersionUID = 1L;
+
+	}
 }

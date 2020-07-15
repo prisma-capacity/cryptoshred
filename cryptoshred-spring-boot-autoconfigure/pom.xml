@@ -44,11 +44,6 @@
     </dependency>
     <dependency>
       <groupId>eu.prismacapacity</groupId>
-      <artifactId>cryptoshred-spring</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>eu.prismacapacity</groupId>
       <artifactId>cryptoshred-spring-cloud-aws</artifactId>
       <version>${project.version}</version>
       <optional>true</optional>

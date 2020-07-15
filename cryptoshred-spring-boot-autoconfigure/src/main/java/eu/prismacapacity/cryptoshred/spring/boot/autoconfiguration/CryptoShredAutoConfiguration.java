@@ -18,8 +18,6 @@ package eu.prismacapacity.cryptoshred.spring.boot.autoconfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import eu.prismacapacity.cryptoshred.spring.CryptoShredConfiguration;
-
 @Configuration
 @Import(CryptoShredConfiguration.class)
 public class CryptoShredAutoConfiguration {
