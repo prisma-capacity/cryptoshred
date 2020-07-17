@@ -66,17 +66,21 @@ public class CryptoModule extends SimpleModule {
 			implements
 				ContextualDeserializer {
 
-		private JavaType contextualType;
+		private JavaType boundType;
 
-		@Override
-		public CryptoContainer<?> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+		public CryptoContainerDeserializer() {
+		}
 
-			JavaType boundType = contextualType.getBindings().getBoundType(0);
+		private CryptoContainerDeserializer(JavaType contextualType) {
+			boundType = contextualType.getBindings().getBoundType(0);
 			if (boundType == null) {
 				throw new IllegalArgumentException(
 						"Cannot infer the container's parameter type. Avoid using RAW-types or use 'new TypeReference<CryptoContainer<String>>() {}' depending on your context.");
 			}
+		}
 
+		@Override
+		public CryptoContainer<?> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
 			Class<?> targetType = boundType.getRawClass();
 
 			JsonNode tree = jp.getCodec().readTree(jp);
@@ -91,8 +95,7 @@ public class CryptoModule extends SimpleModule {
 
 		@Override
 		public JsonDeserializer<CryptoContainer<?>> createContextual(DeserializationContext ctx, BeanProperty prop) {
-			contextualType = ctx.getContextualType();
-			return this;
+			return new CryptoContainerDeserializer(ctx.getContextualType());
 		}
 
 	}
