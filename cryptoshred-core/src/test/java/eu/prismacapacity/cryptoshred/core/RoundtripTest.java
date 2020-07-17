@@ -54,6 +54,16 @@ public class RoundtripTest {
 
         assertEquals(b.pair.get(), b2.pair.get());
 
+        Baz baz = new Baz();
+        baz.name = new CryptoContainer<>("Peter", id);
+        baz.pair = new CryptoContainer<>(new Pair<>("hubba", 77), id);
+        json = om.writeValueAsString(baz);
+        System.out.println(json);
+        Baz baz2 = om.readValue(json, Baz.class);
+
+        assertEquals(baz.name.get(), baz2.name.get());
+        assertEquals(baz.pair.get(), baz2.pair.get());
+
         CryptoContainer<String> c = new CryptoContainer<>("hubbi", id);
         json = om.writeValueAsString(c);
         System.out.println(json);
@@ -75,6 +85,12 @@ public class RoundtripTest {
     @Data
     public static class Bar {
         int bar = 7;
+        CryptoContainer<Pair<String, Integer>> pair;
+    }
+
+    @Data
+    public static class Baz {
+        CryptoContainer<String> name;
         CryptoContainer<Pair<String, Integer>> pair;
     }
 
