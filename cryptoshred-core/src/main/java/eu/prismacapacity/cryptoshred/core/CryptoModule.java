@@ -95,7 +95,7 @@ public class CryptoModule extends SimpleModule {
 
 		@Override
 		public JsonDeserializer<CryptoContainer<?>> createContextual(DeserializationContext ctx, BeanProperty prop) {
-			return new  CryptoContainerDeserializer(ctx.getContextualType());
+			return new CryptoContainerDeserializer(ctx.getContextualType());
 		}
 
 	}
