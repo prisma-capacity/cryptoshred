@@ -15,13 +15,53 @@
  */
 package eu.prismacapacity.cryptoshred.core;
 
-import java.util.UUID;
-
 import lombok.NonNull;
-import lombok.Value;
 
-@Value(staticConstructor = "of")
-public class CryptoSubjectId {
+import java.util.Objects;
+import java.util.UUID;
+import java.util.function.Supplier;
+
+public abstract class CryptoSubjectId {
+
+	private CryptoSubjectId() {}
+
+	public static CryptoSubjectId of(@NonNull UUID id) {
+		return new CryptoSubjectId() {
+			@Override
+			public @NonNull UUID getId() {
+				return id;
+			}
+		};
+	}
+
+	public static CryptoSubjectId of(@NonNull Supplier<UUID> supplier) {
+		return new CryptoSubjectId() {
+			@Override
+			public @NonNull UUID getId() {
+				return Objects.requireNonNull(supplier.get());
+			}
+		};
+	}
+
 	@NonNull
-	UUID id;
+	public abstract UUID getId();
+
+	public boolean equals(final Object o) {
+		if (o == this) return true;
+		if (!(o instanceof CryptoSubjectId)) return false;
+		final CryptoSubjectId other = (CryptoSubjectId) o;
+		return Objects.equals(this.getId(), other.getId());
+	}
+
+	public int hashCode() {
+		final int PRIME = 59;
+		int result = 1;
+		final Object $id = this.getId();
+		result = result * PRIME + ($id == null ? 43 : $id.hashCode());
+		return result;
+	}
+
+	public String toString() {
+		return "CryptoSubjectId(id=" + this.getId() + ")";
+	}
 }
