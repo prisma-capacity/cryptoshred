@@ -15,53 +15,43 @@
  */
 package eu.prismacapacity.cryptoshred.core;
 
-import lombok.NonNull;
-
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public abstract class CryptoSubjectId {
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-	private CryptoSubjectId() {}
-
-	public static CryptoSubjectId of(@NonNull UUID id) {
-		return new CryptoSubjectId() {
-			@Override
-			public @NonNull UUID getId() {
-				return id;
-			}
-		};
-	}
-
-	public static CryptoSubjectId of(@NonNull Supplier<UUID> supplier) {
-		return new CryptoSubjectId() {
-			@Override
-			public @NonNull UUID getId() {
-				return Objects.requireNonNull(supplier.get());
-			}
-		};
-	}
+@RequiredArgsConstructor(staticName = "of")
+public class CryptoSubjectId {
 
 	@NonNull
-	public abstract UUID getId();
+	private final Supplier<UUID> supplier;
+
+	public UUID getId() {
+		return Objects.requireNonNull(supplier.get());
+	}
+
+	public static CryptoSubjectId of(@NonNull UUID id) {
+		return of(() -> id);
+	}
 
 	public boolean equals(final Object o) {
-		if (o == this) return true;
-		if (!(o instanceof CryptoSubjectId)) return false;
+		if (o == this) {
+			return true;
+		}
+		if (!(o instanceof CryptoSubjectId)) {
+			return false;
+		}
 		final CryptoSubjectId other = (CryptoSubjectId) o;
 		return Objects.equals(this.getId(), other.getId());
 	}
 
 	public int hashCode() {
-		final int PRIME = 59;
-		int result = 1;
-		final Object $id = this.getId();
-		result = result * PRIME + ($id == null ? 43 : $id.hashCode());
-		return result;
+		return supplier.get().hashCode();
 	}
 
-	public String toString() {
-		return "CryptoSubjectId(id=" + this.getId() + ")";
-	}
+	// might trigger premature get()
+	// public String toString() { return "CryptoSubjectId(id=" + this.getId() + ")";
+	// }
 }
