@@ -15,13 +15,43 @@
  */
 package eu.prismacapacity.cryptoshred.core;
 
+import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import lombok.NonNull;
-import lombok.Value;
+import lombok.RequiredArgsConstructor;
 
-@Value(staticConstructor = "of")
+@RequiredArgsConstructor(staticName = "of")
 public class CryptoSubjectId {
+
 	@NonNull
-	UUID id;
+	private final Supplier<UUID> supplier;
+
+	public UUID getId() {
+		return Objects.requireNonNull(supplier.get());
+	}
+
+	public static CryptoSubjectId of(@NonNull UUID id) {
+		return of(() -> id);
+	}
+
+	public boolean equals(final Object o) {
+		if (o == this) {
+			return true;
+		}
+		if (!(o instanceof CryptoSubjectId)) {
+			return false;
+		}
+		final CryptoSubjectId other = (CryptoSubjectId) o;
+		return Objects.equals(this.getId(), other.getId());
+	}
+
+	public int hashCode() {
+		return supplier.get().hashCode();
+	}
+
+	// might trigger premature get()
+	// public String toString() { return "CryptoSubjectId(id=" + this.getId() + ")";
+	// }
 }
