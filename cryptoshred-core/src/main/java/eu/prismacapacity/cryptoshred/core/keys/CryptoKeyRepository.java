@@ -15,20 +15,23 @@
  */
 package eu.prismacapacity.cryptoshred.core.keys;
 
-import java.util.Optional;
-
-import lombok.NonNull;
-
 import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
 import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
+import java.util.Optional;
+import lombok.NonNull;
 
 public interface CryptoKeyRepository {
 
-	@NonNull
-	Optional<CryptoKey> findKeyFor(@NonNull CryptoSubjectId subjectId, @NonNull CryptoAlgorithm algo,
-			@NonNull CryptoKeySize size);
+  @NonNull
+  Optional<CryptoKey> findKeyFor(
+      @NonNull CryptoSubjectId subjectId,
+      @NonNull CryptoAlgorithm algo,
+      @NonNull CryptoKeySize size);
 
-	@NonNull
-	CryptoKey getOrCreateKeyFor(@NonNull CryptoSubjectId subjectId, @NonNull CryptoAlgorithm algo,
-			@NonNull CryptoKeySize size) throws CryptoKeyNotFoundAfterCreatingException;
+  @NonNull
+  CryptoKey getOrCreateKeyFor(
+      @NonNull CryptoSubjectId subjectId,
+      @NonNull CryptoAlgorithm algo,
+      @NonNull CryptoKeySize size)
+      throws CryptoKeyNotFoundAfterCreatingException;
 }

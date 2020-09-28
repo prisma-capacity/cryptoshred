@@ -15,16 +15,15 @@
  */
 package eu.prismacapacity.cryptoshred.spring.micrometer;
 
+import eu.prismacapacity.cryptoshred.micrometer.MicrometerCryptoMetrics;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import eu.prismacapacity.cryptoshred.micrometer.MicrometerCryptoMetrics;
-import io.micrometer.core.instrument.MeterRegistry;
-
 @Configuration
 public class MicrometerCryptoMetricsConfiguration {
-	@Bean
-	public MicrometerCryptoMetrics micrometerCryptoMetrics(MeterRegistry reg) {
-		return new MicrometerCryptoMetrics(reg);
-	}
+  @Bean
+  public MicrometerCryptoMetrics micrometerCryptoMetrics(MeterRegistry reg) {
+    return new MicrometerCryptoMetrics(reg);
+  }
 }
