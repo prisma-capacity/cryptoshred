@@ -18,3 +18,5 @@ jobs:
           args: " --replace"
           # Recommended if you use MacOS:
           # githubToken: ${{ secrets.GITHUB_TOKEN }}
+          version: 1.7
+          
