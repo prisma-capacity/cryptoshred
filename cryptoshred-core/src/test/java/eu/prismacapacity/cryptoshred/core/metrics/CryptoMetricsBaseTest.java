@@ -6,30 +6,29 @@ import org.junit.jupiter.api.*;
 
 public class CryptoMetricsBaseTest {
 
-	final CryptoMetrics.Base uut = new CryptoMetrics.Base() {
-	};
+  final CryptoMetrics.Base uut = new CryptoMetrics.Base() {};
 
-	@Test
-	public void notifyMissingKey() {
-		assertNotThrows(uut::notifyMissingKey);
-	}
+  @Test
+  public void notifyMissingKey() {
+    assertNotThrows(uut::notifyMissingKey);
+  }
 
-	@Test
-	public void notifyDecryptionSuccess() {
-		assertNotThrows(uut::notifyDecryptionSuccess);
-	}
+  @Test
+  public void notifyDecryptionSuccess() {
+    assertNotThrows(uut::notifyDecryptionSuccess);
+  }
 
-	@Test
-	public void notifyDecryptionFailure() {
-		assertNotThrows(() -> uut.notifyDecryptionFailure(new Exception()));
-		assertThrows(NullPointerException.class, () -> uut.notifyDecryptionFailure(null));
-	}
+  @Test
+  public void notifyDecryptionFailure() {
+    assertNotThrows(() -> uut.notifyDecryptionFailure(new Exception()));
+    assertThrows(NullPointerException.class, () -> uut.notifyDecryptionFailure(null));
+  }
 
-	public void assertNotThrows(Runnable r) {
-		try {
-			r.run();
-		} catch (Exception e) {
-			fail(e);
-		}
-	}
+  public void assertNotThrows(Runnable r) {
+    try {
+      r.run();
+    } catch (Exception e) {
+      fail(e);
+    }
+  }
 }
