@@ -19,9 +19,9 @@ import java.util.HashMap;
 
 class Maps {
 
-  public static <K, V> HashMap<K, V> of(K k, V v) {
-    HashMap<K, V> ret = new HashMap<K, V>();
-    ret.put(k, v);
-    return ret;
-  }
+	public static <K, V> HashMap<K, V> of(K k, V v) {
+		HashMap<K, V> ret = new HashMap<K, V>();
+		ret.put(k, v);
+		return ret;
+	}
 }

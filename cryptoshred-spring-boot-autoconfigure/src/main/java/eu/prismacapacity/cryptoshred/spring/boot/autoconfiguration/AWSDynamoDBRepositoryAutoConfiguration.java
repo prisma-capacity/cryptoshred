@@ -15,12 +15,14 @@
  */
 package eu.prismacapacity.cryptoshred.spring.boot.autoconfiguration;
 
-import eu.prismacapacity.cryptoshred.spring.cloud.aws.AWSDynamoDBKeyRepositoryConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import eu.prismacapacity.cryptoshred.spring.cloud.aws.AWSDynamoDBKeyRepositoryConfiguration;
+
 @Configuration
 @Import(AWSDynamoDBKeyRepositoryConfiguration.class)
 @ConditionalOnClass(AWSDynamoDBKeyRepositoryConfiguration.class)
-public class AWSDynamoDBRepositoryAutoConfiguration {}
+public class AWSDynamoDBRepositoryAutoConfiguration {
+}

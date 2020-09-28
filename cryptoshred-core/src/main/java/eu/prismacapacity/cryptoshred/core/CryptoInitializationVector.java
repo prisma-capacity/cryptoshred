@@ -17,20 +17,23 @@ package eu.prismacapacity.cryptoshred.core;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+
 import lombok.NonNull;
 import lombok.Value;
 
 @Value(staticConstructor = "of")
 public class CryptoInitializationVector {
-  @NonNull String initVector;
+	@NonNull
+	String initVector;
 
-  public byte[] getBytes() {
-    // make sure, we have 16 bytes there
-    StringBuffer sb = new StringBuffer(initVector);
-    while (sb.length() < 16) sb.append(initVector);
+	public byte[] getBytes() {
+		// make sure, we have 16 bytes there
+		StringBuffer sb = new StringBuffer(initVector);
+		while (sb.length() < 16)
+			sb.append(initVector);
 
-    byte[] bytes = sb.toString().getBytes(StandardCharsets.UTF_8);
-    // take the first 16 bytes
-    return Arrays.copyOf(bytes, 16);
-  }
+		byte[] bytes = sb.toString().getBytes(StandardCharsets.UTF_8);
+		// take the first 16 bytes
+		return Arrays.copyOf(bytes, 16);
+	}
 }

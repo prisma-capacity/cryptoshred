@@ -19,64 +19,65 @@ import lombok.NonNull;
 
 public interface CryptoMetrics {
 
-  void notifyMissingKey();
+	void notifyMissingKey();
 
-  void notifyDecryptionSuccess();
+	void notifyDecryptionSuccess();
 
-  void notifyDecryptionFailure(@NonNull Exception e);
+	void notifyDecryptionFailure(@NonNull Exception e);
 
-  void notifyKeyLookUp();
+	void notifyKeyLookUp();
 
-  void notifyKeyCreation();
+	void notifyKeyCreation();
 
-  <T> T timedFindKey(MetricsCallable<T> fn);
+	<T> T timedFindKey(MetricsCallable<T> fn);
 
-  <T> T timedCreateKey(MetricsCallable<T> fn);
+	<T> T timedCreateKey(MetricsCallable<T> fn);
 
-  void notifyKeyCreationAfterConflict();
+	void notifyKeyCreationAfterConflict();
 
-  abstract class Base implements CryptoMetrics {
+	abstract class Base implements CryptoMetrics {
 
-    @Override
-    public void notifyMissingKey() {
-      // intentionally empty
-    }
+		@Override
+		public void notifyMissingKey() {
+			// intentionally empty
+		}
 
-    @Override
-    public void notifyDecryptionSuccess() {
-      // intentionally empty
-    }
+		@Override
+		public void notifyDecryptionSuccess() {
+			// intentionally empty
+		}
 
-    @Override
-    public void notifyDecryptionFailure(@NonNull Exception e) {
-      // intentionally empty
-    }
+		@Override
+		public void notifyDecryptionFailure(@NonNull Exception e) {
+			// intentionally empty
+		}
 
-    @Override
-    public void notifyKeyLookUp() {
-      // intentionally empty
-    }
+		@Override
+		public void notifyKeyLookUp() {
+			// intentionally empty
+		}
 
-    @Override
-    public void notifyKeyCreation() {
-      // intentionally empty
-    }
+		@Override
+		public void notifyKeyCreation() {
+			// intentionally empty
+		}
 
-    @Override
-    public <T> T timedFindKey(MetricsCallable<T> fn) {
-      return fn.call();
-    }
+		@Override
+		public <T> T timedFindKey(MetricsCallable<T> fn) {
+			return fn.call();
+		}
 
-    @Override
-    public <T> T timedCreateKey(MetricsCallable<T> fn) {
-      return fn.call();
-    }
+		@Override
+		public <T> T timedCreateKey(MetricsCallable<T> fn) {
+			return fn.call();
+		}
 
-    @Override
-    public void notifyKeyCreationAfterConflict() {
-      // intentionally empty
-    }
-  }
+		@Override
+		public void notifyKeyCreationAfterConflict() {
+			// intentionally empty
+		}
+	}
 
-  final class NOP extends Base {}
+	final class NOP extends Base {
+	}
 }

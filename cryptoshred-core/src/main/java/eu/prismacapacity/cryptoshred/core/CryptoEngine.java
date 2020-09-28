@@ -15,9 +15,10 @@
  */
 package eu.prismacapacity.cryptoshred.core;
 
+import lombok.NonNull;
+
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
-import lombok.NonNull;
 
 /**
  * Encapsulates the actual encryption / decryption using jdk or bouncy castle
@@ -26,14 +27,12 @@ import lombok.NonNull;
  */
 public interface CryptoEngine {
 
-  @NonNull
-  byte[] decrypt(
-      @NonNull CryptoAlgorithm algo, @NonNull CryptoKey cryptoKey, @NonNull byte[] bytes);
+	@NonNull
+	byte[] decrypt(@NonNull CryptoAlgorithm algo, @NonNull CryptoKey cryptoKey, @NonNull byte[] bytes);
 
-  @NonNull
-  byte[] encrypt(
-      @NonNull byte[] unencypted, @NonNull CryptoAlgorithm algorithm, @NonNull CryptoKey key);
+	@NonNull
+	byte[] encrypt(@NonNull byte[] unencypted, @NonNull CryptoAlgorithm algorithm, @NonNull CryptoKey key);
 
-  @NonNull
-  CryptoKey generateKey(@NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size);
+	@NonNull
+	CryptoKey generateKey(@NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size);
 }
