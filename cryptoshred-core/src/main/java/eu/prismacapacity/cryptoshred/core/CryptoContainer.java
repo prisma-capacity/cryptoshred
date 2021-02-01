@@ -132,7 +132,7 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
 	protected void encrypt(CryptoKeyRepository keyRepository, CryptoEngine engine, ObjectMapper om) {
 		CryptoKey key = keyRepository.getOrCreateKeyFor(subjectId, algo, size);
 		byte[] bytes;
-		bytes = om.writeValueAsBytes(cachedValue.get());
+		bytes = om.writeValueAsBytes(value());
 		this.encryptedBytes = engine.encrypt(bytes, algo, key);
 	}
 }

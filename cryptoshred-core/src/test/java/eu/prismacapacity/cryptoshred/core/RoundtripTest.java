@@ -76,6 +76,28 @@ public class RoundtripTest {
 
     }
 
+    @Test
+    void testDeAndReSerialization() throws Exception{
+        // arrange
+
+        CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
+        Foo foo = new Foo();
+        foo.name = new CryptoContainer<>("Peter", id);
+        // just need a crypto-json that can be deserialized for later
+        String json = om.writeValueAsString(foo);
+
+        // act
+
+        final Foo deserializedFoo = om.readValue(json, new TypeReference<Foo>() {
+        });
+        // not accessing deserializedFoo.name here, so that the lazy decryption does not occur
+        final String reserializedFoo = om.writeValueAsString(deserializedFoo);
+
+        // assert that it worked and we got a result and no exception
+
+        assertNotNull(reserializedFoo);
+    }
+
     @Data
     public static class Foo {
         int bar = 7;
