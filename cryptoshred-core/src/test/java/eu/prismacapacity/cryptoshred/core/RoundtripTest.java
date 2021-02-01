@@ -92,6 +92,9 @@ public class RoundtripTest {
         });
         // not accessing deserializedFoo.name here, so that the lazy decryption does not occur
         final String reserializedFoo = om.writeValueAsString(deserializedFoo);
+
+        // assert that it worked and we got a result and no exception
+
         assertNotNull(reserializedFoo);
     }
 
