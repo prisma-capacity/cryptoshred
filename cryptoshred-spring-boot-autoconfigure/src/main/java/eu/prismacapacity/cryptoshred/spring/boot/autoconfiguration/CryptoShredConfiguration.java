@@ -64,6 +64,9 @@ public class CryptoShredConfiguration {
 			engine = new JDKCryptoEngine(CryptoInitializationVector.of(initVector));
 		}
 
+    if (metrics==null)
+      metrics=new CryptoMetrics.NOP();
+
 		om.registerModule(
 				new CryptoModule(engine, repository, CryptoAlgorithm.of(algo), CryptoKeySize.of(size), metrics));
 		return om;

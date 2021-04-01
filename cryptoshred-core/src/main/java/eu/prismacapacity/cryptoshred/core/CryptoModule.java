@@ -28,6 +28,9 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
+import java.io.IOException;
+import java.util.UUID;
+import lombok.NonNull;
 
 public class CryptoModule extends SimpleModule {
 
@@ -42,8 +45,13 @@ public class CryptoModule extends SimpleModule {
 		this(engine, keyRepo, CryptoAlgorithm.AES_CBC, CryptoKeySize.BIT_256, new CryptoMetrics.NOP());
 	}
 
-	public CryptoModule(CryptoEngine engine, CryptoKeyRepository keyRepo, CryptoAlgorithm algo, CryptoKeySize keySize,
-			CryptoMetrics metrics) {
+  public CryptoModule(
+          @NonNull CryptoEngine engine,
+          @NonNull CryptoKeyRepository keyRepo,
+          @NonNull CryptoAlgorithm algo,
+          @NonNull CryptoKeySize keySize,
+          @NonNull CryptoMetrics metrics
+  ) {
 		this.engine = engine;
 		this.keyRepo = keyRepo;
 		this.algo = algo;
@@ -94,7 +102,9 @@ public class CryptoModule extends SimpleModule {
 		}
 
 		@Override
-		public JsonDeserializer<CryptoContainer<?>> createContextual(DeserializationContext ctx, BeanProperty prop) {
+    public JsonDeserializer<CryptoContainer<?>> createContextual(
+            DeserializationContext ctx, BeanProperty prop
+    ) {
 			return new CryptoContainerDeserializer(ctx.getContextualType());
 		}
 
