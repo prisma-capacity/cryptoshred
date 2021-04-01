@@ -109,12 +109,12 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
 
 			if (key.isPresent()) {
 
-				byte[] decrypted = engine.decrypt(getAlgo(), key.get(), bytes);
 				try {
+				  byte[] decrypted = engine.decrypt(getAlgo(), key.get(), bytes);
 					T t = mapper.readerFor(getType()).readValue(decrypted);
 					if (metrics != null) metrics.notifyDecryptionSuccess();
 					return t;
-				} catch (IOException e) {
+				} catch (Exception e) {
 					if (metrics != null) metrics.notifyDecryptionFailure(e);
 					log.warn("Exception while decryption", e);
 				}
