@@ -120,7 +120,7 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
 				}
 			} else {
 				// key missing, nothing to see here...
-				metrics.notifyMissingKey();
+				if (metrics != null) metrics.notifyMissingKey();
 			}
 
 			// no value, nothing to do here...
