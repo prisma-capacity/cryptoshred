@@ -15,23 +15,17 @@
  */
 package eu.prismacapacity.cryptoshred.spring.boot.autoconfiguration;
 
-import lombok.NonNull;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.prismacapacity.cryptoshred.core.*;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
+import lombok.NonNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class CryptoShredConfiguration {
@@ -39,8 +33,8 @@ public class CryptoShredConfiguration {
   @Bean
   @ConditionalOnMissingBean
   public CryptoModule cryptoModule(
-          @NonNull @Value("${cryptoshred.defaults.algorithm:AES}") String algo,
-          @Value("${cryptoshred.defaults.keySize:256}") int size,
+      @NonNull @Value("${cryptoshred.defaults.algorithm:AES}") String algo,
+      @Value("${cryptoshred.defaults.keySize:256}") int size,
       @NonNull CryptoKeyRepository repository,
       @NonNull CryptoEngine engine,
       @Autowired(required = false) CryptoMetrics metrics) {
@@ -62,9 +56,10 @@ public class CryptoShredConfiguration {
     return new JDKCryptoEngine(CryptoInitializationVector.of(initVector));
   }
 
+
   @Bean
   @ConditionalOnMissingBean
-  public ObjectMapper objectMapper(CryptoModule cm){
+  public ObjectMapper objectMapper(CryptoModule cm) {
     return new ObjectMapper().registerModule(cm);
   }
 
@@ -75,6 +70,5 @@ public class CryptoShredConfiguration {
     }
 
     private static final long serialVersionUID = 1L;
-
   }
 }

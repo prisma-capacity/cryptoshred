@@ -23,5 +23,5 @@ package eu.prismacapacity.cryptoshred.core.metrics;
  */
 @FunctionalInterface
 public interface MetricsCallable<T> {
-	T call();
+  T call();
 }

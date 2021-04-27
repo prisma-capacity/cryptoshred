@@ -15,16 +15,12 @@
  */
 package eu.prismacapacity.cryptoshred.core;
 
-import java.io.IOException;
-import java.util.UUID;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.IntNode;
-
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
@@ -34,103 +30,106 @@ import lombok.NonNull;
 
 public class CryptoModule extends SimpleModule {
 
-	private final CryptoEngine engine;
-	private final CryptoKeyRepository keyRepo;
-	private final CryptoAlgorithm algo;
-	private final CryptoKeySize keySize;
-	private final CryptoMetrics metrics;
-	private ObjectMapper om;
+  private final CryptoEngine engine;
+  private final CryptoKeyRepository keyRepo;
+  private final CryptoAlgorithm algo;
+  private final CryptoKeySize keySize;
+  private final CryptoMetrics metrics;
+  private ObjectMapper om;
 
-	public CryptoModule(CryptoEngine engine, CryptoKeyRepository keyRepo) {
-		this(engine, keyRepo, CryptoAlgorithm.AES_CBC, CryptoKeySize.BIT_256, new CryptoMetrics.NOP());
-	}
+  public CryptoModule(CryptoEngine engine, CryptoKeyRepository keyRepo) {
+    this(engine, keyRepo, CryptoAlgorithm.AES_CBC, CryptoKeySize.BIT_256, new CryptoMetrics.NOP());
+  }
 
   public CryptoModule(
-          @NonNull CryptoEngine engine,
-          @NonNull CryptoKeyRepository keyRepo,
-          @NonNull CryptoAlgorithm algo,
-          @NonNull CryptoKeySize keySize,
-          @NonNull CryptoMetrics metrics
-  ) {
-		this.engine = engine;
-		this.keyRepo = keyRepo;
-		this.algo = algo;
-		this.keySize = keySize;
-		this.metrics = metrics;
+      @NonNull CryptoEngine engine,
+      @NonNull CryptoKeyRepository keyRepo,
+      @NonNull CryptoAlgorithm algo,
+      @NonNull CryptoKeySize keySize,
+      @NonNull CryptoMetrics metrics) {
+    this.engine = engine;
+    this.keyRepo = keyRepo;
+    this.algo = algo;
+    this.keySize = keySize;
+    this.metrics = metrics;
 
-		addSerializer(CryptoContainer.class, new CryptoContainerSerializer());
-		addDeserializer(CryptoContainer.class, new CryptoContainerDeserializer());
-	}
+    addSerializer(CryptoContainer.class, new CryptoContainerSerializer());
+    addDeserializer(CryptoContainer.class, new CryptoContainerDeserializer());
+  }
 
-	private static final String JSON_KEY_ENCRYPTED_BYTES = "enc";
+  private static final String JSON_KEY_ENCRYPTED_BYTES = "enc";
 
-	private static final String JSON_KEY_SUBJECT_ID = "id";
+  private static final String JSON_KEY_SUBJECT_ID = "id";
 
-	private static final String JSON_KEY_KEY_SIZE = "ksize";
+  private static final String JSON_KEY_KEY_SIZE = "ksize";
 
-	private static final String JSON_KEY_ALGO = "algo";
+  private static final String JSON_KEY_ALGO = "algo";
 
-	public class CryptoContainerDeserializer extends JsonDeserializer<CryptoContainer<?>>
-			implements
-				ContextualDeserializer {
+  public class CryptoContainerDeserializer extends JsonDeserializer<CryptoContainer<?>>
+      implements ContextualDeserializer {
 
-		private JavaType boundType;
+    private JavaType boundType;
 
-		public CryptoContainerDeserializer() {
-		}
+    public CryptoContainerDeserializer() {}
 
-		private CryptoContainerDeserializer(JavaType contextualType) {
-			boundType = contextualType.getBindings().getBoundType(0);
-			if (boundType == null) {
-				throw new IllegalArgumentException(
-						"Cannot infer the container's parameter type. Avoid using RAW-types or use 'new TypeReference<CryptoContainer<String>>() {}' depending on your context.");
-			}
-		}
+    private CryptoContainerDeserializer(JavaType contextualType) {
+      boundType = contextualType.getBindings().getBoundType(0);
+      if (boundType == null) {
+        throw new IllegalArgumentException(
+            "Cannot infer the container's parameter type. Avoid using RAW-types or use 'new TypeReference<CryptoContainer<String>>() {}' depending on your context.");
+      }
+    }
 
-		@Override
-		public CryptoContainer<?> deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
-			Class<?> targetType = boundType.getRawClass();
+    @Override
+    public CryptoContainer<?> deserialize(JsonParser jp, DeserializationContext ctxt)
+        throws IOException {
+      Class<?> targetType = boundType.getRawClass();
 
-			JsonNode tree = jp.getCodec().readTree(jp);
-			int keySize = (Integer) ((IntNode) tree.get(JSON_KEY_KEY_SIZE)).numberValue();
-			String subjectId = tree.get(JSON_KEY_SUBJECT_ID).asText();
-			String algo = tree.get(JSON_KEY_ALGO).asText();
-			byte[] encrypted = tree.get(JSON_KEY_ENCRYPTED_BYTES).binaryValue();
+      JsonNode tree = jp.getCodec().readTree(jp);
+      int keySize = (Integer) ((IntNode) tree.get(JSON_KEY_KEY_SIZE)).numberValue();
+      String subjectId = tree.get(JSON_KEY_SUBJECT_ID).asText();
+      String algo = tree.get(JSON_KEY_ALGO).asText();
+      byte[] encrypted = tree.get(JSON_KEY_ENCRYPTED_BYTES).binaryValue();
 
-			return CryptoContainer.fromDeserialization(targetType, CryptoAlgorithm.of(algo), CryptoKeySize.of(keySize),
-					CryptoSubjectId.of(UUID.fromString(subjectId)), encrypted, engine, keyRepo, metrics, om);
-		}
+      return CryptoContainer.fromDeserialization(
+          targetType,
+          CryptoAlgorithm.of(algo),
+          CryptoKeySize.of(keySize),
+          CryptoSubjectId.of(UUID.fromString(subjectId)),
+          encrypted,
+          engine,
+          keyRepo,
+          metrics,
+          om);
+    }
 
-		@Override
+    @Override
     public JsonDeserializer<CryptoContainer<?>> createContextual(
-            DeserializationContext ctx, BeanProperty prop
-    ) {
-			return new CryptoContainerDeserializer(ctx.getContextualType());
-		}
+        DeserializationContext ctx, BeanProperty prop) {
+      return new CryptoContainerDeserializer(ctx.getContextualType());
+    }
+  }
 
-	}
+  public class CryptoContainerSerializer extends JsonSerializer<CryptoContainer> {
 
-	public class CryptoContainerSerializer extends JsonSerializer<CryptoContainer> {
+    @Override
+    public void serialize(CryptoContainer value, JsonGenerator jgen, SerializerProvider serializers)
+        throws IOException {
 
-		@Override
-		public void serialize(CryptoContainer value, JsonGenerator jgen, SerializerProvider serializers)
-				throws IOException {
+      value.encrypt(keyRepo, engine, om);
 
-			value.encrypt(keyRepo, engine, om);
+      jgen.writeStartObject();
+      jgen.writeStringField(JSON_KEY_ALGO, value.getAlgo().getId());
+      jgen.writeNumberField(JSON_KEY_KEY_SIZE, value.getSize().asInt());
+      jgen.writeStringField(JSON_KEY_SUBJECT_ID, value.getSubjectId().getId().toString());
+      jgen.writeBinaryField(JSON_KEY_ENCRYPTED_BYTES, value.getEncryptedBytes());
+      jgen.writeEndObject();
+    }
+  }
 
-			jgen.writeStartObject();
-			jgen.writeStringField(JSON_KEY_ALGO, value.getAlgo().getId());
-			jgen.writeNumberField(JSON_KEY_KEY_SIZE, value.getSize().asInt());
-			jgen.writeStringField(JSON_KEY_SUBJECT_ID, value.getSubjectId().getId().toString());
-			jgen.writeBinaryField(JSON_KEY_ENCRYPTED_BYTES, value.getEncryptedBytes());
-			jgen.writeEndObject();
-		}
-
-	}
-
-	@Override
-	public void setupModule(SetupContext context) {
-		super.setupModule(context);
-		this.om = context.getOwner();
-	}
+  @Override
+  public void setupModule(SetupContext context) {
+    super.setupModule(context);
+    this.om = context.getOwner();
+  }
 }

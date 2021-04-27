@@ -9,7 +9,7 @@
     <version>0.1.10</version>
   </parent>
   <artifactId>cryptoshred</artifactId>
-  <version>1.1.7-SNAPSHOT</version>
+  <version>1.1.8-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>cryptoshredding lib</name>
   <description>TODO</description>
@@ -53,6 +53,8 @@
     <jackson.version>2.12.3</jackson.version>
     <slf4j.version>1.7.30</slf4j.version>
     <spring-boot.version>2.4.5</spring-boot.version>
+    <etc>${basedir}/src/etc</etc>
+    <spotless-maven-plugin.version>2.4.1</spotless-maven-plugin.version>
   </properties>
   <modules>
     <module>cryptoshred-core</module>
@@ -174,6 +176,54 @@
           <gitFlowConfig>
             <developmentBranch>master</developmentBranch>
           </gitFlowConfig>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>${spotless-maven-plugin.version}</version>
+        <inherited>false</inherited>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <java>
+            <licenseHeader>
+              <file>file://${etc}/header.txt</file>
+            </licenseHeader>
+            <trimTrailingWhitespace/>
+            <removeUnusedImports/>
+            <googleJavaFormat>
+              <version>1.7</version> <!-- optional -->
+              <style>GOOGLE</style>  <!-- or AOSP (optional) -->
+            </googleJavaFormat>
+            <includes>
+              <include>**/src/main/java/**/*.java
+              </include>
+              <include>**/src/test/java/**/*.java
+              </include>
+            </includes>
+          </java>
+          <kotlin>
+            <licenseHeader>
+              <file>file://${etc}/header.txt</file>
+            </licenseHeader>
+            <trimTrailingWhitespace/>
+            <ktlint>
+              <!-- Optional, available versions: https://github.com/shyiko/ktlint/releases -->
+              <version>0.36.0</version>
+            </ktlint>
+            <includes>
+              <include>**/src/main/kotlin/**/*.kt
+              </include>
+            </includes>
+          </kotlin>
         </configuration>
       </plugin>
     </plugins>

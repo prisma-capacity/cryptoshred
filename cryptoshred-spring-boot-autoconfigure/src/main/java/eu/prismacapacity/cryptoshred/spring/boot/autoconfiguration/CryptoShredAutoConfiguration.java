@@ -20,6 +20,4 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @Import(CryptoShredConfiguration.class)
-public class CryptoShredAutoConfiguration {
-
-}
+public class CryptoShredAutoConfiguration {}
