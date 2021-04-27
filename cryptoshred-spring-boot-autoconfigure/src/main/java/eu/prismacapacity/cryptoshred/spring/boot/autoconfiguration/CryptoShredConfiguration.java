@@ -38,12 +38,12 @@ public class CryptoShredConfiguration {
       @NonNull CryptoKeyRepository repository,
       @NonNull CryptoEngine engine,
       @Autowired(required = false) CryptoMetrics metrics) {
-		if (metrics == null) {
-			metrics = new CryptoMetrics.NOP();
-		}
-    return new CryptoModule(engine, repository, CryptoAlgorithm.of(algo), CryptoKeySize.of(size), metrics);
+    if (metrics == null) {
+      metrics = new CryptoMetrics.NOP();
+    }
+    return new CryptoModule(
+        engine, repository, CryptoAlgorithm.of(algo), CryptoKeySize.of(size), metrics);
   }
-
 
   @Bean
   @ConditionalOnMissingBean
@@ -55,7 +55,6 @@ public class CryptoShredConfiguration {
     }
     return new JDKCryptoEngine(CryptoInitializationVector.of(initVector));
   }
-
 
   @Bean
   @ConditionalOnMissingBean
