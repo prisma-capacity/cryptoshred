@@ -35,24 +35,25 @@ public class CryptoShredConfiguration {
   public CryptoModule cryptoModule(
       @NonNull @Value("${cryptoshred.defaults.algorithm:AES}") String algo,
       @Value("${cryptoshred.defaults.keySize:256}") int size,
-      @Value("${cryptoshred.initVector:#{null}}") String initVector,
       @NonNull CryptoKeyRepository repository,
-      @Autowired(required = false) CryptoEngine engine,
+      @NonNull CryptoEngine engine,
       @Autowired(required = false) CryptoMetrics metrics) {
-    if (engine == null) {
-      // then we'll need an initVector
-      if (initVector == null || initVector.length() < 1) {
-        throw new CryptoPropertyMissingException(
-            "cryptoshred.initVector (non-empty String) is required unless you define a CryptoEngine.");
-      }
-      engine = new JDKCryptoEngine(CryptoInitializationVector.of(initVector));
-    }
-
     if (metrics == null) {
       metrics = new CryptoMetrics.NOP();
     }
     return new CryptoModule(
         engine, repository, CryptoAlgorithm.of(algo), CryptoKeySize.of(size), metrics);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  public CryptoEngine cryptoEngine(@Value("${cryptoshred.initVector:#{null}}") String initVector) {
+    // then we'll need an initVector
+    if (initVector == null || initVector.length() < 1) {
+      throw new CryptoPropertyMissingException(
+          "cryptoshred.initVector (non-empty String) is required unless you define a CryptoEngine.");
+    }
+    return new JDKCryptoEngine(CryptoInitializationVector.of(initVector));
   }
 
   @Bean
