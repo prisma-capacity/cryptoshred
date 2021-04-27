@@ -36,49 +36,43 @@ import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
 @Configuration
 public class CryptoShredConfiguration {
 
-	@Bean
-	@ConditionalOnMissingBean
-	public ObjectMapper objectMapper(@NonNull @Value("${cryptoshred.defaults.algorithm:AES}") String algo,
-			@Value("${cryptoshred.defaults.keySize:256}") int size,
-			@Value("${cryptoshred.initVector:#{null}}") String initVector, @NonNull CryptoKeyRepository repository,
-			@Autowired(required = false) CryptoEngine engine, @Autowired(required = false) CryptoMetrics metrics) {
-		return reconfiguredObjectMapper(algo, size, initVector, repository, engine, metrics, new ObjectMapper());
-	}
+  @Bean
+  @ConditionalOnMissingBean
+  public CryptoModule cryptoModule(
+          @NonNull @Value("${cryptoshred.defaults.algorithm:AES}") String algo,
+          @Value("${cryptoshred.defaults.keySize:256}") int size,
+          @Value("${cryptoshred.initVector:#{null}}") String initVector, @NonNull CryptoKeyRepository repository,
+          @Autowired(required = false) CryptoEngine engine, @Autowired(required = false) CryptoMetrics metrics
+  ) {
+    if (engine == null) {
+      // then we'll need an initVector
+      if (initVector == null || initVector.length() < 1) {
+        throw new CryptoPropertyMissingException(
+                "cryptoshred.initVector (non-empty String) is required unless you define a CryptoEngine.");
+      }
+      engine = new JDKCryptoEngine(CryptoInitializationVector.of(initVector));
+    }
 
-	@Bean
-	@ConditionalOnBean
-	@Order(Ordered.HIGHEST_PRECEDENCE)
-	public ObjectMapper reconfiguredObjectMapper(@NonNull @Value("${cryptoshred.defaults.algorithm:AES}") String algo,
-			@Value("${cryptoshred.defaults.keySize:256}") int size,
-			@Value("${cryptoshred.initVector:#{null}}") String initVector, @NonNull CryptoKeyRepository repository,
-			@Autowired(required = false) CryptoEngine engine, @Autowired(required = false) CryptoMetrics metrics,
-			@NonNull ObjectMapper om) {
-
-		if (engine == null) {
-			// then we'll need an initVector
-			if (initVector == null || initVector.length() < 1) {
-				throw new CryptoPropertyMissingException(
-						"cryptoshred.initVector is required and must be a non-empty String");
-			}
-
-			engine = new JDKCryptoEngine(CryptoInitializationVector.of(initVector));
+		if (metrics == null) {
+			metrics = new CryptoMetrics.NOP();
 		}
+    return new CryptoModule(engine, repository, CryptoAlgorithm.of(algo), CryptoKeySize.of(size), metrics);
+  }
 
-    if (metrics==null)
-      metrics=new CryptoMetrics.NOP();
 
-		om.registerModule(
-				new CryptoModule(engine, repository, CryptoAlgorithm.of(algo), CryptoKeySize.of(size), metrics));
-		return om;
-	}
+  @Bean
+  @ConditionalOnMissingBean
+  public ObjectMapper objectMapper(CryptoModule cm){
+    return new ObjectMapper().registerModule(cm);
+  }
 
-	public static class CryptoPropertyMissingException extends IllegalArgumentException {
+  public static class CryptoPropertyMissingException extends IllegalArgumentException {
 
-		public CryptoPropertyMissingException(@NonNull String string) {
-			super(string);
-		}
+    public CryptoPropertyMissingException(@NonNull String string) {
+      super(string);
+    }
 
-		private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	}
+  }
 }
