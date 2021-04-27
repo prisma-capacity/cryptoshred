@@ -26,6 +26,7 @@ import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
 import java.io.IOException;
 import java.util.UUID;
+import lombok.NonNull;
 
 public class CryptoModule extends SimpleModule {
 
@@ -41,11 +42,11 @@ public class CryptoModule extends SimpleModule {
   }
 
   public CryptoModule(
-      CryptoEngine engine,
-      CryptoKeyRepository keyRepo,
-      CryptoAlgorithm algo,
-      CryptoKeySize keySize,
-      CryptoMetrics metrics) {
+      @NonNull CryptoEngine engine,
+      @NonNull CryptoKeyRepository keyRepo,
+      @NonNull CryptoAlgorithm algo,
+      @NonNull CryptoKeySize keySize,
+      @NonNull CryptoMetrics metrics) {
     this.engine = engine;
     this.keyRepo = keyRepo;
     this.algo = algo;

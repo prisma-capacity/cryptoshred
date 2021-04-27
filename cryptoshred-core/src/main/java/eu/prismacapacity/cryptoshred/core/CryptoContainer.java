@@ -20,7 +20,6 @@ import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
-import java.io.IOException;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -119,18 +118,18 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
 
       if (key.isPresent()) {
 
-        byte[] decrypted = engine.decrypt(getAlgo(), key.get(), bytes);
         try {
+          byte[] decrypted = engine.decrypt(getAlgo(), key.get(), bytes);
           T t = mapper.readerFor(getType()).readValue(decrypted);
-          metrics.notifyDecryptionSuccess();
+          if (metrics != null) metrics.notifyDecryptionSuccess();
           return t;
-        } catch (IOException e) {
-          metrics.notifyDecryptionFailure(e);
+        } catch (Exception e) {
+          if (metrics != null) metrics.notifyDecryptionFailure(e);
           log.warn("Exception while decryption", e);
         }
       } else {
         // key missing, nothing to see here...
-        metrics.notifyMissingKey();
+        if (metrics != null) metrics.notifyMissingKey();
       }
 
       // no value, nothing to do here...
@@ -142,7 +141,7 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
   protected void encrypt(CryptoKeyRepository keyRepository, CryptoEngine engine, ObjectMapper om) {
     CryptoKey key = keyRepository.getOrCreateKeyFor(subjectId, algo, size);
     byte[] bytes;
-    bytes = om.writeValueAsBytes(cachedValue.get());
+    bytes = om.writeValueAsBytes(value());
     this.encryptedBytes = engine.encrypt(bytes, algo, key);
   }
 }

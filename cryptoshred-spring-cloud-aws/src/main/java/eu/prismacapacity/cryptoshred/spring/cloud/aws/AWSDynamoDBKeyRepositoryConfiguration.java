@@ -20,6 +20,7 @@ import eu.prismacapacity.cryptoshred.cloud.aws.DynamoDBCryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.CryptoEngine;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,9 +29,9 @@ import org.springframework.context.annotation.Configuration;
 public class AWSDynamoDBKeyRepositoryConfiguration {
   @Bean
   public CryptoKeyRepository cryptoKeyRepository(
-      CryptoEngine engine,
-      AmazonDynamoDB dynamoDB,
-      CryptoMetrics metrics,
+      @NonNull CryptoEngine engine,
+      @NonNull AmazonDynamoDB dynamoDB,
+      @NonNull CryptoMetrics metrics,
       @Value("${cryptoshred.cloud.aws.dynamo.tablename:#{null}}") String tableName) {
 
     if (tableName == null)

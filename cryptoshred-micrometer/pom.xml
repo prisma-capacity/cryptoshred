@@ -7,13 +7,13 @@
   <parent>
     <groupId>eu.prismacapacity</groupId>
     <artifactId>cryptoshred</artifactId>
-    <version>1.1.3-SNAPSHOT</version>
+    <version>1.1.7-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>cryptoshred-micrometer</artifactId>
   <properties>
-    <spring-boot.version>2.3.4.RELEASE</spring-boot.version>
+    <spring-boot.version>2.4.5</spring-boot.version>
   </properties>
 
   <dependencyManagement>

@@ -5,7 +5,7 @@
   <parent>
     <artifactId>cryptoshred</artifactId>
     <groupId>eu.prismacapacity</groupId>
-    <version>1.1.3-SNAPSHOT</version>
+    <version>1.1.7-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -22,7 +22,7 @@
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-dynamodb</artifactId>
-      <version>1.11.872</version>
+      <version>1.11.1004</version>
     </dependency>
 
     <!-- test deps -->
@@ -30,14 +30,14 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>localstack</artifactId>
-      <version>1.14.3</version>
+      <version>1.15.3</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>1.14.3</version>
+      <version>1.15.3</version>
       <scope>test</scope>
     </dependency>
 
