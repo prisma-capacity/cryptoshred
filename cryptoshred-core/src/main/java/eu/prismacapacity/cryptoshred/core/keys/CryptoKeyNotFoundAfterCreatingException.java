@@ -19,13 +19,13 @@ import lombok.NonNull;
 
 public class CryptoKeyNotFoundAfterCreatingException extends IllegalStateException {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	public CryptoKeyNotFoundAfterCreatingException(@NonNull Exception e) {
-		super(e);
-	}
+  public CryptoKeyNotFoundAfterCreatingException(@NonNull Exception e) {
+    super(e);
+  }
 
-	public CryptoKeyNotFoundAfterCreatingException(@NonNull String msg) {
-		super(msg);
-	}
+  public CryptoKeyNotFoundAfterCreatingException(@NonNull String msg) {
+    super(msg);
+  }
 }

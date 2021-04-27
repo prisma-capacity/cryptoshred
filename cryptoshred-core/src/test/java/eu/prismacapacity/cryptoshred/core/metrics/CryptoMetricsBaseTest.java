@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.prismacapacity.cryptoshred.core.metrics;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -6,30 +21,29 @@ import org.junit.jupiter.api.*;
 
 public class CryptoMetricsBaseTest {
 
-	final CryptoMetrics.Base uut = new CryptoMetrics.Base() {
-	};
+  final CryptoMetrics.Base uut = new CryptoMetrics.Base() {};
 
-	@Test
-	public void notifyMissingKey() {
-		assertNotThrows(uut::notifyMissingKey);
-	}
+  @Test
+  public void notifyMissingKey() {
+    assertNotThrows(uut::notifyMissingKey);
+  }
 
-	@Test
-	public void notifyDecryptionSuccess() {
-		assertNotThrows(uut::notifyDecryptionSuccess);
-	}
+  @Test
+  public void notifyDecryptionSuccess() {
+    assertNotThrows(uut::notifyDecryptionSuccess);
+  }
 
-	@Test
-	public void notifyDecryptionFailure() {
-		assertNotThrows(() -> uut.notifyDecryptionFailure(new Exception()));
-		assertThrows(NullPointerException.class, () -> uut.notifyDecryptionFailure(null));
-	}
+  @Test
+  public void notifyDecryptionFailure() {
+    assertNotThrows(() -> uut.notifyDecryptionFailure(new Exception()));
+    assertThrows(NullPointerException.class, () -> uut.notifyDecryptionFailure(null));
+  }
 
-	public void assertNotThrows(Runnable r) {
-		try {
-			r.run();
-		} catch (Exception e) {
-			fail(e);
-		}
-	}
+  public void assertNotThrows(Runnable r) {
+    try {
+      r.run();
+    } catch (Exception e) {
+      fail(e);
+    }
+  }
 }
