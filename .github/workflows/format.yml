@@ -12,7 +12,8 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           # Recommended: latest versions of Google Java Format require JDK 11+
-          java-version: "11"
+          java-version: 11
+          distribution: 'adopt'
       - uses: axel-op/googlejavaformat-action@v3
         with:
           args: " --replace"
