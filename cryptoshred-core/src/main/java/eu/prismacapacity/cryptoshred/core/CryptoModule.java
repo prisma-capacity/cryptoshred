@@ -130,6 +130,7 @@ public class CryptoModule extends SimpleModule {
   @Override
   public void setupModule(SetupContext context) {
     super.setupModule(context);
+    if(om==null)
     this.om = context.getOwner();
   }
 }
