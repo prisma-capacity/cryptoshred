@@ -15,15 +15,14 @@
  */
 package eu.prismacapacity.cryptoshred.spring.boot.autoconfiguration;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
 import eu.prismacapacity.cryptoshred.micrometer.MicrometerCryptoMetrics;
 import eu.prismacapacity.cryptoshred.spring.micrometer.MicrometerCryptoMetricsConfiguration;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnClass(MicrometerCryptoMetricsConfiguration.class)
