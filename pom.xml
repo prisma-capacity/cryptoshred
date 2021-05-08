@@ -55,6 +55,7 @@
     <spring-boot.version>2.4.5</spring-boot.version>
     <etc>${basedir}/src/etc</etc>
     <spotless-maven-plugin.version>2.11.0</spotless-maven-plugin.version>
+    <dependency-check.skip>true</dependency-check.skip>
   </properties>
   <modules>
     <module>cryptoshred-core</module>
