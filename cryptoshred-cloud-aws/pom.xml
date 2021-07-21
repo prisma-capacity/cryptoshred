@@ -22,7 +22,7 @@
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-dynamodb</artifactId>
-      <version>1.12.22</version>
+      <version>1.12.27</version>
     </dependency>
 
     <!-- test deps -->
@@ -44,7 +44,7 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version>
+      <version>1.2.4</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
