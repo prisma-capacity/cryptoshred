@@ -45,3 +45,8 @@ Resources:
 
 ```
 **Note**: The managed policy `cryptoshred-use-policy` is designed to be used by all users of the library.
+
+### Configuration Property
+- `cryptoshred.cloud.aws.dynamo.tablename` 
+    - name of AWS DynamoDB table to store the subjectId/ key pairs
+    - required parameter
