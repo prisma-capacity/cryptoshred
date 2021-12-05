@@ -54,7 +54,7 @@
     <slf4j.version>1.7.32</slf4j.version>
     <spring-boot.version>2.6.1</spring-boot.version>
     <etc>${basedir}/src/etc</etc>
-    <spotless-maven-plugin.version>2.17.5</spotless-maven-plugin.version>
+    <spotless-maven-plugin.version>2.17.6</spotless-maven-plugin.version>
     <dependency-check.skip>true</dependency-check.skip>
   </properties>
   <modules>
