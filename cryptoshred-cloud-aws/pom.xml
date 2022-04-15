@@ -22,7 +22,7 @@
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-dynamodb</artifactId>
-      <version>1.12.200</version>
+      <version>1.12.201</version>
     </dependency>
 
     <!-- test deps -->
