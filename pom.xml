@@ -55,7 +55,6 @@
 		<spring-boot.version>2.6.6</spring-boot.version>
 		<etc>${basedir}/src/etc</etc>
 		<spotless-maven-plugin.version>2.22.1</spotless-maven-plugin.version>
-		<dependency-check.skip>true</dependency-check.skip>
 	</properties>
 	<modules>
 		<module>cryptoshred-core</module>
@@ -126,6 +125,28 @@
 	</dependencies>
 	<build>
 		<plugins>
+
+			<plugin>
+				<groupId>org.owasp</groupId>
+				<artifactId>dependency-check-maven</artifactId>
+				<version>7.0.4</version>
+				<executions>
+					<execution>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<failOnError>true</failOnError>
+					<failBuildOnAnyVulnerability>true</failBuildOnAnyVulnerability>
+					<skipRuntimeScope>true</skipRuntimeScope>
+					<skipProvidedScope>true</skipProvidedScope>
+					<skipTestScope>true</skipTestScope>
+					<skipSystemScope>true</skipSystemScope>
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.0.0-M6</version>
