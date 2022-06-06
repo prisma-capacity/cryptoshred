@@ -11,7 +11,6 @@
 <a href="https://www.apache.org/licenses/LICENSE-2.0">
     <img class="inline" src="https://img.shields.io/badge/license-ASL2-green.svg?style=flat">
 </a>
-[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=prisma-capacity/cryptoshred)](https://dependabot.com)
 
 
 ### Motivation
