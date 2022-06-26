@@ -83,7 +83,8 @@ public class CryptoModule extends SimpleModule {
       boundType = contextualType.getBindings().getBoundType(0);
       if (boundType == null) {
         throw new IllegalArgumentException(
-            "Cannot infer the container's parameter type. Avoid using RAW-types or use 'new TypeReference<CryptoContainer<String>>() {}' depending on your context.");
+            "Cannot infer the container's parameter type. Avoid using RAW-types or use 'new"
+                + " TypeReference<CryptoContainer<String>>() {}' depending on your context.");
       }
     }
 

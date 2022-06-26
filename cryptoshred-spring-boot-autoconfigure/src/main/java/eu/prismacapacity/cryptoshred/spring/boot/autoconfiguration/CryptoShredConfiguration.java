@@ -51,7 +51,8 @@ public class CryptoShredConfiguration {
     // then we'll need an initVector
     if (initVector == null || initVector.length() < 1) {
       throw new CryptoPropertyMissingException(
-          "cryptoshred.initVector (non-empty String) is required unless you define a CryptoEngine.");
+          "cryptoshred.initVector (non-empty String) is required unless you define a"
+              + " CryptoEngine.");
     }
     return new JDKCryptoEngine(CryptoInitializationVector.of(initVector));
   }
