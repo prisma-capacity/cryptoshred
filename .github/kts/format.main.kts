@@ -32,7 +32,7 @@ public val workflowFormat: Workflow = workflow(
         uses(
           name = "SetupJava",
           action = SetupJavaV3(
-            javaVersion = "11",
+            javaVersion = "17",
             distribution = SetupJavaV3.Distribution.Corretto,
           ),
         )
@@ -43,8 +43,8 @@ public val workflowFormat: Workflow = workflow(
             actionName = "googlejavaformat-action",
             actionVersion = "v3",
             inputs = mapOf(
-              "args" to " --replace",
-              "version" to "1.7",
+              "args" to " --skip-javadoc-formatting --skip-reflowing-long-strings --skip-sorting-imports --replace",
+              "version" to "1.15",
             )
           ),
         )
@@ -52,4 +52,4 @@ public val workflowFormat: Workflow = workflow(
 
     }
 
-workflowFormat.writeToFile()
+workflowFormat.writeToFile(addConsistencyCheck = false)

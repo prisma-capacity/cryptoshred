@@ -66,4 +66,4 @@ public val workflowBuild: Workflow = workflow(
 
     }
 
-workflowBuild.writeToFile()
+workflowBuild.writeToFile(addConsistencyCheck = false)
