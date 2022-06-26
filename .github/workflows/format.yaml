@@ -40,5 +40,5 @@ jobs:
         name: GooglejavaformatActionV3
         uses: axel-op/googlejavaformat-action@v3
         with:
-          args:  --replace
-          version: 1.7
+          args:  --skip-sorting-imports --replace
+          version: 1.15
