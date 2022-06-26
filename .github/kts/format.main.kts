@@ -32,7 +32,7 @@ public val workflowFormat: Workflow = workflow(
         uses(
           name = "SetupJava",
           action = SetupJavaV3(
-            javaVersion = "11",
+            javaVersion = "17",
             distribution = SetupJavaV3.Distribution.Corretto,
           ),
         )

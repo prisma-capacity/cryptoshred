@@ -34,7 +34,7 @@ jobs:
         name: SetupJava
         uses: actions/setup-java@v3
         with:
-          java-version: 11
+          java-version: 17
           distribution: corretto
       - id: step-2
         name: GooglejavaformatActionV3
