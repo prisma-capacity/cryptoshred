@@ -26,5 +26,5 @@ jobs:
         name: GooglejavaformatActionV3
         uses: axel-op/googlejavaformat-action@v3
         with:
-          args:  --skip-sorting-imports --replace
+          args:  --skip-javadoc-formatting --skip-reflowing-long-strings --skip-sorting-imports --replace
           version: 1.15

@@ -43,7 +43,7 @@ public val workflowFormat: Workflow = workflow(
             actionName = "googlejavaformat-action",
             actionVersion = "v3",
             inputs = mapOf(
-              "args" to " --skip-sorting-imports --replace",
+              "args" to " --skip-javadoc-formatting --skip-reflowing-long-strings --skip-sorting-imports --replace",
               "version" to "1.15",
             )
           ),
