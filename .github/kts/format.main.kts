@@ -52,4 +52,4 @@ public val workflowFormat: Workflow = workflow(
 
     }
 
-workflowFormat.writeToFile()
+workflowFormat.writeToFile(addConsistencyCheck = false)
