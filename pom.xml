@@ -54,7 +54,7 @@
 		<slf4j.version>1.7.36</slf4j.version>
 		<spring-boot.version>2.7.1</spring-boot.version>
 		<etc>${basedir}/src/etc</etc>
-		<spotless-maven-plugin.version>2.22.8</spotless-maven-plugin.version>
+		<spotless-maven-plugin.version>2.23.0</spotless-maven-plugin.version>
 	</properties>
 	<modules>
 		<module>cryptoshred-core</module>
@@ -239,7 +239,7 @@
 						<trimTrailingWhitespace />
 						<ktlint>
 							<!-- Optional, available versions: https://github.com/shyiko/ktlint/releases -->
-							<version>0.36.0</version>
+							<version>0.46.0</version>
 						</ktlint>
 						<includes>
 							<include>**/src/main/kotlin/**/*.kt
