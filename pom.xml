@@ -239,7 +239,7 @@
 						<trimTrailingWhitespace />
 						<ktlint>
 							<!-- Optional, available versions: https://github.com/shyiko/ktlint/releases -->
-							<version>0.36.0</version>
+							<version>0.46.0</version>
 						</ktlint>
 						<includes>
 							<include>**/src/main/kotlin/**/*.kt
