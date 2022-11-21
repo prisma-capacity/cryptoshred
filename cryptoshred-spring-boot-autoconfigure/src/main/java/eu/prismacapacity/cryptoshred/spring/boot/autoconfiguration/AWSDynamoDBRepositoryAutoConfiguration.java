@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2022 PRISMA European Capacity Platform GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
  */
 package eu.prismacapacity.cryptoshred.spring.boot.autoconfiguration;
 
-import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
-import eu.prismacapacity.cryptoshred.spring.cloud.aws.AWSDynamoDBKeyRepositoryConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Import;
+
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
+import eu.prismacapacity.cryptoshred.spring.cloud.aws.AWSDynamoDBKeyRepositoryConfiguration;
 
 @AutoConfiguration
 @Import(AWSDynamoDBKeyRepositoryConfiguration.class)
