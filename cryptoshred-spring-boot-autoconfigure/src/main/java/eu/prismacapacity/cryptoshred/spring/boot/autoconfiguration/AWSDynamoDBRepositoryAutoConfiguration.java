@@ -17,12 +17,12 @@ package eu.prismacapacity.cryptoshred.spring.boot.autoconfiguration;
 
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.spring.cloud.aws.AWSDynamoDBKeyRepositoryConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-@Configuration
+@AutoConfiguration
 @Import(AWSDynamoDBKeyRepositoryConfiguration.class)
 @ConditionalOnClass(AWSDynamoDBKeyRepositoryConfiguration.class)
 @ConditionalOnMissingBean(CryptoKeyRepository.class)
