@@ -1,6 +1,6 @@
 #!/usr/bin/env kotlin
 
-@file:DependsOn("it.krzeminski:github-actions-kotlin-dsl:0.34.0")
+@file:DependsOn("it.krzeminski:github-actions-kotlin-dsl:0.34.1")
 
 import it.krzeminski.githubactions.actions.actions.CacheV3
 import it.krzeminski.githubactions.actions.actions.CheckoutV3
