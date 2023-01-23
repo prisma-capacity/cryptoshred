@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package eu.prismacapacity.cryptoshred.spring.boot.autoconfiguration;
 
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Import;
 
-@Configuration
+@AutoConfiguration
 @Import(CryptoShredConfiguration.class)
 public class CryptoShredAutoConfiguration {}
