@@ -52,10 +52,10 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
   }
 
   public CryptoContainer(
-          @NonNull Class<T> type,
-          @NonNull CryptoSubjectId subjectId,
-          @NonNull CryptoAlgorithm algo,
-          @NonNull CryptoKeySize size) {
+      @NonNull Class<T> type,
+      @NonNull CryptoSubjectId subjectId,
+      @NonNull CryptoAlgorithm algo,
+      @NonNull CryptoKeySize size) {
     this.cachedValue = Optional.empty();
     this.type = type;
     this.subjectId = subjectId;
@@ -64,15 +64,16 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
   }
 
   private CryptoContainer(
-          @NonNull CryptoSubjectId subjectId,
-          @NonNull CryptoAlgorithm algo,
-          @NonNull CryptoKeySize size) {
+      @NonNull CryptoSubjectId subjectId,
+      @NonNull CryptoAlgorithm algo,
+      @NonNull CryptoKeySize size) {
     this.type = null;
     this.cachedValue = Optional.empty();
     this.subjectId = subjectId;
     this.algo = algo;
     this.size = size;
   }
+
   private CryptoContainer(
       Class<T> targetType,
       CryptoAlgorithm algo,
@@ -172,7 +173,6 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
     this.encryptedBytes = engine.encrypt(bytes, algo, key);
   }
 
-
   public CryptoContainer<T> filter(Predicate<? super T> predicate) {
     Objects.requireNonNull(predicate);
     if (!isPresent()) return empty();
@@ -183,7 +183,7 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
     Objects.requireNonNull(mapper);
     if (!isPresent()) return emptyWithoutTypeInfo();
     else {
-      return new CryptoContainer<>(mapper.apply(value()), subjectId,algo,size);
+      return new CryptoContainer<>(mapper.apply(value()), subjectId, algo, size);
     }
   }
 
@@ -191,8 +191,7 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
     return new CryptoContainer<>(this.type, subjectId, algo, size);
   }
 
-  private<X> CryptoContainer<X> emptyWithoutTypeInfo() {
+  private <X> CryptoContainer<X> emptyWithoutTypeInfo() {
     return new CryptoContainer<>(subjectId, algo, size);
   }
-
 }
