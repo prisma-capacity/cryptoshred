@@ -20,7 +20,12 @@ import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
+
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -40,12 +45,34 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
       @NonNull CryptoAlgorithm algo,
       @NonNull CryptoKeySize size) {
     this.cachedValue = Optional.ofNullable(value);
-    this.type = value.getClass();
+    this.type = (Class<T>) value.getClass();
     this.subjectId = subjectId;
     this.algo = algo;
     this.size = size;
   }
 
+  public CryptoContainer(
+          @NonNull Class<T> type,
+          @NonNull CryptoSubjectId subjectId,
+          @NonNull CryptoAlgorithm algo,
+          @NonNull CryptoKeySize size) {
+    this.cachedValue = Optional.empty();
+    this.type = type;
+    this.subjectId = subjectId;
+    this.algo = algo;
+    this.size = size;
+  }
+
+  private CryptoContainer(
+          @NonNull CryptoSubjectId subjectId,
+          @NonNull CryptoAlgorithm algo,
+          @NonNull CryptoKeySize size) {
+    this.type = null;
+    this.cachedValue = Optional.empty();
+    this.subjectId = subjectId;
+    this.algo = algo;
+    this.size = size;
+  }
   private CryptoContainer(
       Class<T> targetType,
       CryptoAlgorithm algo,
@@ -88,7 +115,7 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
         targetType, algorithm, keySize, subjectId, encrypted, engine, keyRepo, metrics, om);
   }
 
-  @Getter private Class<?> type;
+  @Getter private Class<T> type;
 
   @Getter private CryptoAlgorithm algo;
 
@@ -144,4 +171,28 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
     bytes = om.writeValueAsBytes(value());
     this.encryptedBytes = engine.encrypt(bytes, algo, key);
   }
+
+
+  public CryptoContainer<T> filter(Predicate<? super T> predicate) {
+    Objects.requireNonNull(predicate);
+    if (!isPresent()) return empty();
+    else return predicate.test(value()) ? this : empty();
+  }
+
+  public <U> CryptoContainer<U> map(Function<? super T, ? extends U> mapper) {
+    Objects.requireNonNull(mapper);
+    if (!isPresent()) return emptyWithoutTypeInfo();
+    else {
+      return new CryptoContainer<>(mapper.apply(value()), subjectId,algo,size);
+    }
+  }
+
+  private CryptoContainer<T> empty() {
+    return new CryptoContainer<>(this.type, subjectId, algo, size);
+  }
+
+  private<X> CryptoContainer<X> emptyWithoutTypeInfo() {
+    return new CryptoContainer<>(subjectId, algo, size);
+  }
+
 }

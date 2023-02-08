@@ -27,6 +27,10 @@ abstract class OptionalBehavior<T> {
 
   abstract T value();
 
+  public Optional<T> asOptional(){
+    return Optional.ofNullable(value());
+  }
+
   ////////////////////////////////////////
   // stolen from optional
   ////////////////////////////////////////
@@ -44,28 +48,6 @@ abstract class OptionalBehavior<T> {
 
   public void ifPresent(Consumer<? super T> consumer) {
     if (value() != null) consumer.accept(value());
-  }
-
-  public Optional<T> filter(Predicate<? super T> predicate) {
-    Objects.requireNonNull(predicate);
-    if (!isPresent()) return Optional.empty();
-    else return predicate.test(value()) ? Optional.of(value()) : Optional.empty();
-  }
-
-  public <U> Optional<U> map(Function<? super T, ? extends U> mapper) {
-    Objects.requireNonNull(mapper);
-    if (!isPresent()) return Optional.empty();
-    else {
-      return Optional.ofNullable(mapper.apply(value()));
-    }
-  }
-
-  public <U> Optional<U> flatMap(Function<? super T, Optional<U>> mapper) {
-    Objects.requireNonNull(mapper);
-    if (!isPresent()) return Optional.empty();
-    else {
-      return Objects.requireNonNull(mapper.apply(value()));
-    }
   }
 
   public T orElse(T other) {
