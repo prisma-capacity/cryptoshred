@@ -13,7 +13,7 @@
 
   <artifactId>cryptoshred-spring-cloud-aws</artifactId>
   <properties>
-    <spring-boot.version>2.7.10</spring-boot.version>
+    <spring-boot.version>2.7.11</spring-boot.version>
   </properties>
 
   <dependencyManagement>
