@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,25 +17,31 @@ package eu.prismacapacity.cryptoshred.cloud.aws;
 
 import static org.junit.Assert.*;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.model.*;
-import com.amazonaws.waiters.WaiterParameters;
-import eu.prismacapacity.cryptoshred.cloud.aws.utils.TestIntegration;
-import eu.prismacapacity.cryptoshred.core.*;
-import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
-import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
-import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.UUID;
-import lombok.NonNull;
-import lombok.val;
+
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.model.*;
+import com.amazonaws.waiters.WaiterParameters;
+
+import eu.prismacapacity.cryptoshred.cloud.aws.utils.TestIntegration;
+import eu.prismacapacity.cryptoshred.core.*;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
+import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
+import lombok.NonNull;
+import lombok.val;
 
 @Testcontainers
 class DynamoDBCryptoKeyRepositoryIntegrationTest {
@@ -199,10 +205,13 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
   }
 
   private static AmazonDynamoDB getClient() {
+    final URI endpointOverride =
+        localstack.getEndpointOverride(LocalStackContainer.Service.DYNAMODB);
     return AmazonDynamoDBClientBuilder.standard()
         .withEndpointConfiguration(
-            localstack.getEndpointConfiguration(LocalStackContainer.Service.DYNAMODB))
-        .withCredentials(localstack.getDefaultCredentialsProvider())
+            new AwsClientBuilder.EndpointConfiguration(
+                endpointOverride.toString(), localstack.getRegion()))
+        .withCredentials(new DefaultAWSCredentialsProviderChain())
         .build();
   }
 }
