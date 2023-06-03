@@ -4,9 +4,9 @@
 
 # cryptoshred
 
-![Java CI](https://github.com/prisma-capacity/cryptoshred/workflows/Java%20CI/badge.svg?branch=master)
+![Java CI](https://github.com/prisma-capacity/cryptoshred/workflows/Java%20CI/badge.svg?branch=main)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/333bfd567a6a447895212994b414f077)](https://app.codacy.com/gh/prisma-capacity/cryptoshred?utm_source=github.com&utm_medium=referral&utm_content=prisma-capacity/cryptoshred&utm_campaign=Badge_Grade_Settings)
-[![codecov](https://codecov.io/gh/prisma-capacity/cryptoshred/branch/master/graph/badge.svg)](https://codecov.io/gh/prisma-capacity/cryptoshred)
+[![codecov](https://codecov.io/gh/prisma-capacity/cryptoshred/branch/main/graph/badge.svg)](https://codecov.io/gh/prisma-capacity/cryptoshred)
 [![MavenCentral](https://img.shields.io/maven-central/v/eu.prismacapacity/cryptoshred)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22eu.prismacapacity%22)
 <a href="https://www.apache.org/licenses/LICENSE-2.0">
     <img class="inline" src="https://img.shields.io/badge/license-ASL2-green.svg?style=flat">
