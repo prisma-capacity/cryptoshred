@@ -196,7 +196,7 @@
 				<version>1.20.0</version>
 				<configuration>
 					<gitFlowConfig>
-						<developmentBranch>master</developmentBranch>
+						<developmentBranch>main</developmentBranch>
 					</gitFlowConfig>
 				</configuration>
 			</plugin>
