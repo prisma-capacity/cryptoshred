@@ -10,4 +10,8 @@
         <notes>We're not using XML here, and also there is no updated jackson-core yet, so that we cannot avoid the transitive dependency.</notes>
         <cve>CVE-2022-45688</cve>
     </suppress>
+    <suppress>
+        <notes>CVE is being considered by the community a false positive. See https://github.com/FasterXML/jackson-databind/issues/3972.</notes>
+        <cve>CVE-2023-35116</cve>
+    </suppress>
 </suppressions>
