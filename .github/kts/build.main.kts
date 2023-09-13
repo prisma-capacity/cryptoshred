@@ -48,7 +48,7 @@ public val workflowBuild: Workflow = workflow(
           name = "Set up JDK",
           action = SetupJavaV3(
             distribution = SetupJavaV3.Distribution.Corretto,
-            javaVersion = "11",
+            javaVersion = "17",
           ),
         )
         run(
