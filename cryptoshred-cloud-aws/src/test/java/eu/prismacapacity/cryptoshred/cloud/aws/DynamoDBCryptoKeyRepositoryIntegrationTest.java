@@ -18,7 +18,6 @@ package eu.prismacapacity.cryptoshred.cloud.aws;
 import static org.junit.Assert.*;
 
 import java.net.URI;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -28,13 +27,6 @@ import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.model.*;
-import com.amazonaws.waiters.WaiterParameters;
-
 import eu.prismacapacity.cryptoshred.cloud.aws.utils.TestIntegration;
 import eu.prismacapacity.cryptoshred.core.*;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
@@ -42,6 +34,10 @@ import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
 import lombok.NonNull;
 import lombok.val;
+import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.*;
 
 @Testcontainers
 class DynamoDBCryptoKeyRepositoryIntegrationTest {
@@ -59,20 +55,25 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
     val client = getClient();
 
     client.createTable(
-        new CreateTableRequest()
-            .withTableName(TABLE_NAME)
-            .withKeySchema(
-                new KeySchemaElement().withKeyType(KeyType.HASH).withAttributeName("subjectId"))
-            .withProvisionedThroughput(new ProvisionedThroughput(10L, 10L))
-            .withAttributeDefinitions(
-                new AttributeDefinition()
-                    .withAttributeName("subjectId")
-                    .withAttributeType(ScalarAttributeType.S)));
+        CreateTableRequest.builder()
+            .tableName(TABLE_NAME)
+            .keySchema(
+                KeySchemaElement.builder().keyType(KeyType.HASH).attributeName("subjectId").build())
+            .provisionedThroughput(
+                ProvisionedThroughput.builder()
+                    .readCapacityUnits(10L)
+                    .writeCapacityUnits(10L)
+                    .build())
+            .attributeDefinitions(
+                AttributeDefinition.builder()
+                    .attributeName("subjectId")
+                    .attributeType(ScalarAttributeType.S)
+                    .build())
+            .build());
 
-    val describeTable = new DescribeTableRequest().withTableName(TABLE_NAME);
-    val waitParams = new WaiterParameters<DescribeTableRequest>().withRequest(describeTable);
+    val describeTable = DescribeTableRequest.builder().tableName(TABLE_NAME).build();
 
-    client.waiters().tableExists().run(waitParams);
+    client.waiter().waitUntilTableExists(describeTable);
   }
 
   @TestIntegration
@@ -171,7 +172,7 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
 
     public RaceConditionCryptoKeyRepository(
         @NonNull CryptoEngine engine,
-        @NonNull AmazonDynamoDB dynamoDB,
+        @NonNull DynamoDbClient dynamoDB,
         @NonNull CryptoMetrics metrics,
         @NonNull String tableName,
         CryptoKey key) {
@@ -194,24 +195,22 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
     val client = getClient();
 
     val item = new HashMap<String, AttributeValue>();
-    item.put("subjectId", new AttributeValue(subjectId.getId().toString()));
+    item.put("subjectId", AttributeValue.fromS(subjectId.getId().toString()));
     item.put(
         Utils.generateKeyPropertyName(algorithm, size),
-        new AttributeValue().withB(ByteBuffer.wrap(key.getBytes())));
+        AttributeValue.fromB(SdkBytes.fromByteArray(key.getBytes())));
 
-    val request = new PutItemRequest().withTableName(TABLE_NAME).withItem(item);
+    val request = PutItemRequest.builder().tableName(TABLE_NAME).item(item).build();
 
     client.putItem(request);
   }
 
-  private static AmazonDynamoDB getClient() {
+  private static DynamoDbClient getClient() {
     final URI endpointOverride =
         localstack.getEndpointOverride(LocalStackContainer.Service.DYNAMODB);
-    return AmazonDynamoDBClientBuilder.standard()
-        .withEndpointConfiguration(
-            new AwsClientBuilder.EndpointConfiguration(
-                endpointOverride.toString(), localstack.getRegion()))
-        .withCredentials(new DefaultAWSCredentialsProviderChain())
+    return DynamoDbClient.builder()
+        .endpointOverride(endpointOverride)
+        .region(Region.US_EAST_1)
         .build();
   }
 }

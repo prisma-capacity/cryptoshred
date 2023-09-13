@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,19 @@
  */
 package eu.prismacapacity.cryptoshred.cloud.aws;
 
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import java.util.Map;
+import java.util.Optional;
+
 import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
 import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
-import java.util.Map;
-import java.util.Optional;
 import lombok.val;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 class Utils {
   static Map<String, AttributeValue> subjectIdToKeyAttributeMap(CryptoSubjectId subjectId) {
-    return Maps.of("subjectId", new AttributeValue(subjectId.getId().toString()));
+    return Maps.of("subjectId", AttributeValue.fromS(subjectId.getId().toString()));
   }
 
   static String generateKeyPropertyName(CryptoAlgorithm algorithm, CryptoKeySize size) {
@@ -42,12 +43,12 @@ class Utils {
       return Optional.empty();
     }
 
-    val bytes = keyAttributeValue.getB();
+    val bytes = keyAttributeValue.b();
 
     if (bytes == null) {
       return Optional.empty();
     }
 
-    return Optional.of(CryptoKey.fromBytes(bytes.array()));
+    return Optional.of(CryptoKey.fromBytes(bytes.asByteArray()));
   }
 }

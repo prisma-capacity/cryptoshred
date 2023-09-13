@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package eu.prismacapacity.cryptoshred.cloud.aws;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
+import java.util.Optional;
+
 import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
 import eu.prismacapacity.cryptoshred.core.CryptoEngine;
 import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
@@ -25,10 +25,11 @@ import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyNotFoundAfterCreatingExc
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
-import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException;
 
 /**
  * CryptoKeyRepository implementation based on AWS DynamoDB. Supports multiple keys (algorithm +
@@ -40,7 +41,7 @@ import lombok.val;
 public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
   @NonNull private final CryptoEngine engine;
 
-  @NonNull private final AmazonDynamoDB dynamoDB;
+  @NonNull private final DynamoDbClient dynamoDB;
 
   @NonNull private final CryptoMetrics metrics;
 
@@ -55,7 +56,7 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
 
     val getRequest = GetCryptoKeyRequest.of(subjectId, algorithm, size, tableName);
 
-    val item = metrics.timedFindKey(() -> dynamoDB.getItem(getRequest.toDynamoRequest()).getItem());
+    val item = metrics.timedFindKey(() -> dynamoDB.getItem(getRequest.toDynamoRequest()).item());
 
     if (item == null) {
       return Optional.empty();
@@ -83,7 +84,7 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
       val result =
           metrics.timedCreateKey(() -> dynamoDB.updateItem(createRequest.toDynamoRequest()));
 
-      val resultKey = Utils.extractCryptoKeyFromItem(algorithm, size, result.getAttributes());
+      val resultKey = Utils.extractCryptoKeyFromItem(algorithm, size, result.attributes());
 
       if (!resultKey.isPresent()) {
         // should never ever happen because that would indicate a broken DynamoDB API

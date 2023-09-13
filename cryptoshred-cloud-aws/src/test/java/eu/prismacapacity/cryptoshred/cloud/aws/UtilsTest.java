@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,18 @@
  */
 package eu.prismacapacity.cryptoshred.cloud.aws;
 
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import java.util.HashMap;
+import java.util.UUID;
+
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
+
 import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
 import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.UUID;
 import lombok.val;
-import org.junit.Assert;
-import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 class UtilsTest {
 
@@ -34,7 +36,7 @@ class UtilsTest {
 
     val attributeMap = Utils.subjectIdToKeyAttributeMap(subjectId);
 
-    Assert.assertEquals(attributeMap.get("subjectId").getS(), subjectId.getId().toString());
+    Assert.assertEquals(attributeMap.get("subjectId").s(), subjectId.getId().toString());
     Assert.assertEquals(attributeMap.size(), 1);
   }
 
@@ -59,7 +61,7 @@ class UtilsTest {
     val item =
         new HashMap<String, AttributeValue>() {
           {
-            put(propertyName, new AttributeValue().withB(ByteBuffer.wrap(bytes)));
+            put(propertyName, AttributeValue.fromB(SdkBytes.fromByteArray(bytes)));
           }
         };
 
@@ -78,7 +80,7 @@ class UtilsTest {
     val item =
         new HashMap<String, AttributeValue>() {
           {
-            put(propertyName, new AttributeValue().withS("foo"));
+            put(propertyName, AttributeValue.fromS("foo"));
           }
         };
 
