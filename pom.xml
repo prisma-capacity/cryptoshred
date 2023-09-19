@@ -222,7 +222,7 @@
 						<trimTrailingWhitespace />
 						<removeUnusedImports />
 						<googleJavaFormat>
-							<version>1.8</version> <!-- optional -->
+							<version>1.17.0</version> <!-- optional -->
 							<style>GOOGLE</style>  <!-- or AOSP (optional) -->
 						</googleJavaFormat>
 						<includes>
