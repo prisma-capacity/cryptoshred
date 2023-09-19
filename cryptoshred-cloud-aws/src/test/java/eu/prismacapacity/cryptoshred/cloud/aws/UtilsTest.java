@@ -68,7 +68,7 @@ class UtilsTest {
     val key = Utils.extractCryptoKeyFromItem(algorithm, size, item);
 
     Assert.assertTrue(key.isPresent());
-    Assert.assertEquals(key.get().getBytes(), bytes);
+    Assert.assertArrayEquals(key.get().getBytes(), bytes);
   }
 
   @Test
