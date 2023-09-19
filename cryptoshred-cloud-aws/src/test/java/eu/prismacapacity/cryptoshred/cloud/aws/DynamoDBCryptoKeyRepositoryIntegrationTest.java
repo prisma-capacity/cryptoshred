@@ -210,7 +210,7 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
         localstack.getEndpointOverride(LocalStackContainer.Service.DYNAMODB);
     return DynamoDbClient.builder()
         .endpointOverride(endpointOverride)
-        .region(Region.US_EAST_1)
+        .region(Region.of(localstack.getRegion()))
         .build();
   }
 }
