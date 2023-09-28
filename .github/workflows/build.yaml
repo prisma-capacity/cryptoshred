@@ -1,39 +1,37 @@
-# This file was generated using Kotlin DSL (.github/kts/build.main.kts).
+# This file was generated using Kotlin DSL (.github/kts/.github/kts/build.main.kts).
 # If you want to modify the workflow, please change the Kotlin file and regenerate this YAML file.
-# Generated with https://github.com/krzema12/github-actions-kotlin-dsl
+# Generated with https://github.com/krzema12/github-workflows-kt
 
 name: Java CI
-
 on:
-  push:
-
+  push: {}
 jobs:
-  "build":
-    runs-on: "ubuntu-latest"
+  build:
+    runs-on: ubuntu-latest
     steps:
-      - id: step-0
-        name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - id: step-1
-        name: Cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
-      - id: step-2
-        name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: 11
-          distribution: corretto
-      - id: step-3
-        name: Build with Maven
-        run: mvn -B install --file pom.xml
-      - id: step-4
-        name: CodecovAction
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+    - id: step-0
+      name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - id: step-1
+      name: Cache
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-maven-
+    - id: step-2
+      name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: 17
+        distribution: corretto
+    - id: step-3
+      name: Build with Maven
+      run: mvn -B install --file pom.xml
+    - id: step-4
+      name: CodecovAction
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}

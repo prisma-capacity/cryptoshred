@@ -101,5 +101,9 @@ assertEquals("Peter",p2.name.get());
 // of course you should rather use p2.name.orElse("unknown") or something rather than get, but you know all that from using Optional...
 ```
 
+### Spring Boot Compatibility
 
-
+| Library version | Spring Boot version |
+|-----------------|---------------------|
+| 1.x.x           | 2.7+                |
+| 2.x.x           | 3.1+                |

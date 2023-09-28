@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  */
 package eu.prismacapacity.cryptoshred.cloud.aws;
 
-import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
 import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
 import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import lombok.NonNull;
 import lombok.Value;
+import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 
 @Value(staticConstructor = "of")
 class GetCryptoKeyRequest {
@@ -33,10 +33,11 @@ class GetCryptoKeyRequest {
   @NonNull private final String tableName;
 
   GetItemRequest toDynamoRequest() {
-    return new GetItemRequest()
-        .withTableName(tableName)
-        .withKey(Utils.subjectIdToKeyAttributeMap(subjectId))
-        .withConsistentRead(true)
-        .withProjectionExpression(Utils.generateKeyPropertyName(algorithm, size));
+    return GetItemRequest.builder()
+        .tableName(tableName)
+        .key(Utils.subjectIdToKeyAttributeMap(subjectId))
+        .consistentRead(true)
+        .projectionExpression(Utils.generateKeyPropertyName(algorithm, size))
+        .build();
   }
 }

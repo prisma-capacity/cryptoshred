@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
  */
 package eu.prismacapacity.cryptoshred.cloud.aws;
 
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.ReturnValue;
-import com.amazonaws.services.dynamodbv2.model.UpdateItemRequest;
 import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
 import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
-import java.nio.ByteBuffer;
 import lombok.NonNull;
 import lombok.Value;
+import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.ReturnValue;
+import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 
 @Value(staticConstructor = "of")
 class CreateCryptoKeyRequest {
@@ -39,14 +39,15 @@ class CreateCryptoKeyRequest {
   @NonNull private final String tableName;
 
   UpdateItemRequest toDynamoRequest() {
-    return new UpdateItemRequest()
-        .withTableName(tableName)
-        .withKey(Utils.subjectIdToKeyAttributeMap(subjectId))
-        .withConditionExpression("attribute_not_exists(#k)")
-        .withUpdateExpression("SET #k = :v")
-        .withExpressionAttributeNames(Maps.of("#k", Utils.generateKeyPropertyName(algorithm, size)))
-        .withReturnValues(ReturnValue.ALL_NEW)
-        .withExpressionAttributeValues(
-            Maps.of(":v", new AttributeValue().withB(ByteBuffer.wrap(key.getBytes()))));
+    return UpdateItemRequest.builder()
+        .tableName(tableName)
+        .key(Utils.subjectIdToKeyAttributeMap(subjectId))
+        .conditionExpression("attribute_not_exists(#k)")
+        .updateExpression("SET #k = :v")
+        .expressionAttributeNames(Maps.of("#k", Utils.generateKeyPropertyName(algorithm, size)))
+        .returnValues(ReturnValue.ALL_NEW)
+        .expressionAttributeValues(
+            Maps.of(":v", AttributeValue.fromB(SdkBytes.fromByteArray(key.getBytes()))))
+        .build();
   }
 }
