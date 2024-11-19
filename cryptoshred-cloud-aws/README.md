@@ -50,3 +50,14 @@ Resources:
 - `cryptoshred.cloud.aws.dynamo.tablename` 
     - name of AWS DynamoDB table to store the subjectId/ key pairs
     - required parameter
+
+
+### Retry
+
+In case you're wondering, cryptoshred does not alter the defaults for retry
+behavior. That means, if you did not configure it differently, it'll come
+with the SDKs defaults of: 100 retries and 500ms base delay / max backOff
+20s
+
+See com.amazonaws.retry.PredefinedRetryPolicies#getDynamoDBDefaultRetryPolicy
+
