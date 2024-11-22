@@ -13,7 +13,7 @@
 
   <artifactId>cryptoshred-spring-boot-autoconfiguration</artifactId>
   <properties>
-    <spring-boot.version>3.3.5</spring-boot.version>
+    <spring-boot.version>3.3.6</spring-boot.version>
   </properties>
 
   <dependencyManagement>
