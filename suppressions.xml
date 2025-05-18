@@ -14,4 +14,8 @@
         <notes>CVE is being considered by the community a false positive. See https://github.com/FasterXML/jackson-databind/issues/3972.</notes>
         <cve>CVE-2023-35116</cve>
     </suppress>
+    <suppress>
+        <notes>irrelevant for this lib</notes>
+        <cve>CVE-2025-22233</cve>
+    </suppress>
 </suppressions>
