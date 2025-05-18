@@ -30,7 +30,6 @@ workflow(
         uses(
             name = "Checkout",
             action = Checkout(
-                token = "${'$'}{{  secrets.PAT }}",
                 fetchDepth = Checkout.FetchDepth.Infinite,
             ),
         )
