@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2025 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,6 @@ import lombok.Value;
 // not an enum for a reason...
 @Value(staticConstructor = "of")
 public class CryptoAlgorithm {
-      public static final CryptoAlgorithm AES_CBC = of("AES");
+  public static final CryptoAlgorithm AES_CBC = of("AES");
   @NonNull String id;
 }
