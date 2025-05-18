@@ -1,69 +1,79 @@
 #!/usr/bin/env kotlin
 
-@file:DependsOn("it.krzeminski:github-actions-kotlin-dsl:0.40.0")
+@file:DependsOn("io.github.typesafegithub:github-workflows-kt:3.4.0")
 
-import it.krzeminski.githubactions.actions.actions.CacheV3
-import it.krzeminski.githubactions.actions.actions.CheckoutV3
-import it.krzeminski.githubactions.actions.actions.SetupJavaV3
-import it.krzeminski.githubactions.actions.codecov.CodecovActionV3
-import it.krzeminski.githubactions.domain.RunnerType
-import it.krzeminski.githubactions.domain.Workflow
-import it.krzeminski.githubactions.domain.triggers.Push
-import it.krzeminski.githubactions.dsl.workflow
-import it.krzeminski.githubactions.yaml.writeToFile
-import java.nio.file.Paths
 
-public val workflowBuild: Workflow = workflow(
-      name = "Java CI",
-      on = listOf(
-        Push(),
+@file:Repository("https://repo.maven.apache.org/maven2/")
+@file:Repository("https://bindings.krzeminski.it")
+
+@file:DependsOn("actions:checkout:v4")
+@file:DependsOn("actions:cache:v4")
+@file:DependsOn("actions:setup-java:v4")
+@file:DependsOn("codecov:codecov-action:v5")
+
+
+import io.github.typesafegithub.workflows.actions.actions.Cache
+import io.github.typesafegithub.workflows.actions.actions.Checkout
+import io.github.typesafegithub.workflows.actions.actions.SetupJava
+import io.github.typesafegithub.workflows.actions.codecov.CodecovAction
+import io.github.typesafegithub.workflows.domain.RunnerType
+import io.github.typesafegithub.workflows.domain.triggers.PullRequest
+import io.github.typesafegithub.workflows.domain.triggers.Push
+import io.github.typesafegithub.workflows.dsl.expressions.expr
+import io.github.typesafegithub.workflows.dsl.workflow
+import io.github.typesafegithub.workflows.yaml.ConsistencyCheckJobConfig
+
+
+workflow(
+  name = "Maven all in one",
+  on = listOf(
+    PullRequest(),
+    Push(
+      branches = listOf("main"),
+    ),
+  ),
+  sourceFile = __FILE__,
+  consistencyCheckJobConfig = ConsistencyCheckJobConfig.Disabled
+) {
+  job(
+    id = "build",
+    runsOn = RunnerType.UbuntuLatest,
+  ) {
+    uses(
+      name = "Checkout",
+      action = Checkout(fetchDepth = Checkout.FetchDepth.Infinite)
+    )
+    uses(
+      name = "Cache - Maven Repository",
+      action = Cache(
+        path = listOf(
+          "~/.m2/repository",
         ),
-      sourceFile = Paths.get(".github/kts/build.main.kts"),
-    ) {
-      job(
-        id = "build",
-        runsOn = RunnerType.UbuntuLatest,
-      ) {
-        uses(
-          name = "Checkout",
-          action = CheckoutV3(
-            fetchDepth = CheckoutV3.FetchDepth.Infinite,
-          ),
-        )
-        uses(
-          name = "Cache",
-          action = CacheV3(
-            path = listOf(
-              "~/.m2/repository",
-            )
-            ,
-            key = "${'$'}{{ runner.os }}-maven-${'$'}{{ hashFiles('**/pom.xml') }}",
-            restoreKeys = listOf(
-              "${'$'}{{ runner.os }}-maven-",
-            )
-            ,
-          ),
-        )
-        uses(
-          name = "Set up JDK",
-          action = SetupJavaV3(
-            distribution = SetupJavaV3.Distribution.Corretto,
-            javaVersion = "17",
-          ),
-        )
-        run(
-          name = "Build with Maven",
-          command = "mvn -B install --file pom.xml"
-        )
-        uses(
-          name = "CodecovAction",
-          action = CodecovActionV3(
-            token = "${'$'}{{ secrets.CODECOV_TOKEN }}",
-            // _customVersion = "v1",
-          ),
-        )
-      }
+        key = "${'$'}{{ runner.os }}-maven-${'$'}{{ hashFiles('**/pom.xml') }}",
+        restoreKeys = listOf(
+          "${'$'}{{ runner.os }}-maven-",
+        ),
+      ),
+    )
+    uses(
+      name = "JDK 17",
+      action = SetupJava(
+        distribution = SetupJava.Distribution.Corretto,
+        javaVersion = "17",
+      ),
+    )
 
-    }
+    run(
+      name = "Build with Maven",
+      command = "./mvnw -B clean install",
+    )
+    uses(
+      name = "Codecov upload",
+      action = CodecovAction(
+        token = "${'$'}{{ secrets.CODECOV_TOKEN }}"
+      ),
+    )
+  }
+}
 
-workflowBuild.writeToFile(addConsistencyCheck = false)
+

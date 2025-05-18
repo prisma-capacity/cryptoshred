@@ -1,55 +1,63 @@
 #!/usr/bin/env kotlin
+@file:DependsOn("io.github.typesafegithub:github-workflows-kt:3.4.0")
 
-@file:DependsOn("it.krzeminski:github-actions-kotlin-dsl:0.40.0")
 
-import it.krzeminski.githubactions.actions.CustomAction
-import it.krzeminski.githubactions.actions.actions.CheckoutV3
-import it.krzeminski.githubactions.actions.actions.SetupJavaV3
-import it.krzeminski.githubactions.domain.RunnerType
-import it.krzeminski.githubactions.domain.Workflow
-import it.krzeminski.githubactions.domain.triggers.Push
-import it.krzeminski.githubactions.dsl.workflow
-import it.krzeminski.githubactions.yaml.writeToFile
-import java.nio.file.Paths
+@file:Repository("https://repo.maven.apache.org/maven2/")
+@file:Repository("https://bindings.krzeminski.it")
 
-public val workflowFormat: Workflow = workflow(
-      name = "Format",
-      on = listOf(
-        Push(),
-        ),
-      sourceFile = Paths.get(".github/kts/format.main.kts"),
-    ) {
-      job(
+@file:DependsOn("actions:checkout:v4")
+@file:DependsOn("actions:setup-java:v4")
+
+import io.github.typesafegithub.workflows.actions.actions.Checkout
+import io.github.typesafegithub.workflows.actions.actions.SetupJava
+import io.github.typesafegithub.workflows.domain.RunnerType
+import io.github.typesafegithub.workflows.domain.actions.CustomAction
+import io.github.typesafegithub.workflows.domain.triggers.Push
+import io.github.typesafegithub.workflows.dsl.workflow
+import io.github.typesafegithub.workflows.yaml.ConsistencyCheckJobConfig
+
+
+workflow(
+    name = "Format",
+    on = listOf(Push()),
+    sourceFile =  __FILE__,
+    consistencyCheckJobConfig = ConsistencyCheckJobConfig.Disabled
+) {
+    job(
         id = "formatting",
         runsOn = RunnerType.UbuntuLatest,
-      ) {
+    ) {
         uses(
-          name = "Checkout",
-          action = CheckoutV3(
-            fetchDepth = CheckoutV3.FetchDepth.Infinite,
-          ),
+            name = "Checkout",
+            action = Checkout(
+                token = "${'$'}{{ secrets.PAT }}",
+            ),
         )
         uses(
-          name = "SetupJava",
-          action = SetupJavaV3(
-            javaVersion = "17",
-            distribution = SetupJavaV3.Distribution.Corretto,
-          ),
+            name = "JDK 17",
+            action = SetupJava(
+                distribution = SetupJava.Distribution.Corretto,
+                javaVersion = "17",
+            ),
+        )
+        run(
+            name = "Spotless",
+            command = "./mvnw -B sortpom:sort --file pom.xml",
+        )
+        run(
+            name = "Spotless",
+            command = "./mvnw -B spotless:apply --file pom.xml",
         )
         uses(
-          name = "GooglejavaformatActionV3",
-          action = CustomAction(
-            actionOwner = "axel-op",
-            actionName = "googlejavaformat-action",
-            actionVersion = "v3.6.0",
-            inputs = mapOf(
-              "args" to " --skip-javadoc-formatting --skip-reflowing-long-strings --skip-sorting-imports --replace",
-              "version" to "1.15",
-            )
-          ),
+            name = "Commit formatting changes",
+            action = CustomAction(
+                actionOwner = "stefanzweifel",
+                actionName = "git-auto-commit-action",
+                actionVersion = "v5",
+                inputs = mapOf(
+                    "commit_message" to "Apply formatter",
+                )
+            ),
         )
-      }
-
     }
-
-workflowFormat.writeToFile(addConsistencyCheck = false)
+}
