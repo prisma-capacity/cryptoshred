@@ -30,7 +30,7 @@ workflow(
         uses(
             name = "Checkout",
             action = Checkout(
-                token = "${'$'}{{ github.token }}",
+                token = "${'$'}{{  secrets.PAT }}",
             ),
         )
         uses(
