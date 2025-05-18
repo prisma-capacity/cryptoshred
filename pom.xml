@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>eu.prismacapacity</groupId>
@@ -14,10 +12,18 @@
   <name>cryptoshredding lib</name>
   <description>TODO</description>
   <url>https://github.com/prisma-capacity/cryptoshred</url>
+  <!-- Default value, should be overwritten in actual project -->
+  <inceptionYear>2020</inceptionYear>
   <organization>
     <name>PRISMA European Capacity Platform GmbH</name>
     <url>http://www.prisma-capacity.eu</url>
   </organization>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
   <developers>
     <developer>
       <id>uwe.schaefer</id>
@@ -25,23 +31,23 @@
       <email>uwe.schaefer@prisma-capacity.eu</email>
     </developer>
   </developers>
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-    </license>
-  </licenses>
-  <!-- Default value, should be overwritten in actual project -->
-  <inceptionYear>2020</inceptionYear>
-  <issueManagement>
-    <system>github</system>
-    <url>https://github.com/prisma-capacity/cryptoshred/issues</url>
-  </issueManagement>
+  <modules>
+    <module>cryptoshred-core</module>
+    <module>cryptoshred-cloud-aws</module>
+    <module>cryptoshred-spring-micrometer</module>
+    <module>cryptoshred-spring-boot-autoconfigure</module>
+    <module>cryptoshred-spring-cloud-aws</module>
+    <module>cryptoshred-micrometer</module>
+  </modules>
   <scm>
     <connection>scm:git:http://github.com/prisma-capacity/cryptoshred.git</connection>
     <developerConnection>scm:git:ssh://github.com/prisma-capacity/cryptoshred.git</developerConnection>
     <url>https://github.com/prisma-capacity/cryptoshred</url>
   </scm>
+  <issueManagement>
+    <system>github</system>
+    <url>https://github.com/prisma-capacity/cryptoshred/issues</url>
+  </issueManagement>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -55,14 +61,6 @@
     <spring-boot.version>3.4.5</spring-boot.version>
     <spotless-maven-plugin.version>2.39.0</spotless-maven-plugin.version>
   </properties>
-  <modules>
-    <module>cryptoshred-core</module>
-    <module>cryptoshred-cloud-aws</module>
-    <module>cryptoshred-spring-micrometer</module>
-    <module>cryptoshred-spring-boot-autoconfigure</module>
-    <module>cryptoshred-spring-cloud-aws</module>
-    <module>cryptoshred-micrometer</module>
-  </modules>
   <dependencies>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -123,19 +121,46 @@
     </dependency>
   </dependencies>
   <build>
+    <pluginManagement>
+      <plugins>
+        <!--This plugin's configuration is used to store Eclipse m2e settings 
+          only. It has no influence on the Maven build itself. -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>eu.prismacapacity</groupId>
+                    <artifactId>unixuid-maven-plugin</artifactId>
+                    <versionRange>[1.0.8,)</versionRange>
+                    <goals>
+                      <goal>unixuid</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore></ignore>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>com.github.ekryd.sortpom</groupId>
+        <artifactId>sortpom-maven-plugin</artifactId>
+        <version>4.0.0</version>
+      </plugin>
       <plugin>
         <groupId>org.owasp</groupId>
         <artifactId>dependency-check-maven</artifactId>
         <version>12.1.1</version>
-        <executions>
-          <execution>
-            <phase>verify</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
           <failOnError>true</failOnError>
           <failBuildOnAnyVulnerability>true</failBuildOnAnyVulnerability>
@@ -144,6 +169,14 @@
           <skipTestScope>true</skipTestScope>
           <skipSystemScope>true</skipSystemScope>
         </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>verify</phase>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -163,16 +196,6 @@
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <version>0.8.13</version>
-        <executions>
-          <execution>
-            <id>prepare-agent</id>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <!-- <execution> <id>report</id> <phase>test</phase> <goals> <goal>report</goal> 
-            </goals> </execution> -->
-        </executions>
         <configuration>
           <excludes>
             <!-- Spring specific classes -->
@@ -187,6 +210,16 @@
             <exclude>**/OptionalBehavior*</exclude>
           </excludes>
         </configuration>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <!-- <execution> <id>report</id> <phase>test</phase> <goals> <goal>report</goal> 
+            </goals> </execution> -->
+        </executions>
       </plugin>
       <plugin>
         <groupId>com.amashchenko.maven.plugin</groupId>
@@ -200,39 +233,5 @@
       </plugin>
 
     </plugins>
-    <pluginManagement>
-      <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings 
-          only. It has no influence on the Maven build itself. -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId> eu.prismacapacity
-                    </groupId>
-                    <artifactId>
-                      unixuid-maven-plugin
-                    </artifactId>
-                    <versionRange> [1.0.8,)
-                    </versionRange>
-                    <goals>
-                      <goal>unixuid</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore></ignore>
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
 </project>
