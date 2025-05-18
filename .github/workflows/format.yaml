@@ -13,7 +13,7 @@ jobs:
       name: 'Checkout'
       uses: 'actions/checkout@v4'
       with:
-        token: '${{ secrets.PAT }}'
+        token: '${{ github.token }}'
     - id: 'step-1'
       name: 'JDK 17'
       uses: 'actions/setup-java@v4'
@@ -25,7 +25,7 @@ jobs:
       run: './mvnw -B sortpom:sort --file pom.xml'
     - id: 'step-3'
       name: 'Spotless'
-      run: './mvnw -B --non-recursive spotless:apply --file pom.xml'
+      run: './mvnw -B spotless:apply --file pom.xml'
     - id: 'step-4'
       name: 'Commit formatting changes'
       uses: 'stefanzweifel/git-auto-commit-action@v5'
