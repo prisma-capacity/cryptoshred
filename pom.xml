@@ -123,36 +123,6 @@
     </dependency>
   </dependencies>
   <build>
-    <pluginManagement>
-      <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings 
-          only. It has no influence on the Maven build itself. -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>eu.prismacapacity</groupId>
-                    <artifactId>unixuid-maven-plugin</artifactId>
-                    <versionRange>[1.0.8,)</versionRange>
-                    <goals>
-                      <goal>unixuid</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore></ignore>
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>com.github.ekryd.sortpom</groupId>
@@ -182,14 +152,12 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.5.3</version>
         <configuration>
           <excludedGroups>it</excludedGroups>
         </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.5.3</version>
         <configuration>
           <groups>it</groups>
         </configuration>
@@ -219,20 +187,9 @@
               <goal>prepare-agent</goal>
             </goals>
           </execution>
-          <!-- <execution> <id>report</id> <phase>test</phase> <goals> <goal>report</goal> 
-            </goals> </execution> -->
         </executions>
       </plugin>
-      <plugin>
-        <groupId>com.amashchenko.maven.plugin</groupId>
-        <artifactId>gitflow-maven-plugin</artifactId>
-        <version>1.21.0</version>
-        <configuration>
-          <gitFlowConfig>
-            <developmentBranch>main</developmentBranch>
-          </gitFlowConfig>
-        </configuration>
-      </plugin>
+
 
     </plugins>
   </build>
