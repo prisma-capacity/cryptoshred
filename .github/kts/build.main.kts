@@ -67,12 +67,6 @@ workflow(
       name = "Build with Maven",
       command = "./mvnw -B clean install",
     )
-    uses(
-      name = "Codecov upload",
-      action = CodecovAction(
-        token = "${'$'}{{ secrets.CODECOV_TOKEN }}"
-      ),
-    )
   }
 }
 
