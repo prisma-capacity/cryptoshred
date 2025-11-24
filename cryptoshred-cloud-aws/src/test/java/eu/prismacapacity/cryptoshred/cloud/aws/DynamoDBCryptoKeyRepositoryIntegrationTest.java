@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2025 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,25 @@
  */
 package eu.prismacapacity.cryptoshred.cloud.aws;
 
-import static org.junit.Assert.*;
-
-import java.net.URI;
-import java.util.HashMap;
-import java.util.UUID;
-
-import org.junit.Assert;
-import org.junit.jupiter.api.BeforeAll;
-import org.testcontainers.containers.localstack.LocalStackContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import eu.prismacapacity.cryptoshred.cloud.aws.utils.TestIntegration;
 import eu.prismacapacity.cryptoshred.core.*;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.val;
+import org.junit.jupiter.api.BeforeAll;
+import org.testcontainers.containers.localstack.LocalStackContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -87,7 +87,7 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
     val uut = new DynamoDBCryptoKeyRepository(engine, client, metrics, TABLE_NAME);
     val result = uut.findKeyFor(subjectId, algorithm, size);
 
-    Assert.assertFalse(result.isPresent());
+    assertFalse(result.isPresent());
   }
 
   @TestIntegration
@@ -104,7 +104,7 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
     val uut = new DynamoDBCryptoKeyRepository(engine, client, metrics, TABLE_NAME);
     val result = uut.findKeyFor(subjectId, algorithm, size);
 
-    Assert.assertTrue(result.isPresent());
+    assertTrue(result.isPresent());
     assertEquals(result.get().getBase64(), key.getBase64());
   }
 
@@ -120,7 +120,7 @@ class DynamoDBCryptoKeyRepositoryIntegrationTest {
     val createdKey = uut.getOrCreateKeyFor(subjectId, algorithm, size);
     val foundKey = uut.findKeyFor(subjectId, algorithm, size);
 
-    Assert.assertTrue(foundKey.isPresent());
+    assertTrue(foundKey.isPresent());
     assertEquals(createdKey, foundKey.get());
   }
 
