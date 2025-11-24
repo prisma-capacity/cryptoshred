@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 PRISMA European Capacity Platform GmbH
+ * Copyright © 2021-2025 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ class CryptoContainerTest {
   @Nested
   class WhenDecrypting {
 
-    class DecryptionTest {
+    abstract class DecryptionTest {
       @Test
       void ignoresNullMetrics() {
         // must not throw NPE

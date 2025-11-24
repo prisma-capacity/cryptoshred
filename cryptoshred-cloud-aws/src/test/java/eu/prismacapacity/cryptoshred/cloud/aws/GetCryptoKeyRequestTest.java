@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2025 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,14 @@
  */
 package eu.prismacapacity.cryptoshred.cloud.aws;
 
-import static org.junit.Assert.*;
-
-import java.util.UUID;
-
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
 import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
+import java.util.UUID;
 import lombok.val;
+import org.junit.jupiter.api.Test;
 
 class GetCryptoKeyRequestTest {
   CryptoSubjectId subjectId = CryptoSubjectId.of(UUID.randomUUID());

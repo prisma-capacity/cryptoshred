@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2025 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,18 @@
  */
 package eu.prismacapacity.cryptoshred.cloud.aws;
 
-import java.util.HashMap;
-import java.util.UUID;
-
-import org.junit.Assert;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
 import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
+import java.util.HashMap;
+import java.util.UUID;
 import lombok.val;
+import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
@@ -36,8 +38,8 @@ class UtilsTest {
 
     val attributeMap = Utils.subjectIdToKeyAttributeMap(subjectId);
 
-    Assert.assertEquals(attributeMap.get("subjectId").s(), subjectId.getId().toString());
-    Assert.assertEquals(attributeMap.size(), 1);
+    assertEquals(attributeMap.get("subjectId").s(), subjectId.getId().toString());
+    assertEquals(1, attributeMap.size());
   }
 
   @Test
@@ -47,7 +49,7 @@ class UtilsTest {
 
     val propertyName = Utils.generateKeyPropertyName(algorithm, size);
 
-    Assert.assertEquals(propertyName, "AES256");
+    assertEquals("AES256", propertyName);
   }
 
   @Test
@@ -67,8 +69,8 @@ class UtilsTest {
 
     val key = Utils.extractCryptoKeyFromItem(algorithm, size, item);
 
-    Assert.assertTrue(key.isPresent());
-    Assert.assertArrayEquals(key.get().getBytes(), bytes);
+    assertTrue(key.isPresent());
+    assertArrayEquals(key.get().getBytes(), bytes);
   }
 
   @Test
@@ -86,7 +88,7 @@ class UtilsTest {
 
     val key = Utils.extractCryptoKeyFromItem(algorithm, size, item);
 
-    Assert.assertFalse(key.isPresent());
+    assertFalse(key.isPresent());
   }
 
   @Test
@@ -97,6 +99,6 @@ class UtilsTest {
     val item = new HashMap<String, AttributeValue>();
     val key = Utils.extractCryptoKeyFromItem(algorithm, size, item);
 
-    Assert.assertFalse(key.isPresent());
+    assertFalse(key.isPresent());
   }
 }
