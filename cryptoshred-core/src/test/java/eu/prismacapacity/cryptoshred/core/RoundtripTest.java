@@ -19,17 +19,23 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.UUID;
+
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import lombok.*;
+
 import org.junit.jupiter.api.*;
 
 public class RoundtripTest {
   ObjectMapper om;
 
+  private InMemCryptoKeyRepository keyRepository;
+
   @BeforeEach
   void setup() {
     CryptoEngine engine = new JDKCryptoEngine(CryptoInitializationVector.of("mysecret"));
-    InMemCryptoKeyRepository keyRepository = new InMemCryptoKeyRepository(engine);
+    keyRepository = new InMemCryptoKeyRepository(engine);
     om = new ObjectMapper();
     om.registerModule(new CryptoModule(engine, keyRepository));
   }
@@ -37,7 +43,6 @@ public class RoundtripTest {
   @Test
   void testHappyPath() throws Exception {
     // arrange
-
     CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
 
     // act
@@ -84,6 +89,34 @@ public class RoundtripTest {
         om.readValue(json, new TypeReference<CryptoContainer<String>>() {});
     assertEquals(String.class, c2.get().getClass());
     assertEquals("hubbi", c2.get());
+  }
+
+  @Test
+  void testHappyPathLegacy() throws Exception {
+    // arrange
+    CryptoSubjectId id =
+        CryptoSubjectId.of(UUID.fromString("a1f6280b-eddf-454d-a2d1-15ed4c716e8e"));
+    CryptoKey k = CryptoKey.fromBase64("Mniow0ZBV2TEAUsoxH/hT+2e4yetncAjnpNCAHEbR+c=");
+    keyRepository.keys.put(id, k);
+
+    // act
+    Foo foo = new Foo();
+    foo.name = new CryptoContainer<>("Peter", id);
+
+    // serialised with default iv
+    String json =
+        "{\"bar\":7,\"name\":{\"algo\":\"AES\",\"ksize\":256,\"id\":\"a1f6280b-eddf-454d-a2d1-15ed4c716e8e\",\"enc\":\"SylOMKTrag8qCH84xVhfqQ==\"}}";
+
+    Foo foo2 = om.readValue(json, Foo.class);
+
+    // not set on this old instance
+    assertNull(foo2.getName().getInitializationVector());
+    // in newer instances should be set
+    assertNotNull(foo.getName().getInitializationVector());
+
+    String fooName = foo.name.get();
+    String foo2Name = foo2.name.get();
+    assertEquals(fooName, foo2Name);
   }
 
   @Test

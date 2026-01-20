@@ -41,12 +41,18 @@ public class JDKCryptoEngine implements CryptoEngine {
     return Collections.unmodifiableMap(map);
   }
 
-  @NonNull private final CryptoInitializationVector initVector;
+  private final CryptoInitializationVector initVector;
 
   @Override
   public byte[] decrypt(
-      @NonNull CryptoAlgorithm algo, @NonNull CryptoKey cryptoKey, @NonNull byte[] bytes) {
-    IvParameterSpec iv = new IvParameterSpec(initVector.getBytes());
+      @NonNull CryptoAlgorithm algo,
+      @NonNull CryptoKey cryptoKey,
+      @NonNull byte[] bytes,
+      IvParameterSpec initializationVector) {
+    IvParameterSpec iv =
+        initializationVector != null
+            ? initializationVector
+            : new IvParameterSpec(initVector.getBytes());
     try {
       Cipher cipher = getCipher(algo);
       SecretKeySpec secret = new SecretKeySpec(cryptoKey.getBytes(), algo.getId());
@@ -62,9 +68,15 @@ public class JDKCryptoEngine implements CryptoEngine {
 
   @Override
   public byte[] encrypt(
-      @NonNull byte[] unencypted, @NonNull CryptoAlgorithm algorithm, @NonNull CryptoKey key) {
+      @NonNull byte[] unencypted,
+      @NonNull CryptoAlgorithm algorithm,
+      @NonNull CryptoKey key,
+      IvParameterSpec initializationVector) {
 
-    IvParameterSpec iv = new IvParameterSpec(initVector.getBytes());
+    IvParameterSpec iv =
+        initializationVector != null
+            ? initializationVector
+            : new IvParameterSpec(initVector.getBytes());
     try {
       Cipher cipher = getCipher(algorithm);
       SecretKeySpec secret = new SecretKeySpec(key.getBytes(), algorithm.getId());

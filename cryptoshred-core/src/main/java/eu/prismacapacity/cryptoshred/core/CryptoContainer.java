@@ -16,11 +16,17 @@
 package eu.prismacapacity.cryptoshred.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
+
+import java.security.SecureRandom;
 import java.util.Optional;
+
+import javax.crypto.spec.IvParameterSpec;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -29,6 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CryptoContainer<T> extends OptionalBehavior<T> {
+
+  private static final SecureRandom RANDOM = new SecureRandom();
 
   public CryptoContainer(@NonNull T value, @NonNull CryptoSubjectId subjectId) {
     this(value, subjectId, CryptoAlgorithm.AES_CBC, CryptoKeySize.BIT_256);
@@ -44,6 +52,10 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
     this.subjectId = subjectId;
     this.algo = algo;
     this.size = size;
+
+    byte[] iv = new byte[16];
+    RANDOM.nextBytes(iv);
+    this.initializationVector = new IvParameterSpec(iv);
   }
 
   private CryptoContainer(
@@ -52,6 +64,7 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
       CryptoKeySize size,
       CryptoSubjectId id,
       byte[] encrypted,
+      byte[] iv,
       CryptoEngine engine,
       CryptoKeyRepository keyRepo,
       CryptoMetrics metrics,
@@ -66,6 +79,7 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
     this.metrics = metrics;
     this.mapper = om;
     this.encryptedBytes = encrypted;
+    this.initializationVector = iv == null ? null : new IvParameterSpec(iv);
   }
 
   // set only on deserialization
@@ -80,12 +94,13 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
       CryptoKeySize keySize,
       CryptoSubjectId subjectId,
       byte[] encrypted,
+      byte[] iv,
       CryptoEngine engine,
       CryptoKeyRepository keyRepo,
       CryptoMetrics metrics,
       ObjectMapper om) {
     return new CryptoContainer<T>(
-        targetType, algorithm, keySize, subjectId, encrypted, engine, keyRepo, metrics, om);
+        targetType, algorithm, keySize, subjectId, encrypted, iv, engine, keyRepo, metrics, om);
   }
 
   @Getter private Class<?> type;
@@ -99,6 +114,9 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
   // the encrypted value
   @Getter(value = AccessLevel.PACKAGE)
   private byte[] encryptedBytes;
+
+  @Getter(value = AccessLevel.PACKAGE)
+  private IvParameterSpec initializationVector;
 
   // set after decryption or before encryption for short circuit retrieval
   private transient Optional<T> cachedValue;
@@ -119,7 +137,7 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
       if (key.isPresent()) {
 
         try {
-          byte[] decrypted = engine.decrypt(getAlgo(), key.get(), bytes);
+          byte[] decrypted = engine.decrypt(getAlgo(), key.get(), bytes, initializationVector);
           T t = mapper.readerFor(getType()).readValue(decrypted);
           if (metrics != null) metrics.notifyDecryptionSuccess();
           return t;
@@ -142,6 +160,6 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
     CryptoKey key = keyRepository.getOrCreateKeyFor(subjectId, algo, size);
     byte[] bytes;
     bytes = om.writeValueAsBytes(value());
-    this.encryptedBytes = engine.encrypt(bytes, algo, key);
+    this.encryptedBytes = engine.encrypt(bytes, algo, key, initializationVector);
   }
 }
