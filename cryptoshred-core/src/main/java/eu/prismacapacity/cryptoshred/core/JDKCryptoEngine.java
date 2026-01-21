@@ -20,6 +20,7 @@ import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +32,8 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class JDKCryptoEngine implements CryptoEngine {
+
+  private static final SecureRandom RANDOM = new SecureRandom();
 
   private final Map<CryptoAlgorithm, String> exactCipherNames = createExactCipherMapping();
 
@@ -108,5 +111,12 @@ public class JDKCryptoEngine implements CryptoEngine {
     } catch (NoSuchAlgorithmException e) {
       throw new CryptoEngineException(e);
     }
+  }
+
+  @Override
+  public @NonNull IvParameterSpec randomInitializationVector() {
+    byte[] iv = new byte[16];
+    RANDOM.nextBytes(iv);
+    return new IvParameterSpec(iv);
   }
 }

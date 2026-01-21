@@ -52,10 +52,6 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
     this.subjectId = subjectId;
     this.algo = algo;
     this.size = size;
-
-    byte[] iv = new byte[16];
-    RANDOM.nextBytes(iv);
-    this.initializationVector = new IvParameterSpec(iv);
   }
 
   private CryptoContainer(
@@ -115,8 +111,13 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
   @Getter(value = AccessLevel.PACKAGE)
   private byte[] encryptedBytes;
 
+  /**
+   * Will be set when encrypting.
+   *
+   * <p>For backward-compatibility - if it does not exist, the engine will use the default iv.
+   */
   @Getter(value = AccessLevel.PACKAGE)
-  private IvParameterSpec initializationVector;
+  private IvParameterSpec initializationVector = null;
 
   // set after decryption or before encryption for short circuit retrieval
   private transient Optional<T> cachedValue;
@@ -157,6 +158,10 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
 
   @SneakyThrows
   protected void encrypt(CryptoKeyRepository keyRepository, CryptoEngine engine, ObjectMapper om) {
+
+    // initialise with random vector
+    this.initializationVector = engine.randomInitializationVector();
+
     CryptoKey key = keyRepository.getOrCreateKeyFor(subjectId, algo, size);
     byte[] bytes;
     bytes = om.writeValueAsBytes(value());

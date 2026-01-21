@@ -100,22 +100,29 @@ public class RoundtripTest {
     keyRepository.keys.put(id, k);
 
     // act
-    Foo foo = new Foo();
-    foo.name = new CryptoContainer<>("Peter", id);
+    Foo fooNew = new Foo();
+    fooNew.name = new CryptoContainer<>("Peter", id);
+    String jsonNew = om.writeValueAsString(fooNew);
+    // reload
+    fooNew = om.readValue(jsonNew, Foo.class);
+    System.out.println(jsonNew);
 
     // serialised with default iv
-    String json =
+    String jsonLegacy =
         "{\"bar\":7,\"name\":{\"algo\":\"AES\",\"ksize\":256,\"id\":\"a1f6280b-eddf-454d-a2d1-15ed4c716e8e\",\"enc\":\"SylOMKTrag8qCH84xVhfqQ==\"}}";
 
-    Foo foo2 = om.readValue(json, Foo.class);
+    Foo fooLegacy = om.readValue(jsonLegacy, Foo.class);
 
     // not set on this old instance
-    assertNull(foo2.getName().getInitializationVector());
-    // in newer instances should be set
-    assertNotNull(foo.getName().getInitializationVector());
+    assertNull(fooLegacy.getName().getInitializationVector());
 
-    String fooName = foo.name.get();
-    String foo2Name = foo2.name.get();
+    // after encryption, iv must be set
+    assertTrue(jsonNew.contains("\"iv\""));
+    // and must be included in the container
+    assertNotNull(fooNew.getName().getInitializationVector());
+
+    String fooName = fooNew.name.get();
+    String foo2Name = fooLegacy.name.get();
     assertEquals(fooName, foo2Name);
   }
 

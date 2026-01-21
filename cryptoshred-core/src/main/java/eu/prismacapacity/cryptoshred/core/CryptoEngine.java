@@ -42,4 +42,10 @@ public interface CryptoEngine {
 
   @NonNull
   CryptoKey generateKey(@NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size);
+
+  /**
+   * @return an iv that is suitable for the specific engine
+   */
+  @NonNull
+  IvParameterSpec randomInitializationVector();
 }
