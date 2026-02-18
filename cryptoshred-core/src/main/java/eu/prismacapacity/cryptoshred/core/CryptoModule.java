@@ -28,11 +28,14 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.IntNode;
+
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
+
 import java.io.IOException;
 import java.util.UUID;
+
 import lombok.NonNull;
 
 public class CryptoModule extends SimpleModule {
@@ -65,6 +68,8 @@ public class CryptoModule extends SimpleModule {
   }
 
   private static final String JSON_KEY_ENCRYPTED_BYTES = "enc";
+
+  private static final String JSON_KEY_IV = "iv";
 
   private static final String JSON_KEY_SUBJECT_ID = "id";
 
@@ -99,12 +104,16 @@ public class CryptoModule extends SimpleModule {
       String algo = tree.get(JSON_KEY_ALGO).asText();
       byte[] encrypted = tree.get(JSON_KEY_ENCRYPTED_BYTES).binaryValue();
 
+      JsonNode jsonNode = tree.get(JSON_KEY_IV);
+      byte[] iv = jsonNode == null ? null : jsonNode.binaryValue();
+
       return CryptoContainer.fromDeserialization(
           targetType,
           CryptoAlgorithm.of(algo),
           CryptoKeySize.of(keySize),
           CryptoSubjectId.of(UUID.fromString(subjectId)),
           encrypted,
+          iv,
           engine,
           keyRepo,
           metrics,
@@ -132,6 +141,9 @@ public class CryptoModule extends SimpleModule {
       jgen.writeNumberField(JSON_KEY_KEY_SIZE, value.getSize().asInt());
       jgen.writeStringField(JSON_KEY_SUBJECT_ID, value.getSubjectId().getId().toString());
       jgen.writeBinaryField(JSON_KEY_ENCRYPTED_BYTES, value.getEncryptedBytes());
+      if (value.getInitializationVector() != null) {
+        jgen.writeBinaryField(JSON_KEY_IV, value.getInitializationVector().getIV());
+      }
       jgen.writeEndObject();
     }
   }

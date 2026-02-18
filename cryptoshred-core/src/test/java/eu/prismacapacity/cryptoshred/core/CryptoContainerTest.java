@@ -19,12 +19,15 @@ import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
+
 import java.util.Optional;
 import java.util.UUID;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.Mock;
@@ -43,13 +46,24 @@ class CryptoContainerTest {
 
   CryptoContainer<Integer> withoutMetrics() {
     return CryptoContainer.fromDeserialization(
-        Integer.class, algo, size, subjectId, new byte[32], engine, keyRepo, null, mapper);
+        Integer.class,
+        algo,
+        size,
+        subjectId,
+        new byte[32],
+        new byte[16],
+        engine,
+        keyRepo,
+        null,
+        mapper);
   }
 
   @Nested
   class WhenDecrypting {
 
+    @Nested
     class DecryptionTest {
+
       @Test
       void ignoresNullMetrics() {
         // must not throw NPE
@@ -63,7 +77,7 @@ class CryptoContainerTest {
       void setup() {
         when(keyRepo.findKeyFor(any(), any(), any()))
             .thenReturn(Optional.of(mock(CryptoKey.class)));
-        when(engine.decrypt(any(), any(), any())).thenThrow(IllegalStateException.class);
+        when(engine.decrypt(any(), any(), any(), any())).thenThrow(IllegalStateException.class);
       }
     }
 
@@ -73,7 +87,7 @@ class CryptoContainerTest {
       void setup() {
         when(keyRepo.findKeyFor(any(), any(), any()))
             .thenReturn(Optional.of(mock(CryptoKey.class)));
-        when(engine.decrypt(any(), any(), any())).thenReturn(new byte[32]);
+        when(engine.decrypt(any(), any(), any(), any())).thenReturn(new byte[32]);
         when(mapper.readerFor(any(Class.class))).thenReturn(mock(ObjectReader.class));
       }
     }

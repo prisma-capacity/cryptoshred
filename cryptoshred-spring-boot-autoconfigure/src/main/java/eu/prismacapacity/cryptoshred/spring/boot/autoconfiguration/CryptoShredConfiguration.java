@@ -16,11 +16,13 @@
 package eu.prismacapacity.cryptoshred.spring.boot.autoconfiguration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.prismacapacity.cryptoshred.core.*;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
 import lombok.NonNull;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -48,13 +50,8 @@ public class CryptoShredConfiguration {
   @Bean
   @ConditionalOnMissingBean
   public CryptoEngine cryptoEngine(@Value("${cryptoshred.initVector:#{null}}") String initVector) {
-    // then we'll need an initVector
-    if (initVector == null || initVector.length() < 1) {
-      throw new CryptoPropertyMissingException(
-          "cryptoshred.initVector (non-empty String) is required unless you define a"
-              + " CryptoEngine.");
-    }
-    return new JDKCryptoEngine(CryptoInitializationVector.of(initVector));
+    return new JDKCryptoEngine(
+        initVector == null ? null : CryptoInitializationVector.of(initVector));
   }
 
   @Bean
