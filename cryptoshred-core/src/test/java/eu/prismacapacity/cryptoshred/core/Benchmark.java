@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2026 PRISMA European Capacity Platform GmbH 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package eu.prismacapacity.cryptoshred.core;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -51,7 +66,7 @@ public class Benchmark {
       sb.append(om.writeValueAsString(dto));
       long endIndividual = System.currentTimeMillis();
 
-      if (capacity -  sb.length() < 200_000){
+      if (capacity - sb.length() < 200_000) {
         sb.delete(0, sb.length());
       }
 
@@ -80,7 +95,7 @@ public class Benchmark {
 
     // hope that compiler does not optimize too much away if we do this
     idx = new Random().nextInt(sb.length() - 1);
-    System.out.println(sb.substring(idx, idx+1));
+    System.out.println(sb.substring(idx, idx + 1));
   }
 
   private static String getCaption(int lenMultiplier) {
