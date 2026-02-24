@@ -138,9 +138,7 @@ public class CryptoModule extends SimpleModule {
       jgen.writeNumberField(JSON_KEY_KEY_SIZE, value.getSize().asInt());
       jgen.writeStringField(JSON_KEY_SUBJECT_ID, value.getSubjectId().getId().toString());
       jgen.writeBinaryField(JSON_KEY_ENCRYPTED_BYTES, value.getEncryptedBytes());
-      if (value.getInitializationVector() != null) {
-        jgen.writeBinaryField(JSON_KEY_IV, value.getInitializationVector().getIV());
-      }
+      jgen.writeBinaryField(JSON_KEY_IV, value.getInitializationVector().getIV());
       jgen.writeEndObject();
     }
   }
