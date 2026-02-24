@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2026 PRISMA European Capacity Platform GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,10 @@ import com.fasterxml.jackson.databind.*;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
+import java.util.UUID;
 import lombok.*;
-
 import org.junit.jupiter.api.*;
 
 class RoundtripTest {
