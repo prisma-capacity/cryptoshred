@@ -51,7 +51,7 @@ public class JDKCryptoEngine implements CryptoEngine {
   public byte[] decrypt(
       @NonNull CryptoAlgorithm algo,
       @NonNull CryptoKey cryptoKey,
-      @NonNull byte[] bytes,
+      byte @NonNull [] bytes,
       IvParameterSpec initializationVectorOrNull) {
 
     IvParameterSpec iv = resolveInitVectorForDecryption(initializationVectorOrNull);
@@ -113,6 +113,7 @@ public class JDKCryptoEngine implements CryptoEngine {
   }
 
   @Override
+  @NonNull
   public CryptoKey generateKey(@NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size) {
     try {
       KeyGenerator kgen = KeyGenerator.getInstance(algo.getId());
@@ -127,7 +128,7 @@ public class JDKCryptoEngine implements CryptoEngine {
   @Override
   public @NonNull IvParameterSpec getInitVectorForEncryption() {
 
-    if (useRandomInitVector || configuredInitVector == null) {
+    if (useRandomInitVector) {
       byte[] iv = new byte[16];
       RANDOM.nextBytes(iv);
       return new IvParameterSpec(iv);

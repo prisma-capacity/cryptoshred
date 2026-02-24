@@ -30,11 +30,11 @@ public interface CryptoEngine {
   byte[] decrypt(
       @NonNull CryptoAlgorithm algo,
       @NonNull CryptoKey cryptoKey,
-      @NonNull byte[] bytes,
+      byte @NonNull [] bytes,
       IvParameterSpec initializationVectorOrNull);
 
   byte[] encrypt(
-      @NonNull byte[] unencypted,
+      byte @NonNull [] unencypted,
       @NonNull CryptoAlgorithm algorithm,
       @NonNull CryptoKey key,
       @NonNull IvParameterSpec initializationVector);

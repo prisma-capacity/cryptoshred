@@ -19,6 +19,8 @@ import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyNotFoundAfterCreatingException;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
+import lombok.NonNull;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -33,14 +35,14 @@ public class InMemCryptoKeyRepository implements CryptoKeyRepository {
   }
 
   @Override
-  public synchronized Optional<CryptoKey> findKeyFor(
-      CryptoSubjectId subjectId, CryptoAlgorithm algo, CryptoKeySize size) {
+  public synchronized @NonNull Optional<CryptoKey> findKeyFor(
+          @NonNull CryptoSubjectId subjectId, @NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size) {
     return Optional.ofNullable(keys.get(subjectId));
   }
 
   @Override
-  public synchronized CryptoKey getOrCreateKeyFor(
-      CryptoSubjectId subjectId, CryptoAlgorithm algo, CryptoKeySize size)
+  public synchronized @NonNull CryptoKey getOrCreateKeyFor(
+          @NonNull CryptoSubjectId subjectId, @NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size)
       throws CryptoKeyNotFoundAfterCreatingException {
     Optional<CryptoKey> existingKey = findKeyFor(subjectId, algo, size);
     return existingKey.orElseGet(

@@ -26,7 +26,8 @@ import lombok.RequiredArgsConstructor;
 @EqualsAndHashCode
 public class CryptoKey {
   @Getter @NonNull private final String base64;
-  @Getter @NonNull private final byte[] bytes;
+  @Getter
+  private final byte @NonNull [] bytes;
 
   public static CryptoKey fromBase64(@NonNull String base64encoded) {
     return new CryptoKey(base64encoded, Base64.getDecoder().decode(base64encoded));

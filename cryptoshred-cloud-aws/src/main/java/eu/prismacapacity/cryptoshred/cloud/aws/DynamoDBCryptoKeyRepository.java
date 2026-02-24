@@ -48,7 +48,7 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
   @NonNull private final String tableName;
 
   @Override
-  public Optional<CryptoKey> findKeyFor(
+  public @NonNull Optional<CryptoKey> findKeyFor(
       @NonNull CryptoSubjectId subjectId,
       @NonNull CryptoAlgorithm algorithm,
       @NonNull CryptoKeySize size) {
@@ -66,7 +66,7 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
   }
 
   @Override
-  public CryptoKey getOrCreateKeyFor(
+  public @NonNull CryptoKey getOrCreateKeyFor(
       @NonNull CryptoSubjectId subjectId,
       @NonNull CryptoAlgorithm algorithm,
       @NonNull CryptoKeySize size)

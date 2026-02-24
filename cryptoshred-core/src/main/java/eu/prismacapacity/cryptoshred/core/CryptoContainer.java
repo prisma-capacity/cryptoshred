@@ -32,8 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CryptoContainer<T> extends OptionalBehavior<T> {
 
-  private static final SecureRandom RANDOM = new SecureRandom();
-
   public CryptoContainer(@NonNull T value, @NonNull CryptoSubjectId subjectId) {
     this(value, subjectId, CryptoAlgorithm.AES_CBC, CryptoKeySize.BIT_256);
   }
