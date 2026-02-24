@@ -43,7 +43,7 @@ import software.amazon.awssdk.services.dynamodb.model.*;
 class DynamoDBCryptoKeyRepositoryIntegrationTest {
   private static String TABLE_NAME = "foo";
 
-  CryptoEngine engine = new JDKCryptoEngine(CryptoInitializationVector.of("mysecret"));
+  CryptoEngine engine = new JDKCryptoEngine("mysecret",false);
   CryptoMetrics metrics = new CryptoMetrics.NOP();
 
   @Container

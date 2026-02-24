@@ -15,27 +15,27 @@
  */
 package eu.prismacapacity.cryptoshred.core;
 
-import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
-import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import javax.crypto.*;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
+import eu.prismacapacity.cryptoshred.core.keys.*;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+import javax.crypto.*;
+import javax.crypto.spec.*;
+import java.security.*;
+import java.util.*;
+
 public class JDKCryptoEngine implements CryptoEngine {
 
   private static final SecureRandom RANDOM = new SecureRandom();
 
   private final Map<CryptoAlgorithm, String> exactCipherNames = createExactCipherMapping();
+
+  public JDKCryptoEngine(String configuredInitVectorOrNull, boolean useRandomInitVector) {
+    if (configuredInitVectorOrNull == null) {
+      this.configuredInitVector = null;
+    } else this.configuredInitVector = CryptoInitializationVector.of(configuredInitVectorOrNull);
+
+    this.useRandomInitVector = useRandomInitVector;
+  }
 
   private static Map<CryptoAlgorithm, String> createExactCipherMapping() {
     // initialize with known algorithms
@@ -44,18 +44,19 @@ public class JDKCryptoEngine implements CryptoEngine {
     return Collections.unmodifiableMap(map);
   }
 
-  private final CryptoInitializationVector initVector;
+  private final CryptoInitializationVector configuredInitVector;
+
+  private final boolean useRandomInitVector;
 
   @Override
   public byte[] decrypt(
       @NonNull CryptoAlgorithm algo,
       @NonNull CryptoKey cryptoKey,
       @NonNull byte[] bytes,
-      IvParameterSpec initializationVector) {
-    IvParameterSpec iv =
-        initializationVector != null
-            ? initializationVector
-            : new IvParameterSpec(initVector.getBytes());
+      IvParameterSpec initializationVectorOrNull) {
+
+    IvParameterSpec iv = resolveInitVectorForDecryption(initializationVectorOrNull);
+
     try {
       Cipher cipher = getCipher(algo);
       SecretKeySpec secret = new SecretKeySpec(cryptoKey.getBytes(), algo.getId());
@@ -69,21 +70,32 @@ public class JDKCryptoEngine implements CryptoEngine {
     }
   }
 
+  @NonNull
+  public IvParameterSpec resolveInitVectorForDecryption(
+      IvParameterSpec initializationVectorProvidedOrNull) {
+
+    if (initializationVectorProvidedOrNull != null) {
+      return initializationVectorProvidedOrNull;
+    } else {
+      // no IV stored with the container, so we use the configured one
+      if (configuredInitVector == null)
+        throw new IllegalStateException(
+            "No init vector configured, and none stored with the container.");
+      else return configuredInitVector.getIvParameterSpec();
+    }
+  }
+
   @Override
   public byte[] encrypt(
-      @NonNull byte[] unencypted,
+      byte @NonNull [] unencypted,
       @NonNull CryptoAlgorithm algorithm,
       @NonNull CryptoKey key,
-      IvParameterSpec initializationVector) {
+      @NonNull IvParameterSpec initializationVectorForEncryption) {
 
-    IvParameterSpec iv =
-        initializationVector != null
-            ? initializationVector
-            : new IvParameterSpec(initVector.getBytes());
     try {
       Cipher cipher = getCipher(algorithm);
       SecretKeySpec secret = new SecretKeySpec(key.getBytes(), algorithm.getId());
-      cipher.init(Cipher.ENCRYPT_MODE, secret, iv);
+      cipher.init(Cipher.ENCRYPT_MODE, secret, initializationVectorForEncryption);
       return cipher.doFinal(unencypted);
     } catch (InvalidKeyException
         | InvalidAlgorithmParameterException
@@ -114,9 +126,17 @@ public class JDKCryptoEngine implements CryptoEngine {
   }
 
   @Override
-  public @NonNull IvParameterSpec randomInitializationVector() {
-    byte[] iv = new byte[16];
-    RANDOM.nextBytes(iv);
-    return new IvParameterSpec(iv);
+  public @NonNull IvParameterSpec getInitVectorForEncryption() {
+
+    if (useRandomInitVector || configuredInitVector == null) {
+      byte[] iv = new byte[16];
+      RANDOM.nextBytes(iv);
+      return new IvParameterSpec(iv);
+    }
+
+    if (configuredInitVector == null) {
+      throw new IllegalStateException("No init vector configured");
+    }
+    return configuredInitVector.getIvParameterSpec();
   }
 }

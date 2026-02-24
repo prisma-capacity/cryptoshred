@@ -32,20 +32,21 @@ public interface CryptoEngine {
       @NonNull CryptoAlgorithm algo,
       @NonNull CryptoKey cryptoKey,
       @NonNull byte[] bytes,
-      IvParameterSpec initializationVector);
+      IvParameterSpec initializationVectorOrNull);
 
   byte[] encrypt(
       @NonNull byte[] unencypted,
       @NonNull CryptoAlgorithm algorithm,
       @NonNull CryptoKey key,
-      IvParameterSpec initializationVector);
+      @NonNull IvParameterSpec initializationVector
+      );
 
   @NonNull
   CryptoKey generateKey(@NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size);
 
   /**
-   * @return an iv that is suitable for the specific engine
+   * @return an iv that is suitable for the specific engine an d configuration
    */
   @NonNull
-  IvParameterSpec randomInitializationVector();
+  IvParameterSpec getInitVectorForEncryption();
 }

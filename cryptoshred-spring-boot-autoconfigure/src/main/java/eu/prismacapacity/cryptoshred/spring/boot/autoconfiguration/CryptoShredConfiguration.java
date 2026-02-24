@@ -49,9 +49,10 @@ public class CryptoShredConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  public CryptoEngine cryptoEngine(@Value("${cryptoshred.initVector:#{null}}") String initVector) {
-    return new JDKCryptoEngine(
-        initVector == null ? null : CryptoInitializationVector.of(initVector));
+  public CryptoEngine cryptoEngine(@Value("${cryptoshred.initVector:#{null}}") String initVectorOrNull,
+                                   @Value("${cryptoshred.useRandomInitVector:#{false}}") boolean useRandomInitVector
+                                   ) {
+    return new JDKCryptoEngine(initVectorOrNull,useRandomInitVector);
   }
 
   @Bean

@@ -159,12 +159,10 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
   @SneakyThrows
   protected void encrypt(CryptoKeyRepository keyRepository, CryptoEngine engine, ObjectMapper om) {
 
-    // initialise with random vector
-    this.initializationVector = engine.randomInitializationVector();
+    this.initializationVector = engine.getInitVectorForEncryption();
 
     CryptoKey key = keyRepository.getOrCreateKeyFor(subjectId, algo, size);
-    byte[] bytes;
-    bytes = om.writeValueAsBytes(value());
-    this.encryptedBytes = engine.encrypt(bytes, algo, key, initializationVector);
+    byte[] bytes = om.writeValueAsBytes(value());
+    this.encryptedBytes = engine.encrypt(bytes, algo, key, this.initializationVector);
   }
 }
