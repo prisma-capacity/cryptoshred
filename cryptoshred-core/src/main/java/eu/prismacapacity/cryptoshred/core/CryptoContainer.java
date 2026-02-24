@@ -20,7 +20,6 @@ import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
-import java.security.SecureRandom;
 import java.util.Optional;
 import javax.crypto.spec.IvParameterSpec;
 import lombok.AccessLevel;
