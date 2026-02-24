@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2026 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package eu.prismacapacity.cryptoshred.core;
 
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
+import javax.crypto.spec.IvParameterSpec;
 import lombok.NonNull;
 
 /**
@@ -26,14 +27,24 @@ import lombok.NonNull;
  */
 public interface CryptoEngine {
 
-  @NonNull
   byte[] decrypt(
-      @NonNull CryptoAlgorithm algo, @NonNull CryptoKey cryptoKey, @NonNull byte[] bytes);
+      @NonNull CryptoAlgorithm algo,
+      @NonNull CryptoKey cryptoKey,
+      byte @NonNull [] bytes,
+      IvParameterSpec initializationVectorOrNull);
 
-  @NonNull
   byte[] encrypt(
-      @NonNull byte[] unencypted, @NonNull CryptoAlgorithm algorithm, @NonNull CryptoKey key);
+      byte @NonNull [] unencypted,
+      @NonNull CryptoAlgorithm algorithm,
+      @NonNull CryptoKey key,
+      @NonNull IvParameterSpec initializationVector);
 
   @NonNull
   CryptoKey generateKey(@NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size);
+
+  /**
+   * @return an iv that is suitable for the specific engine an d configuration
+   */
+  @NonNull
+  IvParameterSpec getInitVectorForEncryption();
 }

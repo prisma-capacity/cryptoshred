@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2026 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,26 +18,131 @@ package eu.prismacapacity.cryptoshred.core;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import java.util.UUID;
 import lombok.*;
 import org.junit.jupiter.api.*;
 
-public class RoundtripTest {
+class RoundtripTest {
   ObjectMapper om;
+
+  private InMemCryptoKeyRepository keyRepository;
 
   @BeforeEach
   void setup() {
-    CryptoEngine engine = new JDKCryptoEngine(CryptoInitializationVector.of("mysecret"));
-    InMemCryptoKeyRepository keyRepository = new InMemCryptoKeyRepository(engine);
+    CryptoEngine engine = new JDKCryptoEngine("mysecret", false);
+    keyRepository = new InMemCryptoKeyRepository(engine);
     om = new ObjectMapper();
     om.registerModule(new CryptoModule(engine, keyRepository));
+  }
+
+  @SneakyThrows
+  @Test
+  void testStaticIV() {
+    CryptoEngine engine = new JDKCryptoEngine("mysecret", false);
+    keyRepository = new InMemCryptoKeyRepository(engine);
+    om = new ObjectMapper();
+    om.registerModule(new CryptoModule(engine, keyRepository));
+
+    // arrange
+    CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
+
+    // act
+    Foo foo = new Foo();
+    foo.name = new CryptoContainer<>("Peter", id);
+    String json1 = om.writeValueAsString(foo);
+    String json2 = om.writeValueAsString(foo);
+
+    assertEquals(json1, json2);
+  }
+
+  @SneakyThrows
+  @Test
+  void testRandomIV() {
+    CryptoEngine engine = new JDKCryptoEngine("mysecret", true);
+    keyRepository = new InMemCryptoKeyRepository(engine);
+    om = new ObjectMapper();
+    om.registerModule(new CryptoModule(engine, keyRepository));
+
+    // arrange
+    CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
+
+    // act
+
+    Foo foo = new Foo();
+    foo.name = new CryptoContainer<>("Peter", id);
+
+    String json1 = om.writeValueAsString(foo);
+    String json2 = om.writeValueAsString(foo);
+
+    assertNotEquals(json1, json2);
+  }
+
+  @SneakyThrows
+  @Test
+  void testFailureWithRandomIVUsed() {
+
+    CryptoEngine engine = new JDKCryptoEngine("mysecret", true);
+    keyRepository = new InMemCryptoKeyRepository(engine);
+    om = new ObjectMapper();
+    om.registerModule(new CryptoModule(engine, keyRepository));
+
+    CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
+    Foo foo = new Foo();
+    foo.name = new CryptoContainer<>("Peter", id);
+    String json = om.writeValueAsString(foo);
+
+    // deserialize with random IV
+    Foo foo2 = om.readValue(json, Foo.class);
+    assertEquals(foo.bar, foo2.bar);
+    assertEquals(foo.name.get(), foo2.name.get());
+
+    // remove IV from json
+    JsonNode tree = om.readTree(json);
+    ObjectNode on = (ObjectNode) tree.get("name");
+    on.remove("iv");
+
+    // must fail due to unmatching IV
+    Foo fooWithoutIV = om.readValue(tree.toString(), Foo.class);
+    assertFalse(fooWithoutIV.name.isPresent()); // disappeared due to decryption failure
+  }
+
+  @SneakyThrows
+  @Test
+  void testDownwardsCompatibility() {
+    CryptoEngine engine = new JDKCryptoEngine("mysecret", false);
+    keyRepository = new InMemCryptoKeyRepository(engine);
+    om = new ObjectMapper();
+    om.registerModule(new CryptoModule(engine, keyRepository));
+
+    CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
+
+    Foo foo = new Foo();
+    foo.name = new CryptoContainer<>("Peter", id);
+
+    String json = om.writeValueAsString(foo);
+
+    Foo foo2 = om.readValue(json, Foo.class);
+    assertEquals(foo.bar, foo2.bar);
+    assertEquals(foo.name.get(), foo2.name.get());
+
+    // remove IV from json
+    JsonNode tree = om.readTree(json);
+    ObjectNode on = (ObjectNode) tree.get("name");
+    on.remove("iv");
+
+    // should fall back to configured IV
+    Foo foo3 = om.readValue(tree.toString(), Foo.class);
+    assertEquals(foo.bar, foo3.bar);
+    assertEquals(foo.name.get(), foo3.name.get());
   }
 
   @Test
   void testHappyPath() throws Exception {
     // arrange
-
     CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
 
     // act
@@ -46,9 +151,6 @@ public class RoundtripTest {
     foo.name = new CryptoContainer<>("Peter", id);
 
     String json = om.writeValueAsString(foo);
-
-    // remove
-    System.out.println("serialized to json: " + json);
 
     Foo foo2 = om.readValue(json, Foo.class);
 
@@ -60,7 +162,6 @@ public class RoundtripTest {
     Bar b = new Bar();
     b.pair = new CryptoContainer<>(new Pair<>("hubba", 77), id);
     json = om.writeValueAsString(b);
-    System.out.println(json);
     Bar b2 = om.readValue(json, Bar.class);
 
     assertEquals(b.pair.get(), b2.pair.get());
@@ -69,7 +170,6 @@ public class RoundtripTest {
     baz.name = new CryptoContainer<>("Peter", id);
     baz.pair = new CryptoContainer<>(new Pair<>("hubba", 77), id);
     json = om.writeValueAsString(baz);
-    System.out.println(json);
     Baz baz2 = om.readValue(json, Baz.class);
 
     assertEquals(baz.name.get(), baz2.name.get());
@@ -77,13 +177,46 @@ public class RoundtripTest {
 
     CryptoContainer<String> c = new CryptoContainer<>("hubbi", id);
     json = om.writeValueAsString(c);
-    System.out.println(json);
     // if we need to deserialize a container without a surrounding bean (so without
     // type info), we need to pass a type-reference
     CryptoContainer<String> c2 =
         om.readValue(json, new TypeReference<CryptoContainer<String>>() {});
     assertEquals(String.class, c2.get().getClass());
     assertEquals("hubbi", c2.get());
+  }
+
+  @Test
+  void testHappyPathLegacy() throws Exception {
+    // arrange
+    CryptoSubjectId id =
+        CryptoSubjectId.of(UUID.fromString("a1f6280b-eddf-454d-a2d1-15ed4c716e8e"));
+    CryptoKey k = CryptoKey.fromBase64("Mniow0ZBV2TEAUsoxH/hT+2e4yetncAjnpNCAHEbR+c=");
+    keyRepository.keys.put(id, k);
+
+    // act
+    Foo fooNew = new Foo();
+    fooNew.name = new CryptoContainer<>("Peter", id);
+    String jsonNew = om.writeValueAsString(fooNew);
+    // reload
+    fooNew = om.readValue(jsonNew, Foo.class);
+
+    // serialised with default iv
+    String jsonLegacy =
+        "{\"bar\":7,\"name\":{\"algo\":\"AES\",\"ksize\":256,\"id\":\"a1f6280b-eddf-454d-a2d1-15ed4c716e8e\",\"enc\":\"SylOMKTrag8qCH84xVhfqQ==\"}}";
+
+    Foo fooLegacy = om.readValue(jsonLegacy, Foo.class);
+
+    // not set on this old instance
+    assertNull(fooLegacy.getName().getInitializationVector());
+
+    // after encryption, iv must be set
+    assertTrue(jsonNew.contains("\"iv\""));
+    // and must be included in the container
+    assertNotNull(fooNew.getName().getInitializationVector());
+
+    String fooName = fooNew.name.get();
+    String foo2Name = fooLegacy.name.get();
+    assertEquals(fooName, foo2Name);
   }
 
   @Test

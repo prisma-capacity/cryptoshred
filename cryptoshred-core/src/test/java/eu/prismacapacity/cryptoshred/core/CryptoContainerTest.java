@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 PRISMA European Capacity Platform GmbH
+ * Copyright © 2021-2026 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,13 +43,24 @@ class CryptoContainerTest {
 
   CryptoContainer<Integer> withoutMetrics() {
     return CryptoContainer.fromDeserialization(
-        Integer.class, algo, size, subjectId, new byte[32], engine, keyRepo, null, mapper);
+        Integer.class,
+        algo,
+        size,
+        subjectId,
+        new byte[32],
+        new byte[16],
+        engine,
+        keyRepo,
+        null,
+        mapper);
   }
 
   @Nested
   class WhenDecrypting {
 
+    @Nested
     class DecryptionTest {
+
       @Test
       void ignoresNullMetrics() {
         // must not throw NPE
@@ -63,7 +74,7 @@ class CryptoContainerTest {
       void setup() {
         when(keyRepo.findKeyFor(any(), any(), any()))
             .thenReturn(Optional.of(mock(CryptoKey.class)));
-        when(engine.decrypt(any(), any(), any())).thenThrow(IllegalStateException.class);
+        when(engine.decrypt(any(), any(), any(), any())).thenThrow(IllegalStateException.class);
       }
     }
 
@@ -73,7 +84,7 @@ class CryptoContainerTest {
       void setup() {
         when(keyRepo.findKeyFor(any(), any(), any()))
             .thenReturn(Optional.of(mock(CryptoKey.class)));
-        when(engine.decrypt(any(), any(), any())).thenReturn(new byte[32]);
+        when(engine.decrypt(any(), any(), any(), any())).thenReturn(new byte[32]);
         when(mapper.readerFor(any(Class.class))).thenReturn(mock(ObjectReader.class));
       }
     }

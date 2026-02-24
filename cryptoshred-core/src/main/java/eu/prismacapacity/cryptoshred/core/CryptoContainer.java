@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2026 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
 import java.util.Optional;
+import javax.crypto.spec.IvParameterSpec;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -52,6 +53,7 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
       CryptoKeySize size,
       CryptoSubjectId id,
       byte[] encrypted,
+      byte[] iv,
       CryptoEngine engine,
       CryptoKeyRepository keyRepo,
       CryptoMetrics metrics,
@@ -66,6 +68,7 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
     this.metrics = metrics;
     this.mapper = om;
     this.encryptedBytes = encrypted;
+    this.initializationVector = iv == null ? null : new IvParameterSpec(iv);
   }
 
   // set only on deserialization
@@ -80,12 +83,13 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
       CryptoKeySize keySize,
       CryptoSubjectId subjectId,
       byte[] encrypted,
+      byte[] iv,
       CryptoEngine engine,
       CryptoKeyRepository keyRepo,
       CryptoMetrics metrics,
       ObjectMapper om) {
     return new CryptoContainer<T>(
-        targetType, algorithm, keySize, subjectId, encrypted, engine, keyRepo, metrics, om);
+        targetType, algorithm, keySize, subjectId, encrypted, iv, engine, keyRepo, metrics, om);
   }
 
   @Getter private Class<?> type;
@@ -99,6 +103,14 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
   // the encrypted value
   @Getter(value = AccessLevel.PACKAGE)
   private byte[] encryptedBytes;
+
+  /**
+   * Will be set when encrypting.
+   *
+   * <p>For backward-compatibility - if it does not exist, the engine will use the default iv.
+   */
+  @Getter(value = AccessLevel.PACKAGE)
+  private IvParameterSpec initializationVector = null;
 
   // set after decryption or before encryption for short circuit retrieval
   private transient Optional<T> cachedValue;
@@ -119,7 +131,7 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
       if (key.isPresent()) {
 
         try {
-          byte[] decrypted = engine.decrypt(getAlgo(), key.get(), bytes);
+          byte[] decrypted = engine.decrypt(getAlgo(), key.get(), bytes, initializationVector);
           T t = mapper.readerFor(getType()).readValue(decrypted);
           if (metrics != null) metrics.notifyDecryptionSuccess();
           return t;
@@ -139,9 +151,11 @@ public class CryptoContainer<T> extends OptionalBehavior<T> {
 
   @SneakyThrows
   protected void encrypt(CryptoKeyRepository keyRepository, CryptoEngine engine, ObjectMapper om) {
+
+    this.initializationVector = engine.getInitVectorForEncryption();
+
     CryptoKey key = keyRepository.getOrCreateKeyFor(subjectId, algo, size);
-    byte[] bytes;
-    bytes = om.writeValueAsBytes(value());
-    this.encryptedBytes = engine.encrypt(bytes, algo, key);
+    byte[] bytes = om.writeValueAsBytes(value());
+    this.encryptedBytes = engine.encrypt(bytes, algo, key, this.initializationVector);
   }
 }
