@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2026 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2026 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
-
-import java.util.UUID;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import java.util.UUID;
 import lombok.*;
@@ -42,111 +39,106 @@ class RoundtripTest {
     om.registerModule(new CryptoModule(engine, keyRepository));
   }
 
-
-    @SneakyThrows
-    @Test
-    void testStaticIV(){
-        CryptoEngine engine = new JDKCryptoEngine("mysecret", false);
-        keyRepository = new InMemCryptoKeyRepository(engine);
-        om = new ObjectMapper();
-        om.registerModule(new CryptoModule(engine, keyRepository));
-
-        // arrange
-        CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
-
-        // act
-        Foo foo = new Foo();
-        foo.name = new CryptoContainer<>("Peter", id);
-        String json1 = om.writeValueAsString(foo);
-        String json2 = om.writeValueAsString(foo);
-
-        assertEquals(json1,json2);
-    }
-
-
-    @SneakyThrows
+  @SneakyThrows
   @Test
-  void testRandomIV(){
-      CryptoEngine engine = new JDKCryptoEngine("mysecret", true);
-      keyRepository = new InMemCryptoKeyRepository(engine);
-      om = new ObjectMapper();
-      om.registerModule(new CryptoModule(engine, keyRepository));
+  void testStaticIV() {
+    CryptoEngine engine = new JDKCryptoEngine("mysecret", false);
+    keyRepository = new InMemCryptoKeyRepository(engine);
+    om = new ObjectMapper();
+    om.registerModule(new CryptoModule(engine, keyRepository));
 
-      // arrange
-      CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
+    // arrange
+    CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
 
-      // act
+    // act
+    Foo foo = new Foo();
+    foo.name = new CryptoContainer<>("Peter", id);
+    String json1 = om.writeValueAsString(foo);
+    String json2 = om.writeValueAsString(foo);
 
-      Foo foo = new Foo();
-      foo.name = new CryptoContainer<>("Peter", id);
-
-      String json1 = om.writeValueAsString(foo);
-      String json2 = om.writeValueAsString(foo);
-
-
-      assertNotEquals(json1,json2);
+    assertEquals(json1, json2);
   }
 
-  @SneakyThrows@Test
-  void testFailureWithRandomIVUsed(){
+  @SneakyThrows
+  @Test
+  void testRandomIV() {
+    CryptoEngine engine = new JDKCryptoEngine("mysecret", true);
+    keyRepository = new InMemCryptoKeyRepository(engine);
+    om = new ObjectMapper();
+    om.registerModule(new CryptoModule(engine, keyRepository));
 
-          CryptoEngine engine = new JDKCryptoEngine("mysecret", true);
-          keyRepository = new InMemCryptoKeyRepository(engine);
-          om = new ObjectMapper();
-          om.registerModule(new CryptoModule(engine, keyRepository));
+    // arrange
+    CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
 
-      CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
-      Foo foo = new Foo();
-      foo.name = new CryptoContainer<>("Peter", id);
-      String json = om.writeValueAsString(foo);
+    // act
 
-      // deserialize with random IV
-      Foo foo2 = om.readValue(json,Foo.class);
-      assertEquals(foo.bar,foo2.bar);
-      assertEquals(foo.name.get(),foo2.name.get());
+    Foo foo = new Foo();
+    foo.name = new CryptoContainer<>("Peter", id);
 
-      // remove IV from json
-      JsonNode tree = om.readTree(json);
-      ObjectNode on = (ObjectNode) tree.get("name");
-      on.remove("iv");
+    String json1 = om.writeValueAsString(foo);
+    String json2 = om.writeValueAsString(foo);
 
-      // must fail due to unmatching IV
-      Foo fooWithoutIV = om.readValue(tree.toString(), Foo.class);
-      assertFalse(fooWithoutIV.name.isPresent()); // disappeared due to decryption failure
-
-
-
+    assertNotEquals(json1, json2);
   }
 
-    @SneakyThrows
-    @Test
-    void testDownwardsCompatibility(){
-        CryptoEngine engine = new JDKCryptoEngine("mysecret", false);
-        keyRepository = new InMemCryptoKeyRepository(engine);
-        om = new ObjectMapper();
-        om.registerModule(new CryptoModule(engine, keyRepository));
+  @SneakyThrows
+  @Test
+  void testFailureWithRandomIVUsed() {
 
-        CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
+    CryptoEngine engine = new JDKCryptoEngine("mysecret", true);
+    keyRepository = new InMemCryptoKeyRepository(engine);
+    om = new ObjectMapper();
+    om.registerModule(new CryptoModule(engine, keyRepository));
 
-        Foo foo = new Foo();
-        foo.name = new CryptoContainer<>("Peter", id);
+    CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
+    Foo foo = new Foo();
+    foo.name = new CryptoContainer<>("Peter", id);
+    String json = om.writeValueAsString(foo);
 
-        String json = om.writeValueAsString(foo);
+    // deserialize with random IV
+    Foo foo2 = om.readValue(json, Foo.class);
+    assertEquals(foo.bar, foo2.bar);
+    assertEquals(foo.name.get(), foo2.name.get());
 
-        Foo foo2 = om.readValue(json,Foo.class);
-        assertEquals(foo.bar,foo2.bar);
-        assertEquals(foo.name.get(),foo2.name.get());
+    // remove IV from json
+    JsonNode tree = om.readTree(json);
+    ObjectNode on = (ObjectNode) tree.get("name");
+    on.remove("iv");
 
-        // remove IV from json
-        JsonNode tree = om.readTree(json);
-        ObjectNode on = (ObjectNode) tree.get("name");
-        on.remove("iv");
+    // must fail due to unmatching IV
+    Foo fooWithoutIV = om.readValue(tree.toString(), Foo.class);
+    assertFalse(fooWithoutIV.name.isPresent()); // disappeared due to decryption failure
+  }
 
-        // should fall back to configured IV
-        Foo foo3 = om.readValue(tree.toString(),Foo.class);
-        assertEquals(foo.bar,foo3.bar);
-        assertEquals(foo.name.get(),foo3.name.get());
-    }
+  @SneakyThrows
+  @Test
+  void testDownwardsCompatibility() {
+    CryptoEngine engine = new JDKCryptoEngine("mysecret", false);
+    keyRepository = new InMemCryptoKeyRepository(engine);
+    om = new ObjectMapper();
+    om.registerModule(new CryptoModule(engine, keyRepository));
+
+    CryptoSubjectId id = CryptoSubjectId.of(UUID.randomUUID());
+
+    Foo foo = new Foo();
+    foo.name = new CryptoContainer<>("Peter", id);
+
+    String json = om.writeValueAsString(foo);
+
+    Foo foo2 = om.readValue(json, Foo.class);
+    assertEquals(foo.bar, foo2.bar);
+    assertEquals(foo.name.get(), foo2.name.get());
+
+    // remove IV from json
+    JsonNode tree = om.readTree(json);
+    ObjectNode on = (ObjectNode) tree.get("name");
+    on.remove("iv");
+
+    // should fall back to configured IV
+    Foo foo3 = om.readValue(tree.toString(), Foo.class);
+    assertEquals(foo.bar, foo3.bar);
+    assertEquals(foo.name.get(), foo3.name.get());
+  }
 
   @Test
   void testHappyPath() throws Exception {

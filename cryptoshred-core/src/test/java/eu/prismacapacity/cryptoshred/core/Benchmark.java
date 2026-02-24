@@ -27,7 +27,7 @@ public class Benchmark {
   static InMemCryptoKeyRepository keyRepository;
 
   static {
-    CryptoEngine engine = new JDKCryptoEngine("mysecret",false);
+    CryptoEngine engine = new JDKCryptoEngine("mysecret", false);
     keyRepository = new InMemCryptoKeyRepository(engine);
     om = new ObjectMapper();
     om.registerModule(new CryptoModule(engine, keyRepository));

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2026 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,16 @@
  */
 package eu.prismacapacity.cryptoshred.core;
 
-import lombok.*;
-
-import javax.crypto.spec.IvParameterSpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import javax.crypto.spec.IvParameterSpec;
+import lombok.*;
 
 @RequiredArgsConstructor
 @SuppressWarnings("java:S3329")
 public final class CryptoInitializationVector {
 
-    @Getter
-  private final byte[] bytes;
+  @Getter private final byte[] bytes;
 
   public static CryptoInitializationVector of(@NonNull String initVector) {
     return new CryptoInitializationVector(toBytes(initVector));

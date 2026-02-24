@@ -37,8 +37,7 @@ public interface CryptoEngine {
       @NonNull byte[] unencypted,
       @NonNull CryptoAlgorithm algorithm,
       @NonNull CryptoKey key,
-      @NonNull IvParameterSpec initializationVector
-      );
+      @NonNull IvParameterSpec initializationVector);
 
   @NonNull
   CryptoKey generateKey(@NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size);

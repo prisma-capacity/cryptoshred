@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2026 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,21 @@ package eu.prismacapacity.cryptoshred.cloud.aws;
 
 import static org.junit.Assert.*;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.UUID;
-
-import org.junit.Assert;
-import org.junit.jupiter.api.BeforeAll;
-import org.testcontainers.containers.localstack.LocalStackContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
 import eu.prismacapacity.cryptoshred.cloud.aws.utils.TestIntegration;
 import eu.prismacapacity.cryptoshred.core.*;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.val;
+import org.junit.Assert;
+import org.junit.jupiter.api.BeforeAll;
+import org.testcontainers.containers.localstack.LocalStackContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -43,7 +41,7 @@ import software.amazon.awssdk.services.dynamodb.model.*;
 class DynamoDBCryptoKeyRepositoryIntegrationTest {
   private static String TABLE_NAME = "foo";
 
-  CryptoEngine engine = new JDKCryptoEngine("mysecret",false);
+  CryptoEngine engine = new JDKCryptoEngine("mysecret", false);
   CryptoMetrics metrics = new CryptoMetrics.NOP();
 
   @Container
