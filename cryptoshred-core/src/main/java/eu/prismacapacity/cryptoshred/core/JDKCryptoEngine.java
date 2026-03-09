@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2026 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,38 +15,28 @@
  */
 package eu.prismacapacity.cryptoshred.core;
 
-import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
-import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import eu.prismacapacity.cryptoshred.core.keys.*;
+import java.security.*;
+import java.util.*;
 import javax.crypto.*;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.spec.*;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-public class JDKCryptoEngine implements CryptoEngine {
+public class JDKCryptoEngine extends AbstractCryptoEngine {
 
-  private final Map<CryptoAlgorithm, String> exactCipherNames = createExactCipherMapping();
-
-  private static Map<CryptoAlgorithm, String> createExactCipherMapping() {
-    // initialize with known algorithms
-    HashMap<CryptoAlgorithm, String> map = new HashMap<>();
-    map.put(CryptoAlgorithm.AES_CBC, "AES/CBC/PKCS5PADDING");
-    return Collections.unmodifiableMap(map);
+  public JDKCryptoEngine(String configuredInitVectorOrNull, boolean useRandomInitVector) {
+    super(configuredInitVectorOrNull, useRandomInitVector);
   }
-
-  @NonNull private final CryptoInitializationVector initVector;
 
   @Override
   public byte[] decrypt(
-      @NonNull CryptoAlgorithm algo, @NonNull CryptoKey cryptoKey, @NonNull byte[] bytes) {
-    IvParameterSpec iv = new IvParameterSpec(initVector.getBytes());
+      @NonNull CryptoAlgorithm algo,
+      @NonNull CryptoKey cryptoKey,
+      byte @NonNull [] bytes,
+      IvParameterSpec initializationVectorOrNull) {
+
+    IvParameterSpec iv = resolveInitVectorForDecryption(initializationVectorOrNull);
+
     try {
       Cipher cipher = getCipher(algo);
       SecretKeySpec secret = new SecretKeySpec(cryptoKey.getBytes(), algo.getId());
@@ -62,13 +52,15 @@ public class JDKCryptoEngine implements CryptoEngine {
 
   @Override
   public byte[] encrypt(
-      @NonNull byte[] unencypted, @NonNull CryptoAlgorithm algorithm, @NonNull CryptoKey key) {
+      byte @NonNull [] unencypted,
+      @NonNull CryptoAlgorithm algorithm,
+      @NonNull CryptoKey key,
+      @NonNull IvParameterSpec initializationVectorForEncryption) {
 
-    IvParameterSpec iv = new IvParameterSpec(initVector.getBytes());
     try {
       Cipher cipher = getCipher(algorithm);
       SecretKeySpec secret = new SecretKeySpec(key.getBytes(), algorithm.getId());
-      cipher.init(Cipher.ENCRYPT_MODE, secret, iv);
+      cipher.init(Cipher.ENCRYPT_MODE, secret, initializationVectorForEncryption);
       return cipher.doFinal(unencypted);
     } catch (InvalidKeyException
         | InvalidAlgorithmParameterException
@@ -87,6 +79,7 @@ public class JDKCryptoEngine implements CryptoEngine {
   }
 
   @Override
+  @NonNull
   public CryptoKey generateKey(@NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size) {
     try {
       KeyGenerator kgen = KeyGenerator.getInstance(algo.getId());

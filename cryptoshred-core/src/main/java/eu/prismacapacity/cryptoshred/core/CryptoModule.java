@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2026 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.util.UUID;
 import lombok.NonNull;
 
+@SuppressWarnings({"java:S1948", "java:S1068"})
 public class CryptoModule extends SimpleModule {
 
   private final CryptoEngine engine;
@@ -65,6 +66,8 @@ public class CryptoModule extends SimpleModule {
   }
 
   private static final String JSON_KEY_ENCRYPTED_BYTES = "enc";
+
+  private static final String JSON_KEY_IV = "iv";
 
   private static final String JSON_KEY_SUBJECT_ID = "id";
 
@@ -99,12 +102,16 @@ public class CryptoModule extends SimpleModule {
       String algo = tree.get(JSON_KEY_ALGO).asText();
       byte[] encrypted = tree.get(JSON_KEY_ENCRYPTED_BYTES).binaryValue();
 
+      JsonNode jsonNode = tree.get(JSON_KEY_IV);
+      byte[] iv = jsonNode == null ? null : jsonNode.binaryValue();
+
       return CryptoContainer.fromDeserialization(
           targetType,
           CryptoAlgorithm.of(algo),
           CryptoKeySize.of(keySize),
           CryptoSubjectId.of(UUID.fromString(subjectId)),
           encrypted,
+          iv,
           engine,
           keyRepo,
           metrics,
@@ -132,6 +139,7 @@ public class CryptoModule extends SimpleModule {
       jgen.writeNumberField(JSON_KEY_KEY_SIZE, value.getSize().asInt());
       jgen.writeStringField(JSON_KEY_SUBJECT_ID, value.getSubjectId().getId().toString());
       jgen.writeBinaryField(JSON_KEY_ENCRYPTED_BYTES, value.getEncryptedBytes());
+      jgen.writeBinaryField(JSON_KEY_IV, value.getInitializationVector().getIV());
       jgen.writeEndObject();
     }
   }

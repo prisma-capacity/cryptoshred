@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2026 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,14 +47,10 @@ public class CryptoShredConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  public CryptoEngine cryptoEngine(@Value("${cryptoshred.initVector:#{null}}") String initVector) {
-    // then we'll need an initVector
-    if (initVector == null || initVector.length() < 1) {
-      throw new CryptoPropertyMissingException(
-          "cryptoshred.initVector (non-empty String) is required unless you define a"
-              + " CryptoEngine.");
-    }
-    return new JDKCryptoEngine(CryptoInitializationVector.of(initVector));
+  public CryptoEngine cryptoEngine(
+      @Value("${cryptoshred.initVector:#{null}}") String initVectorOrNull,
+      @Value("${cryptoshred.useRandomInitVector:#{false}}") boolean useRandomInitVector) {
+    return new JDKCryptoEngine(initVectorOrNull, useRandomInitVector);
   }
 
   @Bean

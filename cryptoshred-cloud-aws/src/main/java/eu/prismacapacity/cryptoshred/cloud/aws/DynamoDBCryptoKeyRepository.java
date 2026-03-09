@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2023 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2026 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package eu.prismacapacity.cryptoshred.cloud.aws;
 
-import java.util.Optional;
-
 import eu.prismacapacity.cryptoshred.core.CryptoAlgorithm;
 import eu.prismacapacity.cryptoshred.core.CryptoEngine;
 import eu.prismacapacity.cryptoshred.core.CryptoSubjectId;
@@ -25,6 +23,7 @@ import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyNotFoundAfterCreatingExc
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
 import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
+import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -48,7 +47,7 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
   @NonNull private final String tableName;
 
   @Override
-  public Optional<CryptoKey> findKeyFor(
+  public @NonNull Optional<CryptoKey> findKeyFor(
       @NonNull CryptoSubjectId subjectId,
       @NonNull CryptoAlgorithm algorithm,
       @NonNull CryptoKeySize size) {
@@ -66,7 +65,7 @@ public class DynamoDBCryptoKeyRepository implements CryptoKeyRepository {
   }
 
   @Override
-  public CryptoKey getOrCreateKeyFor(
+  public @NonNull CryptoKey getOrCreateKeyFor(
       @NonNull CryptoSubjectId subjectId,
       @NonNull CryptoAlgorithm algorithm,
       @NonNull CryptoKeySize size)

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2026 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @EqualsAndHashCode
 public class CryptoKey {
   @Getter @NonNull private final String base64;
-  @Getter @NonNull private final byte[] bytes;
+  @Getter private final byte @NonNull [] bytes;
 
   public static CryptoKey fromBase64(@NonNull String base64encoded) {
     return new CryptoKey(base64encoded, Base64.getDecoder().decode(base64encoded));
