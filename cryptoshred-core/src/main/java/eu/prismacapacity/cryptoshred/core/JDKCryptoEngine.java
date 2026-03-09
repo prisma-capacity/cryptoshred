@@ -22,36 +22,11 @@ import javax.crypto.*;
 import javax.crypto.spec.*;
 import lombok.NonNull;
 
-public class JDKCryptoEngine implements CryptoEngine {
-
-  private static final SecureRandom RANDOM = new SecureRandom();
-
-  private final Map<CryptoAlgorithm, String> exactCipherNames = createExactCipherMapping();
+public class JDKCryptoEngine extends AbstractCryptoEngine {
 
   public JDKCryptoEngine(String configuredInitVectorOrNull, boolean useRandomInitVector) {
-
-    if (!useRandomInitVector && null == configuredInitVectorOrNull) {
-      throw new IllegalArgumentException("No init vector configured, and useRandomInitVector is false.");
-    }
-
-    this.useRandomInitVector = useRandomInitVector;
-
-    if (configuredInitVectorOrNull == null) {
-      this.configuredInitVector = null;
-    } else this.configuredInitVector = CryptoInitializationVector.of(configuredInitVectorOrNull);
-
+    super(configuredInitVectorOrNull, useRandomInitVector);
   }
-
-  private static Map<CryptoAlgorithm, String> createExactCipherMapping() {
-    // initialize with known algorithms
-    HashMap<CryptoAlgorithm, String> map = new HashMap<>();
-    map.put(CryptoAlgorithm.AES_CBC, "AES/CBC/PKCS5PADDING");
-    return Collections.unmodifiableMap(map);
-  }
-
-  private final CryptoInitializationVector configuredInitVector;
-
-  private final boolean useRandomInitVector;
 
   @Override
   public byte[] decrypt(
@@ -75,20 +50,6 @@ public class JDKCryptoEngine implements CryptoEngine {
     }
   }
 
-  @NonNull
-  public IvParameterSpec resolveInitVectorForDecryption(
-      IvParameterSpec initializationVectorProvidedOrNull) {
-
-    if (initializationVectorProvidedOrNull != null) {
-      return initializationVectorProvidedOrNull;
-    } else {
-      // no IV stored with the container, so we use the configured one
-      if (configuredInitVector == null)
-        throw new IllegalStateException(
-            "No init vector configured, and none stored with the container.");
-      else return configuredInitVector.getIvParameterSpec();
-    }
-  }
 
   @Override
   public byte[] encrypt(
@@ -131,15 +92,4 @@ public class JDKCryptoEngine implements CryptoEngine {
     }
   }
 
-  @Override
-  public @NonNull IvParameterSpec getInitVectorForEncryption() {
-
-    if (useRandomInitVector) {
-      byte[] iv = new byte[16];
-      RANDOM.nextBytes(iv);
-      return new IvParameterSpec(iv);
-    }else
-        // guaranteed by constructor check
-    return configuredInitVector.getIvParameterSpec();
-  }
 }

@@ -34,7 +34,7 @@ import eu.prismacapacity.cryptoshred.core.metrics.CryptoMetrics;
 import java.io.IOException;
 import java.util.UUID;
 import lombok.NonNull;
-
+@SuppressWarnings({"java:S1948", "java:S1068"})
 public class CryptoModule extends SimpleModule {
 
   private final CryptoEngine engine;
