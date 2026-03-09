@@ -41,5 +41,6 @@ public interface CryptoEngine {
 
   @NonNull
   CryptoKey generateKey(@NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size);
+
   IvParameterSpec getInitVectorForEncryption();
 }
