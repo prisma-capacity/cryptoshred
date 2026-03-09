@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2026 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,10 @@ import eu.prismacapacity.cryptoshred.core.keys.CryptoKey;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyNotFoundAfterCreatingException;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeyRepository;
 import eu.prismacapacity.cryptoshred.core.keys.CryptoKeySize;
-import lombok.NonNull;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import lombok.NonNull;
 
 public class InMemCryptoKeyRepository implements CryptoKeyRepository {
 
@@ -36,13 +35,17 @@ public class InMemCryptoKeyRepository implements CryptoKeyRepository {
 
   @Override
   public synchronized @NonNull Optional<CryptoKey> findKeyFor(
-          @NonNull CryptoSubjectId subjectId, @NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size) {
+      @NonNull CryptoSubjectId subjectId,
+      @NonNull CryptoAlgorithm algo,
+      @NonNull CryptoKeySize size) {
     return Optional.ofNullable(keys.get(subjectId));
   }
 
   @Override
   public synchronized @NonNull CryptoKey getOrCreateKeyFor(
-          @NonNull CryptoSubjectId subjectId, @NonNull CryptoAlgorithm algo, @NonNull CryptoKeySize size)
+      @NonNull CryptoSubjectId subjectId,
+      @NonNull CryptoAlgorithm algo,
+      @NonNull CryptoKeySize size)
       throws CryptoKeyNotFoundAfterCreatingException {
     Optional<CryptoKey> existingKey = findKeyFor(subjectId, algo, size);
     return existingKey.orElseGet(
