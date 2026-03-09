@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020-2026 PRISMA European Capacity Platform GmbH
+ * Copyright © 2020-2026 PRISMA European Capacity Platform GmbH 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,8 @@ public class JDKCryptoEngine implements CryptoEngine {
   public JDKCryptoEngine(String configuredInitVectorOrNull, boolean useRandomInitVector) {
 
     if (!useRandomInitVector && null == configuredInitVectorOrNull) {
-      throw new IllegalArgumentException("No init vector configured, and useRandomInitVector is false.");
+      throw new IllegalArgumentException(
+          "No init vector configured, and useRandomInitVector is false.");
     }
 
     this.useRandomInitVector = useRandomInitVector;
@@ -39,7 +40,6 @@ public class JDKCryptoEngine implements CryptoEngine {
     if (configuredInitVectorOrNull == null) {
       this.configuredInitVector = null;
     } else this.configuredInitVector = CryptoInitializationVector.of(configuredInitVectorOrNull);
-
   }
 
   private static Map<CryptoAlgorithm, String> createExactCipherMapping() {
@@ -138,8 +138,8 @@ public class JDKCryptoEngine implements CryptoEngine {
       byte[] iv = new byte[16];
       RANDOM.nextBytes(iv);
       return new IvParameterSpec(iv);
-    }else
-        // guaranteed by constructor check
-    return configuredInitVector.getIvParameterSpec();
+    } else
+      // guaranteed by constructor check
+      return configuredInitVector.getIvParameterSpec();
   }
 }
