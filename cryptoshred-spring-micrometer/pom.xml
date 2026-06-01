@@ -12,6 +12,7 @@
   </parent>
 
   <artifactId>cryptoshred-spring-micrometer</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencyManagement>
     <dependencies>

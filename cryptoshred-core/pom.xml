@@ -12,6 +12,7 @@
   </parent>
 
   <artifactId>cryptoshred-core</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>

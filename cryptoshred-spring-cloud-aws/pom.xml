@@ -12,6 +12,7 @@
   </parent>
 
   <artifactId>cryptoshred-spring-cloud-aws</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencyManagement>
     <dependencies>
