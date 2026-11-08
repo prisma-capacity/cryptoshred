@@ -7,14 +7,12 @@
   <parent>
     <groupId>eu.prismacapacity</groupId>
     <artifactId>cryptoshred</artifactId>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>3.0.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>cryptoshred-spring-boot-autoconfiguration</artifactId>
-  <properties>
-    <spring-boot.version>3.5.8</spring-boot.version>
-  </properties>
+  <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencyManagement>
     <dependencies>
