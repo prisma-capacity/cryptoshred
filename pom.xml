@@ -6,7 +6,7 @@
   <parent>
     <groupId>eu.prismacapacity</groupId>
     <artifactId>basepom-oss</artifactId>
-    <version>0.2.19</version>
+    <version>0.2.22</version>
   </parent>
   <artifactId>cryptoshred</artifactId>
   <version>3.0.1-SNAPSHOT</version>
