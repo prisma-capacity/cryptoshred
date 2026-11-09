@@ -65,6 +65,9 @@ workflow(
 
     run(
       name = "Build with Maven",
+      env = mapOf(
+        "NVD_API_KEY" to "\${{ secrets.NVD_API_KEY }}"
+      ),
       command = "./mvnw -B clean install",
     )
   }
