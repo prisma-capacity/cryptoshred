@@ -32,4 +32,6 @@ jobs:
         distribution: 'corretto'
     - id: 'step-3'
       name: 'Build with Maven'
+      env:
+        NVD_API_KEY: '${{ secrets.NVD_API_KEY }}'
       run: './mvnw -B clean install'
