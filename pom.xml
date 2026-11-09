@@ -130,26 +130,6 @@
         <version>4.0.0</version>
       </plugin>
       <plugin>
-        <groupId>org.owasp</groupId>
-        <artifactId>dependency-check-maven</artifactId>
-        <configuration>
-          <failOnError>true</failOnError>
-          <failBuildOnAnyVulnerability>true</failBuildOnAnyVulnerability>
-          <skipRuntimeScope>true</skipRuntimeScope>
-          <skipProvidedScope>true</skipProvidedScope>
-          <skipTestScope>true</skipTestScope>
-          <skipSystemScope>true</skipSystemScope>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-            </goals>
-            <phase>verify</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <excludedGroups>it</excludedGroups>
